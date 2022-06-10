@@ -10,4 +10,6 @@ steps:
   - config_git
   - run:
       name: Cloning dafiti-group/<<parameters.gitops>> repository
-      command: git clone https://${GITHUB_ACCESS_TOKEN}@github.com/dafiti-group/<<parameters.gitops>>.git
+      environment:
+        GITOPS_REPOSITORY: <<parameters.gitops>>
+      command: <<include(scripts/clone-gitops.sh)>>

@@ -6,7 +6,5 @@ description: >
 steps:
   - run:
       name: config git to use GITHUB_ACCESS_TOKEN
-      command: |
-        git config --global url."https://${GITHUB_ACCESS_TOKEN}@github.com/".insteadOf "git@github.com:"
-        git config --global user.email "${GITHUB_USER_NAME}"
-        git config --global user.name "${GITHUB_USER_EMAIL}"
+      command: <<include(scripts/config-git.sh)>>
+

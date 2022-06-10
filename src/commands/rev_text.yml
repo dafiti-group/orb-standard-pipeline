@@ -6,4 +6,6 @@ parameters:
 steps:
   - run:
       name: Generate rev.txt
-      command: git show -s --format="%ai %H %s %aN" HEAD > <<parameters.app_path>>
+      environment:
+        REV_TXT_FILE: <<parameters.app_path>>
+      command: <<include(scripts/rev-txt.sh)>>
