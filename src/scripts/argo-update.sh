@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ${PARAMETER_ARGO_PATH} || exit 1
-IMAGE="tag: \"$(echo ${CIRCLE_SHA1:0:7})\""
+IMAGE="tag: \"${CIRCLE_SHA1:0:7}\""
 if [ "${PARAMETER_ROLLBACK}" = true ]; then
   IMAGE='tag: "${PARAMETER_VERSION}"'
 fi
