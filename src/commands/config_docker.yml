@@ -1,0 +1,5 @@
+description: Used to setup all dockers with same configurations
+steps:
+  - setup_remote_docker:
+      docker_layer_caching: false
+      version: 20.10.14

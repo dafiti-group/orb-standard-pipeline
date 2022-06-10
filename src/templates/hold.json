@@ -1,0 +1,34 @@
+{
+  "attachments": [
+    {
+      "color": "#0000FF",
+      "blocks": [
+        {
+          "type": "header",
+          "text": {
+            "type": "plain_text",
+            "text": ":hand:\tON HOLD - Awaiting Approval",
+            "emoji": true
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*${CIRCLE_PROJECT_REPONAME}*:`${CIRCLE_BRANCH}` *_<<parameters.step_name>>_* ${SLACK_PARAM_MENTIONS}"
+          },
+          "accessory": {
+            "type": "button",
+            "text": {
+              "type": "plain_text",
+              "text": ":circleci: CircleCI",
+              "emoji": true
+            },
+            "style": "primary",
+            "url": "${CIRCLE_BUILD_URL}"
+          }
+        }
+      ]
+    }
+  ]
+}

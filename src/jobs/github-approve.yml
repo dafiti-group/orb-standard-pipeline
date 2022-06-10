@@ -1,0 +1,13 @@
+description: >
+  Used to force update into all open branches
+  Put a review with request pending alert into all open PRs
+  Needs a context with GITHUB_ACCESS_TOKEN
+executor: small
+steps:
+  - checkout
+  - config_git
+  - github-cli/setup:
+      token: GITHUB_ACCESS_TOKEN
+  - run:
+      name: Check if this repo has open PRs
+      command: <<include(scripts/github-approve-prs.sh)>>

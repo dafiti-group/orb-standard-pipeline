@@ -1,0 +1,6 @@
+description: This job will be the new checkmarx context.
+executor: small
+steps:
+  - run:
+      name: executing checkmarx
+      command: echo "OK"

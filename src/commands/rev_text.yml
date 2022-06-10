@@ -1,0 +1,9 @@
+parameters:
+  app_path:
+    type: string
+    default: "public/rev.txt"
+    description: The path where the file rev.txt will be placed berofe build
+steps:
+  - run:
+      name: Generate rev.txt
+      command: git show -s --format="%ai %H %s %aN" HEAD > <<parameters.app_path>>

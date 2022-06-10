@@ -1,0 +1,13 @@
+description: >
+  Used to clone the GitOps repo to change image tag into k8s deployment.
+  Needs context with GITHUB_ACCESS_TOKEN with a personal access token into it
+parameters:
+  gitops:
+    type: string
+    default: argo
+    description: The name of the repo used to gitOps operations
+steps:
+  - config_git
+  - run:
+      name: Cloning dafiti-group/<<parameters.gitops>> repository
+      command: git clone https://${GITHUB_ACCESS_TOKEN}@github.com/dafiti-group/<<parameters.gitops>>.git

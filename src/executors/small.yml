@@ -1,0 +1,4 @@
+description: A small instance to run slack notifications
+docker:
+  - image: cimg/base:stable
+resource_class: small

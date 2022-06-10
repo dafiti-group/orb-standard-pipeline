@@ -1,0 +1,25 @@
+description: >
+  Use the default layer of your `docker-compose.yml` file to run ci layer as
+  `docker-compose run --rm ci` to run all needed tests.
+
+parameters:
+  build_args:
+    type: string
+    default: ""
+    description: >
+      Used to pass aditional docker build args like: `--build-arg GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}`
+
+executor: default
+
+steps:
+  - checkout
+  - config_docker
+  - run:
+      name: default workarround to fix docker-dafiti_default_network issue
+      command: docker network create docker-dafiti_default || true
+  - run:
+      name: Build ci image test
+      command: docker-compose build <<parameters.build_args>> ci
+  - run:
+      name: Run unit tests
+      command: docker-compose run --rm ci

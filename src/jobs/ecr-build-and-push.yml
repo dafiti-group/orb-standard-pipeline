@@ -1,0 +1,25 @@
+executor: default
+parameters:
+  app_path:
+    type: string
+    default: public/rev.txt
+    description: The place to create/update rev.txt file content
+  extra_build_args:
+    type: string
+    default: ""
+    description: Extra docker build image parameters
+  build_tag:
+    type: string
+    default: "$(echo ${CIRCLE_SHA1:0:7}),latest"
+    description: The artifact tag name or names comma separated
+steps:
+  - checkout
+  - config_docker
+  - aws-ecr/ecr-login
+  - rev_text:
+      app_path: <<parameters.app_path>>
+  - aws-ecr/build-and-push-image:
+      checkout: false
+      repo: ${CIRCLE_PROJECT_REPONAME}
+      tag: <<parameters.build_tag>>
+      extra-build-args: <<parameters.extra_build_args>>
