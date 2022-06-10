@@ -1,11 +1,11 @@
 #!/bin/bash
 
-cd ${PARAMETER_ARGO_PATH}
+cd ${PARAMETER_ARGO_PATH} || exit 1
 IMAGE="tag: \"$(echo ${CIRCLE_SHA1:0:7})\""
 if [ "${PARAMETER_ROLLBACK}" = true ]; then
   IMAGE='tag: "${PARAMETER_VERSION}"'
 fi
-CONFIG_FILE=$(echo "${CIRCLE_PROJECT_REPONAME}.yaml")
+CONFIG_FILE="${CIRCLE_PROJECT_REPONAME}.yaml"
 sed -Ei "s|tag: \"[a-z0-9]+\"|${IMAGE}|" ${CONFIG_FILE}
 if [[ $(git diff) ]]; then
   git diff
