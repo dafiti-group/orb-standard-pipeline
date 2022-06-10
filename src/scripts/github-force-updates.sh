@@ -11,7 +11,7 @@ if [[ $(gh pr list) ]]; then
 else
   echo "Noting to do, No PR found, done!"
 fi
-MY_CUSTOM_CONDITION=`git branch -a | grep -E "release.*|hotfix.*"`
+MY_CUSTOM_CONDITION=$(git branch -a | grep -E "release.*|hotfix.*")
 if [[ $MY_CUSTOM_CONDITION ]]; then
   git branch -a | grep -Eo "release.*|hotfix.*" | while read -r line; do
     git checkout $line
