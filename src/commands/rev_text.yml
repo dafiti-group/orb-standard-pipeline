@@ -1,3 +1,5 @@
+description: >
+  Used to create a file with git show content to track build history
 parameters:
   app_path:
     type: string
