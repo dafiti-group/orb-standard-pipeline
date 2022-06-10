@@ -8,16 +8,20 @@ parameters:
   target:
     type: string
     description: the target promote name to display in commit message
-  start_folder:
+  gitops:
     type: string
     default: argo
-    description: The path to navigate to, to start scripting
+    description: The repo name to clone deployments to change image tags
 executor: default
 steps:
   - config_git
-  - clone_gitops
+  - clone_gitops:
+      gitops: <<parameters.gitops>>
   - run:
       name: Promote image from <<parameters.origin>> to <<parameters.destiny>>
       environment:
-        PARAMETER_START_FOLDER: <<parameters.start_folder>>
+        PARAMETER_START_FOLDER: <<parameters.gitops>>
       command: <<include(scripts/promote.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

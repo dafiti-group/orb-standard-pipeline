@@ -1,3 +1,11 @@
+description: >
+  Job to create your application AWS ECR artifact and push docker images to it
+  Needs context with:
+    - GITHUB_ACCESS_TOKEN
+    - AWS_ACCESS_KEY_ID
+    - AWS_DEFAULT_REGION
+    - AWS_SECRET_ACCESS_KEY
+    - AWS_ECR_REGISTRY_ID
 executor: default
 parameters:
   app_path:
@@ -20,6 +28,10 @@ steps:
       app_path: <<parameters.app_path>>
   - aws-ecr/build-and-push-image:
       checkout: false
+      create-repo: true
       repo: ${CIRCLE_PROJECT_REPONAME}
       tag: <<parameters.build_tag>>
       extra-build-args: <<parameters.extra_build_args>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

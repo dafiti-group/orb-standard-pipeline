@@ -19,3 +19,6 @@ steps:
             {"name": "<< parameters.service_name >>"}
           ]
         }
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

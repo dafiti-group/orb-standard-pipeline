@@ -1,13 +1,154 @@
-description: >
-  Sample example description.
-# Provide a use-case based example for using this orb.
-# Everything in the `usage` section will be displayed in the orb registry.
-# Comments are not retained.
+description: Example using new branch strategy
 usage:
   version: 2.1
+  environment:
+    # setup all mentions use
+    SLACK_PARAM_MENTIONS: "@techowners" # more in https://github.dev/CircleCI-Public/slack-orb/blob/2d3359453a65b3ed3d8f22a5ffebe3a5bfd5a0fd/src/commands/notify.yml#L48
+  # pipeline parameters to enhance the experience clicking on the button run pipeline manually to change behavior
+  parameters:
+    rollback:
+      type: boolean
+      default: false
+      description: Arbitraty parameter to trigger manually this workflow selecting rollback actions
+    version:
+      type: string
+      default: ""
+      description: The commit hash to revert deployment
+  # including dft org
   orbs:
-    <orb-name>: <namespace>/<orb-name>@1.2.3
+    dft: dafiti-group/orb-standard-pipeline@1.0.0
+  # reserved filters anchors
+  default_filters: &default_filters
+    branches:
+      only: [/^feature.*/, /^hotfix.*/]
+  head_filters: &head_filters
+    branches:
+      only: [master, main]
+  release_filters: &release_filters
+    branches:
+      only: [/^feature.*/]
+  hotfix_filters: &hotfix_filters
+    branches:
+      only: [/^hotfix.*/]
+  # declaring your workflows
   workflows:
-    use-my-orb:
+    rollback-flow:
+      when:
+        or:
+          - equal: [true, <<pipeline.parameters.rollback>>]
       jobs:
-        - <orb-name>/<job-name>
+        - dft/eks-deploy:
+            name: rollback-live
+            context: DEPLOY_LIVE
+            rollback: <<pipeline.parameters.rollback>>
+            version: <<pipeline.parameters.rollback>>
+    security-flow:
+      when:
+        or:
+          - equal: [false, <<pipeline.parameters.rollback>>]
+      jobs:
+        - dft/checkmarx:
+            name: checkmarx
+            context: CHECKMARX_CLOUD
+            filters: *head_filters
+    deployment-flow:
+      when:
+        or:
+          - equal: [false, <<pipeline.parameters.rollback>>]
+      jobs:
+        # features & hotfix =============================================================================================
+        - dft/unit-test:
+            name: unit-test
+            context: BUILD_AND_DEPLOY
+            filters: *default_filters
+        - dft/sonarqube:
+            name: sonarqube
+            context: SONAR
+            filters: *default_filters
+        # ===============================================================================================================
+        # releases & hotfixes ===========================================================================================
+        - dft/hold-slack:
+            name: slack-on-hold-start
+            step_name: ":alert: start pipeline to generate aws ecr registry"
+            context: SLACK
+            filters: *default_filters
+        - approval:
+            name: start-to-qa
+            type: approval
+            filters: *release_filters
+        - approval:
+            name: approve-to-qa
+            type: approval
+            filters: *hotfix_filters
+            requires: [unit-test, sonarqube]
+        - dft/ecr-build-and-push:
+            name: ecr-build-and-push
+            context: BUILD_AND_DEPLOY
+            filters: *default_filters
+            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+        - dft/eks-deploy:
+            name: deploy-to-qa
+            argo_path: tmp/clusters/qa
+            target_env: qa
+            context: DEPLOY
+            requires: [approve-to-qa, ecr-build-and-push]
+        - dft/instana-notify:
+            name: feedback-instana-qa
+            context: [INSTANA, DEPLOY_QA]
+            requires: [deploy-to-qa]
+            service_name: "${CIRCLE_PROJECT_REPONAME}-qa.br.dafiti.local"
+        # new cluster actions =========================================================================================
+        - dft/hold-slack:
+            name: slack-notify-staging
+            step_name: ":alert: STAGIN needs action to deploy"
+            context: SLACK
+        - approval:
+            name: approve-to-staging
+            type: approval
+            requires: [deploy-to-qa]
+        - dft/eks-deploy:
+            name: promote-qa-to-staging
+            argo_path: tmp/clusters/staging
+            target_env: staging
+            context: DEPLOY
+            requires: [approve-to-staging]
+        - dft/instana-notify:
+            name: feedback-instana-staging
+            context: [INSTANA, DEPLOY_STAGING]
+            requires: [promote-qa-to-staging]
+            service_name: "${CIRCLE_PROJECT_REPONAME}-staging.br.dafiti.local"
+        # =============================================================================================================
+        # github action to approve this release/hotfix PR to proceed
+        - dft/github-approve:
+            name: dft-deploy-approve-pr
+            context: DEPLOY
+            # if your application does not have staging cluster, change requires to deploy-to-qa
+            requires: [promote-qa-to-staging]
+        # ===============================================================================================================
+        # master & live delivery ========================================================================================
+        - dft/github-update:
+            name: review-open-pr-to-force-update
+            context: DEPLOY
+            filters: *head_filters
+        - dft/hold-slack:
+            name: slack-notify-staging
+            step_name: ":alert: production needs action to deploy"
+            context: SLACK
+            filters: *head_filters
+        - approval:
+            type: approval
+            name: approve-deploy-live
+            filters: *head_filters
+        - dft/eks-promote:
+            name: promote-homolog-to-live
+            origin: clusters/staging
+            destiny: clusters/live
+            target: live
+            context: DEPLOY
+            requires: [approve-deploy-live, review-open-pr-to-force-update]
+        - dft/instana-notify:
+            name: feedback-instana-live
+            context: [INSTANA, DEPLOY_LIVE]
+            requires: [promote-homolog-to-live]
+            service_name: "${CIRCLE_PROJECT_REPONAME}-live.br.dafiti.local"
+        # ===============================================================================================================

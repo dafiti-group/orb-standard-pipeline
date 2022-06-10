@@ -4,13 +4,8 @@ parameters:
     type: string
     default: ""
     description: used to send on-hold
-  mentions:
-    type: string
-    default: ""
-    description: The user ID of the team ID to be mentioned in slack channel
 executor: small
 steps:
   - slack/notify:
-      mentions: <<parameters.mentions>>
       custom: <<include(templates/hold.json)>>
 

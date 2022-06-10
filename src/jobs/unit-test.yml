@@ -23,3 +23,6 @@ steps:
   - run:
       name: Run unit tests
       command: docker-compose run --rm ci
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

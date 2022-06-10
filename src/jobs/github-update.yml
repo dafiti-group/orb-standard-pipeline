@@ -11,3 +11,6 @@ steps:
   - run:
       name: Check if this repo has open PRs
       command: <<include(scripts/github-force-updates.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

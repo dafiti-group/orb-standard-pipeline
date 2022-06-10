@@ -1,3 +1,4 @@
+description: Used to update the gitops repository to k8s deployment
 parameters:
   argo_path:
     type: string
@@ -6,28 +7,31 @@ parameters:
       your application
   target_env:
     type: string
-  mentions:
-    type: string
-    default: ""
-    description: The team or user ID to be mentioned in slack channel
   gitops:
     type: string
     default: argo
     description: A parameter to command clone_gitops repo
+  rollback:
+    type: boolean
+    default: false
+    description: Use <<pipeline.parameters.rollback>> in this parameter
+  version:
+    type: string
+    default: ""
+    description: The commit hash to rollback your deployment use <<pipeline.parameters.rollback>>
 executor: small
 steps:
   - config_git
   - clone_gitops:
       gitops: <<parameters.gitops>>
   - run:
-      name: change value in argo repo
+      name: change value in <<parameters.gitops>> repo
       environment:
         PARAMETER_ARGO_PATH: <<parameters.argo_path>>
         PARAMETER_TARGET_ENV: <<parameters.target_env>>
-        PARAMETER_ROLLBACK: <<pipeline.parameters.rollback>>
-        PARAMETER_VERSION: <<pipeline.parameters.version>>
+        PARAMETER_ROLLBACK: <<parameters.rollback>>
+        PARAMETER_VERSION: <<parameters.version>>
       command: <<include(scripts/argo-update.sh)>>
   - slack/notify:
       event: fail
-      mentions: <<parameters.mentions>>
       custom: <<include(templates/fail.json)>>

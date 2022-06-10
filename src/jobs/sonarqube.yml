@@ -1,3 +1,5 @@
+description: >
+  Used to run sonarqube needs context: SONAR
 executor: sonarqube
 steps:
   - checkout
@@ -13,3 +15,6 @@ steps:
           -Dsonar.projectName=${CIRCLE_PROJECT_REPONAME} \
           -Dsonar.scm.revision=$(echo ${CIRCLE_SHA1:0:7}) \
           -Dsonar.sourceEncoding=UTF-8
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>
