@@ -6,7 +6,7 @@ description: >
   Used to standardize all dafiti-group pipelines
 
 display:
-  home_url: "https://www.example.com/docs"
+  home_url: "https://github.com/dafiti-group/orb-standard-pipeline"
   source_url: "https://github.com/dafiti-group/orb-standard-pipeline"
 
 orbs:
