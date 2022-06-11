@@ -8,6 +8,8 @@ executor: small
 steps:
   - run:
       name: "Setup custom environment variables"
-      command: <<include(scripts/on-hold.sh)>>
+      environment:
+        PARAMETER_TO_EXPORT: <<parameters.step_name>>
+      command: <<include(scripts/hold-slack.sh)>>
   - slack/notify:
       custom: <<include(templates/hold.json)>>
