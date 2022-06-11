@@ -35,3 +35,6 @@ steps:
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
+  - slack/notify:
+      event: pass
+      custom: <<include(templates/success.json)>>
