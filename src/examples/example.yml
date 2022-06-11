@@ -1,10 +1,10 @@
-description: Example using new branch strategy
+description: |
+  Example using new branch strategy
+  In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
+  in your project settings or in your organization context, with the name of your team
+  like @team or with a specific person id using <@USERID>
 usage:
   version: 2.1
-  environment:
-    # setup all mentions use
-    SLACK_PARAM_MENTIONS: "@techowners" # more in https://github.dev/CircleCI-Public/slack-orb/blob/2d3359453a65b3ed3d8f22a5ffebe3a5bfd5a0fd/src/commands/notify.yml#L48
-  # pipeline parameters to enhance the experience clicking on the button run pipeline manually to change behavior
   parameters:
     rollback:
       type: boolean
