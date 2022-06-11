@@ -41,9 +41,6 @@
               "url": "${CIRCLE_BUILD_URL}"
             }
           ]
-        },
-        {
-          "type": "divider"
         }
       ]
     }

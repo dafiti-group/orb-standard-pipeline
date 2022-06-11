@@ -1,4 +1,5 @@
-## PR Type
+# PR Type
+
 What kind of change does this PR introduce?
 
 <!-- Please check the one that applies to this PR using "x". -->
@@ -17,6 +18,7 @@ Issue Number: N/A
 ## What is the new behavior?
 
 ## Does this PR introduce a breaking change?
+
 - [ ] Yes
 - [ ] No
 
