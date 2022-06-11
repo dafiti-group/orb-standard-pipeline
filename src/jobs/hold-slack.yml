@@ -5,11 +5,8 @@ parameters:
     default: ""
     description: used to send on-hold
 executor: small
+environment:
+  PARAMETERS_STEP_NAME: <<parameters.step_name>>
 steps:
-  - run:
-      name: "Setup custom environment variables"
-      environment:
-        PARAMETER_TO_EXPORT: <<parameters.step_name>>
-      command: <<include(scripts/hold-slack.sh)>>
   - slack/notify:
       custom: <<include(templates/hold.json)>>

@@ -15,7 +15,7 @@
           "type": "section",
           "text": {
             "type": "mrkdwn",
-            "text": "*${CIRCLE_PROJECT_REPONAME}*:`${CIRCLE_BRANCH}` *_${PARAMETER_STEP_NAME}_* ${SLACK_PARAM_MENTIONS}"
+            "text": "*${CIRCLE_PROJECT_REPONAME}*:`${CIRCLE_BRANCH}` *_${PARAMETERS_STEP_NAME}_* ${SLACK_MENTIONS}"
           },
           "accessory": {
             "type": "button",

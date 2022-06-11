@@ -8,9 +8,9 @@ description: >
     - AWS_ECR_REGISTRY_ID
 executor: default
 parameters:
-  app_path:
+  revtxt_path:
     type: string
-    default: public/rev.txt
+    default: rev.txt
     description: The place to create/update rev.txt file content
   extra_build_args:
     type: string
@@ -24,8 +24,8 @@ steps:
   - checkout
   - config_docker
   - aws-ecr/ecr-login
-  - rev_text:
-      app_path: <<parameters.app_path>>
+  - rev_txt:
+      revtxt_path: <<parameters.revtxt_path>>
   - aws-ecr/build-and-push-image:
       checkout: false
       create-repo: true

@@ -7,10 +7,3 @@ steps:
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
-  # remove after testing
-  - slack/notify:
-      custom: <<include(templates/fail.json)>>
-  - slack/notify:
-      custom: <<include(templates/success.json)>>
-  - slack/notify:
-      custom: <<include(templates/hold.json)>>

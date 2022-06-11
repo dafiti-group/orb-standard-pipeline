@@ -83,6 +83,7 @@ usage:
             requires: [unit-test, sonarqube]
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
+            revtxt_path: public/rev.txt
             context: BUILD_AND_DEPLOY
             filters: *default_filters
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]

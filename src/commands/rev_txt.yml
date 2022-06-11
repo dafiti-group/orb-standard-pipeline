@@ -1,13 +1,13 @@
 description: >
   Used to create a file with git show content to track build history
 parameters:
-  app_path:
+  revtxt_path:
     type: string
-    default: "public/rev.txt"
+    default: "rev.txt"
     description: The path where the file rev.txt will be placed berofe build
 steps:
   - run:
       name: Generate rev.txt
       environment:
-        REV_TXT_FILE: <<parameters.app_path>>
+        REV_TXT_FILE: <<parameters.revtxt_path>>
       command: <<include(scripts/rev-txt.sh)>>
