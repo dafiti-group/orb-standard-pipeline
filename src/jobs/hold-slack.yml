@@ -8,6 +8,6 @@ executor: small
 steps:
   - run:
       name: "Setup custom environment variables"
-      command: echo 'export PARAMETER_STEP_NAME="<<parameters.step_name>>"' >> $BASH_ENV
+      command: <<include(scripts/on-hold.sh)>>
   - slack/notify:
       custom: <<include(templates/hold.json)>>
