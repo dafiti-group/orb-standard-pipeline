@@ -1,0 +1,24 @@
+description: >
+  Default instana norifyer.
+  Needed contexts:
+    - INSTANA #mandatory
+    - DEPLOY_QA # if target is qa
+    - DEPLOY_LIVE # if target is live
+parameters:
+  service_name:
+    type: string
+    description: Name of you application service in instana apm
+    default: "${CIRCLE_PROJECT_REPONAME}.eks.dafiti.local"
+executor: instana
+steps:
+  - pipeline-feedback/create_release:
+      release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
+      release_scope: |
+        {
+          "services": [
+            {"name": "<< parameters.service_name >>"}
+          ]
+        }
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

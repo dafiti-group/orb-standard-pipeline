@@ -1,0 +1,45 @@
+description: |
+  Job to create your application AWS ECR artifact and push docker images to it
+  Needs context with:
+    - GITHUB_ACCESS_TOKEN
+    - AWS_ACCESS_KEY_ID
+    - AWS_DEFAULT_REGION
+    - AWS_SECRET_ACCESS_KEY
+    - AWS_ECR_REGISTRY_ID
+executor: default
+parameters:
+  rev_txt_path:
+    type: string
+    default: rev.txt
+    description: The place to create/update rev.txt file content
+  extra-build-args:
+    type: string
+    default: >-
+      --build-arg GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
+    description: |
+      Extra docker build image parameters
+      By default the GITHUB_ACCESS_TOKEN is already included, if you need to pass
+      more extra build args, you need to pass full list of your build args like
+        --build-arg GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
+        --build-arg ANOTHER_PARAMETER=${ANOTHER_PARAMETER}
+  build_tag:
+    type: string
+    default: "$(echo ${CIRCLE_SHA1:0:7}),latest"
+    description: |
+      The artifact tag name or names comma separated
+      Default value is the first 7 characters of current commit and latest tag
+steps:
+  - checkout
+  - config_docker
+  - aws-ecr/ecr-login
+  - rev_txt:
+      rev_txt_path: <<parameters.rev_txt_path>>
+  - aws-ecr/build-and-push-image:
+      checkout: false
+      # create-repo: true # TODO: needs to talk about with SRE team
+      repo: ${CIRCLE_PROJECT_REPONAME}
+      tag: <<parameters.build_tag>>
+      extra-build-args: <<parameters.extra-build-args>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

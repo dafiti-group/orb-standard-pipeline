@@ -1,0 +1,12 @@
+description: >
+  Used to run sonarqube needs context: SONAR
+executor: sonarqube
+steps:
+  - checkout
+  - config_docker
+  - run:
+      name: Run Sonar
+      command: <<include(scripts/sonar-scanner.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

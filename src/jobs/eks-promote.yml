@@ -1,0 +1,32 @@
+description: >
+  Used to get image tag from origin environment to replace into target environment
+parameters:
+  origin:
+    type: string
+    description: path to origin image hash to copy from
+  destiny:
+    type: string
+    description: path to destiny file to past to
+  gitops:
+    type: string
+    default: argo
+    description: The repo name to clone deployments to change image tags
+executor: default
+steps:
+  - config_git
+  - clone_gitops:
+      gitops: <<parameters.gitops>>
+  - run:
+      name: Promote image from <<parameters.origin>> to <<parameters.destiny>>
+      environment:
+        PARAMETER_START_FOLDER: <<parameters.gitops>>
+        PARAMETERS_ORIGIN_FILE: <<parameters.origin>>
+        PARAMETERS_DESTINY_FILE: <<parameters.destiny>>
+      command: <<include(scripts/gitops-promote.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>
+  - slack/notify:
+      event: pass
+      custom: <<include(templates/success.json)>>
+

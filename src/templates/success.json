@@ -1,0 +1,48 @@
+{
+  "attachments": [
+    {
+      "color": "#00DD00",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": ":circleci-pass::rocket:\t*${CIRCLE_PROJECT_REPONAME}*:`${CIRCLE_BRANCH}`\t|\t*${CIRCLE_JOB}*:`success`\t|\t*user*: `${CIRCLE_USERNAME}`"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": " ${SLACK_MENTIONS}"
+          }
+        },
+        {
+          "type": "actions",
+          "elements": [
+            {
+              "type": "button",
+              "text": {
+                "type": "plain_text",
+                "text": ":octocat: GitHub",
+                "emoji": true
+              },
+              "style": "danger",
+              "url": "https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/commit/${CIRCLE_SHA1}"
+            },
+            {
+              "type": "button",
+              "text": {
+                "type": "plain_text",
+                "text": ":circleci: CircleCI",
+                "emoji": true
+              },
+              "style": "primary",
+              "url": "${CIRCLE_BUILD_URL}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

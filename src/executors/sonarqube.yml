@@ -1,0 +1,3 @@
+description: sonarqube executor
+docker:
+  - image: newtmitch/sonar-scanner:4

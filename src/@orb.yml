@@ -1,15 +1,18 @@
 version: 2.1
 
 description: >
-  Sample orb description
-# What will your orb allow users to accomplish?
-# Descriptions should be short, simple, and informative.
+  Dafiti group default orb.
 
-# This information will be displayed in the orb registry and is not mandatory.
+  Used to standardize all dafiti-group pipelines
+
 display:
-  home_url: "https://www.example.com/docs"
+  home_url: "https://github.com/dafiti-group/orb-standard-pipeline"
   source_url: "https://github.com/dafiti-group/orb-standard-pipeline"
 
-# If your orb requires other orbs, you can import them like this. Otherwise remove the "orbs" stanza.
-# orbs:
-#  hello: circleci/hello-build@0.0.5
+orbs:
+  aws-cli: circleci/aws-cli@2.0.3 # needs one of context: BUILD_AND_DEPLOY | DEPLOY_QA
+  aws-ecr: circleci/aws-ecr@7.3.0 # needs one of context: BUILD_AND_DEPLOY | DEPLOY_QA
+  cxflow: checkmarx-ts/cxflow@1.0.6 # needs context: CHECKMARX_CLOUD
+  github-cli: circleci/github-cli@2.1.0 # needs one of  context: (DEPLOY | BUILD_AND_DEPLOY | DEPLOY_QA)
+  pipeline-feedback: instana/pipeline-feedback@1.2.0 # needs context: [INSTANA, (BUILD_AND_DEPLOY|DEPLOY_QA)]
+  slack: circleci/slack@4.10.1 # needs context: SLACK

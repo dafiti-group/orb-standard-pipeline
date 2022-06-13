@@ -16,13 +16,17 @@ jobs:
     steps:
       - checkout
       # Run your orb's commands to validate them.
-      - orb-standard-pipeline/greet
+      - orb-standard-pipeline/clone_gitops
+      - orb-standard-pipeline/config_docker
+      - orb-standard-pipeline/config_git
+      - orb-standard-pipeline/rev_txt
 workflows:
   test-deploy:
     jobs:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
       - command-tests:
           filters: *filters
+          context: [TESTS]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
