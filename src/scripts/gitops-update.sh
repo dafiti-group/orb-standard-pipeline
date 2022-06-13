@@ -10,7 +10,7 @@ sed -Ei "s|tag: \"[a-z0-9]+\"|${IMAGE}|" ${CONFIG_FILE}
 if [[ $(git diff) ]]; then
   git diff
   git add .
-  git commit -m "changing ${CIRCLE_PROJECT_REPONAME} image tag value for ${PARAMETER_TARGET_ENV}"
+  git commit -m "${CIRCLE_PROJECT_REPONAME} change image tag in: ${PARAMETER_DEPLOYMENT_PATH}/${CONFIG_FILE}"
   git push
 else
   echo "Nothing to commit, promotion already done!"

@@ -7,9 +7,6 @@ parameters:
   destiny:
     type: string
     description: path to destiny file to past to
-  target:
-    type: string
-    description: the target promote name to display in commit message
   gitops:
     type: string
     default: argo
@@ -23,7 +20,9 @@ steps:
       name: Promote image from <<parameters.origin>> to <<parameters.destiny>>
       environment:
         PARAMETER_START_FOLDER: <<parameters.gitops>>
-      command: <<include(scripts/promote.sh)>>
+        PARAMETERS_ORIGIN_FILE: <<parameters.origin>>
+        PARAMETERS_DESTINY_FILE: <<parameters.destiny>>
+      command: <<include(scripts/gitops-promote.sh)>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>

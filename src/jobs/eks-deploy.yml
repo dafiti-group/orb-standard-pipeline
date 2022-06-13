@@ -5,8 +5,6 @@ parameters:
     description: >
       The path in argo repo to navigate to and change image tag ref for
       your application
-  target_env:
-    type: string
   gitops:
     type: string
     default: argo
@@ -28,10 +26,9 @@ steps:
       name: change value in <<parameters.gitops>> repo
       environment:
         PARAMETER_DEPLOYMENT_PATH: <<parameters.deployment_path>>
-        PARAMETER_TARGET_ENV: <<parameters.target_env>>
         PARAMETER_ROLLBACK: <<parameters.rollback>>
         PARAMETER_VERSION: <<parameters.version>>
-      command: <<include(scripts/argo-update.sh)>>
+      command: <<include(scripts/gitops-update.sh)>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
