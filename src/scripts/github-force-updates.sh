@@ -11,9 +11,11 @@ if [[ $(gh pr list) ]]; then
 else
   echo "Noting to do, No PR found, done!"
 fi
-MY_CUSTOM_CONDITION=$(git branch -a | grep -E "release.*|hotfix.*")
+CURRENT_BRANCH=$(git branch | grep "*" | awk '{print$2}')
+MY_CUSTOM_CONDITION=$(git branch -a | grep -vE "main|master|HEAD|${CURRENT_BRANCH}" | grep -Eo "release.*|hotfix.*")
 if [[ $MY_CUSTOM_CONDITION ]]; then
-  git branch -a | grep -Eo "release.*|hotfix.*" | while read -r line; do
+  git branch -a | grep -vE "main|master|HEAD|${CURRENT_BRANCH}" | grep -Eo "release.*|hotfix.*" | while read -r line; do
+    echo ">>>CURRENT-LINE: ${line}"
     git checkout $line
     git merge -X theirs origin/main
     git push --force
