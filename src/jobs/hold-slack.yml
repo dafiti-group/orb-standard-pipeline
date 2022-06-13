@@ -2,8 +2,11 @@ description: Used to notify a step of type APPROVAL on slack channel
 parameters:
   step_name:
     type: string
-    default: ""
-    description: used to send on-hold
+    default: ${CIRCLE_JOB}
+    description: |
+      Used to send on-hold to slack with customized information.
+      Default value is ${CIRCLE_JOB}.
+      Compatible with markdown anotations.
 executor: small
 environment:
   PARAMETERS_STEP_NAME: <<parameters.step_name>>

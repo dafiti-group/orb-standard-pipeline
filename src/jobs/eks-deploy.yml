@@ -1,6 +1,6 @@
 description: Used to update the gitops repository to k8s deployment
 parameters:
-  argo_path:
+  deployment_path:
     type: string
     description: >
       The path in argo repo to navigate to and change image tag ref for
@@ -27,7 +27,7 @@ steps:
   - run:
       name: change value in <<parameters.gitops>> repo
       environment:
-        PARAMETER_ARGO_PATH: <<parameters.argo_path>>
+        PARAMETER_DEPLOYMENT_PATH: <<parameters.deployment_path>>
         PARAMETER_TARGET_ENV: <<parameters.target_env>>
         PARAMETER_ROLLBACK: <<parameters.rollback>>
         PARAMETER_VERSION: <<parameters.version>>

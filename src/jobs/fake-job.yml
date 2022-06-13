@@ -1,0 +1,11 @@
+description: |
+  Used to create example workflows.
+  Just use like:
+    dft/fake-job:
+      name: unit-test
+  And make required to steps in examples.
+executor: small
+steps:
+  - run:
+      name: fake job run
+      command: echo "OK"

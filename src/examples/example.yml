@@ -39,7 +39,7 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-live
-            context: DEPLOY_LIVE
+            context: [DEPLOY_LIVE, SLACK]
             rollback: <<pipeline.parameters.rollback>>
             version: <<pipeline.parameters.rollback>>
     security-flow:
@@ -49,7 +49,7 @@ usage:
       jobs:
         - dft/checkmarx:
             name: checkmarx
-            context: CHECKMARX_CLOUD
+            context: [CHECKMARX_CLOUD, SLACK]
             filters: *head_filters
     deployment-flow:
       when:
@@ -59,11 +59,11 @@ usage:
         # features & hotfix =============================================================================================
         - dft/unit-test:
             name: unit-test
-            context: BUILD_AND_DEPLOY
+            context: [BUILD_AND_DEPLOY, SLACK]
             filters: *default_filters
         - dft/sonarqube:
             name: sonarqube
-            context: SONAR
+            context: [SONAR, SLACK]
             filters: *default_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
@@ -83,19 +83,19 @@ usage:
             requires: [unit-test, sonarqube]
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
-            revtxt_path: public/rev.txt
-            context: BUILD_AND_DEPLOY
+            rev_txt_path: public/rev.txt
+            context: [BUILD_AND_DEPLOY, SLACK]
             filters: *default_filters
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
-            argo_path: tmp/clusters/qa
+            deployment_path: argo/clusters/eks-qa-dafiti/apps
             target_env: qa
-            context: DEPLOY
+            context: [DEPLOY_QA, SLACK]
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
-            context: [INSTANA, DEPLOY_QA]
+            context: [INSTANA, DEPLOY_QA, SLACK]
             requires: [deploy-to-qa]
             service_name: "${CIRCLE_PROJECT_REPONAME}-qa.br.dafiti.local"
         # new cluster actions =========================================================================================
@@ -109,30 +109,30 @@ usage:
             requires: [deploy-to-qa]
         - dft/eks-deploy:
             name: promote-qa-to-staging
-            argo_path: tmp/clusters/staging
+            deployment_path: argo/clusters/eks-staging-dafiti/apps
             target_env: staging
-            context: DEPLOY
+            context: [DEPLOY, SLACK]
             requires: [approve-to-staging]
         - dft/instana-notify:
             name: feedback-instana-staging
-            context: [INSTANA, DEPLOY_STAGING]
+            context: [INSTANA, DEPLOY_STAGING, SLACK]
             requires: [promote-qa-to-staging]
             service_name: "${CIRCLE_PROJECT_REPONAME}-staging.br.dafiti.local"
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
             name: dft-deploy-approve-pr
-            context: DEPLOY
+            context: [DEPLOY, SLACK]
             # if your application does not have staging cluster, change requires to deploy-to-qa
             requires: [promote-qa-to-staging]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
             name: review-open-pr-to-force-update
-            context: DEPLOY
+            context: [DEPLOY, SLACK]
             filters: *head_filters
         - dft/hold-slack:
-            name: slack-notify-staging
+            name: slack-notify-production
             step_name: ":alert: production needs action to deploy"
             context: SLACK
             filters: *head_filters
@@ -145,11 +145,11 @@ usage:
             origin: clusters/staging
             destiny: clusters/live
             target: live
-            context: DEPLOY
+            context: [DEPLOY, SLACK]
             requires: [approve-deploy-live, review-open-pr-to-force-update]
         - dft/instana-notify:
             name: feedback-instana-live
-            context: [INSTANA, DEPLOY_LIVE]
+            context: [INSTANA, DEPLOY_LIVE, SLACK]
             requires: [promote-homolog-to-live]
             service_name: "${CIRCLE_PROJECT_REPONAME}-live.br.dafiti.local"
         # ===============================================================================================================
