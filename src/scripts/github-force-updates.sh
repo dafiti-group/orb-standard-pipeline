@@ -14,7 +14,7 @@ else
 fi
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 MY_CUSTOM_CONDITION=$(git branch -a | grep "origin" | grep -vE "main|master|HEAD|${CURRENT_BRANCH}" | grep -Eo "release.*|hotfix.*")
-if [[ ! -n "${MY_CUSTOM_CONDITION}" ]]; then
+if [[ -n "${MY_CUSTOM_CONDITION}" ]]; then
   git branch -a | grep "origin" | grep -vE "main|master|HEAD|${CURRENT_BRANCH}" | grep -Eo "release.*|hotfix.*" | while read -r line; do
     echo ">>>CURRENT-LINE: ${line}"
     git checkout $line
