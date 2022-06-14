@@ -1,4 +1,6 @@
-pack:
+remove_old:
+	rm orb.yml || exit 0
+pack: remove_old
 	circleci orb pack src --skip-update-check > orb.yml
 validate:
 	circleci orb validate orb.yml

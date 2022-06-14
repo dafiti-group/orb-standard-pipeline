@@ -9,4 +9,4 @@ if [[ -z "$GITHUB_ACCESS_TOKEN" ]]; then
   exit 1
 fi
 
-git clone https://${GITHUB_ACCESS_TOKEN}@github.com/dafiti-group/${GITOPS_REPOSITORY}.git
+git clone https://${GITHUB_ACCESS_TOKEN}@github.com/${CIRCLE_PROJECT_USERNAME}/${GITOPS_REPOSITORY}.git
