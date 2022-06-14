@@ -12,10 +12,10 @@ if [[ $(gh pr list) ]]; then
 else
   echo "Noting to do, No PR found, done!"
 fi
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-MY_CUSTOM_CONDITION=$(git branch -a | grep "origin" | grep -vE "main|master|HEAD|${CURRENT_BRANCH}" | grep -Eo "release.*|hotfix.*")
-if [[ -n "${MY_CUSTOM_CONDITION}" ]]; then
-  git branch -a | grep "origin" | grep -vE "main|master|HEAD|${CURRENT_BRANCH}" | grep -Eo "release.*|hotfix.*" | while read -r line; do
+# CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# MY_CUSTOM_CONDITION=$(git branch -a | grep "origin" | grep -Eo "release.*|hotfix.*")
+if [[ $(git branch -a | grep "origin" | grep -Eo "release.*|hotfix.*") ]]; then
+  git branch -a | grep "origin" | grep -Eo "release.*|hotfix.*" | while read -r line; do
     echo ">>>CURRENT-LINE: ${line}"
     git checkout $line
     git merge -X theirs origin/main
