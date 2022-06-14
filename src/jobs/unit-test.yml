@@ -14,6 +14,7 @@ executor: default
 steps:
   - checkout
   - config_docker
+  - aws-ecr/ecr-login
   - run:
       name: default workarround to fix docker-dafiti_default_network issue
       command: docker network create docker-dafiti_default || true

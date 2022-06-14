@@ -8,7 +8,7 @@ parameters:
   service_name:
     type: string
     description: Name of you application service in instana apm
-    default: "${CIRCLE_PROJECT_REPONAME}.eks.dafiti.local"
+    default: "${CIRCLE_PROJECT_REPONAME}.eks.${ENV_SHORT}.dafiti.local"
 executor: instana
 steps:
   - pipeline-feedback/create_release:
