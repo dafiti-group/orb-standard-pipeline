@@ -1,4 +1,6 @@
-description: Used to update the gitops repository to k8s deployment
+description: |
+  Used to update the gitops repository to k8s deployment
+  Needs contexts: [SLACK, TESTS]
 parameters:
   deployment_path:
     type: string

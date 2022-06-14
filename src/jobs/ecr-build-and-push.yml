@@ -1,11 +1,6 @@
 description: |
   Job to create your application AWS ECR artifact and push docker images to it
-  Needs context with:
-    - GITHUB_ACCESS_TOKEN
-    - AWS_ACCESS_KEY_ID
-    - AWS_DEFAULT_REGION
-    - AWS_SECRET_ACCESS_KEY
-    - AWS_ECR_REGISTRY_ID
+  Needs contexts: [SLACK, TESTS, (DEPLOY_LIVE|DEPLOY_QA|BUILD_AND_PUSH)]
 executor: default
 parameters:
   rev_txt_path:

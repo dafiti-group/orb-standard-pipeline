@@ -1,9 +1,6 @@
 description: >
   Default instana norifyer.
-  Needed contexts:
-    - INSTANA #mandatory
-    - DEPLOY_QA # if target is qa
-    - DEPLOY_LIVE # if target is live
+  Needs contexts: [SLACK, (DEPLOY_LIVE|DEPLOY_QA)]
 parameters:
   service_name:
     type: string

@@ -1,7 +1,7 @@
 description: >
   Used to force update into all open branches
   Put a review with request pending alert into all open PRs
-  Needs a context with GITHUB_ACCESS_TOKEN
+  Needs contexts: [SLACK, TESTS]
 executor: small
 steps:
   - checkout
