@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-
+echo ">>>> check pr list to request changes"
 if [[ $(gh pr list) ]]; then
   echo "PR open listed. Notify to update"
   gh pr list | awk '{print$1}' | while read -r line; do
@@ -12,7 +12,9 @@ if [[ $(gh pr list) ]]; then
 else
   echo "Noting to do, No PR found, done!"
 fi
-if [[ $(git branch -a | grep -E "origin\/(release|hotfix)") ]]; then
+echo ">>>> force updating branches"
+if git branch -a | grep -Eq "origin\/(release|hotfix)"
+then
   git branch -a | grep "origin" | grep -Eo "release.*|hotfix.*" | while read -r line; do
     echo ">>>CURRENT-LINE: ${line}"
     git checkout $line
