@@ -3,7 +3,7 @@
 cd ${PARAMETER_DEPLOYMENT_PATH} || exit 1
 IMAGE="tag: \"${CIRCLE_SHA1:0:7}\""
 if [ "${PARAMETER_ROLLBACK}" = true ]; then
-  if [[ -z "${PARAMETER_VERSION}"]]; then
+  if [[ -z "${PARAMETER_VERSION}" ]]; then
     echo "Missing parameter PARAMETER_VERSION";
     exit 1
   fi
