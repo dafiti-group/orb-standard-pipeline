@@ -11,7 +11,15 @@ fi
 
 cd ${PARAMETER_START_FOLDER} || exit 1
 ORIGIN_FILE="${PARAMETERS_ORIGIN_FILE}/${CIRCLE_PROJECT_REPONAME}.yaml"
+if [ ! -f "${ORIGIN_FILE}" ]; then
+  echo "file ${ORIGIN_FILE} not found"
+  exit 1
+fi
 DESTINY_FILE="${PARAMETERS_DESTINY_FILE}/${CIRCLE_PROJECT_REPONAME}.yaml"
+if [ ! -f "${DESTINY_FILE}" ]; then
+  echo "file ${DESTINY_FILE} not found"
+  exit 1
+fi
 IMAGE=$(grep -E "tag\: \"[a-z0-9]+\"" ${ORIGIN_FILE})
 sed -Ei "s|\s+tag: \"[a-z0-9]+\"|${IMAGE}|" ${DESTINY_FILE}
 if [[ $(git diff) ]]; then
