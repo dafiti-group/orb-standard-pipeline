@@ -1,5 +1,11 @@
 #!/bin/bash
 
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ "${CURRENT_BRANCH}" != "main" && "${CURRENT_BRANCH}" != "master" ]]; then
+  echo "This command is not allowed to run in a current branch that is not main or master"
+  exit 1
+fi
+
 echo ">>>> check pr list to request changes"
 if [[ $(gh pr list) ]]; then
   echo "PR open listed. Notify to update"
@@ -12,6 +18,7 @@ if [[ $(gh pr list) ]]; then
 else
   echo "Noting to do, No PR found, done!"
 fi
+
 echo ">>>> force updating branches"
 if git branch -a | grep -Eq "origin\/(release|hotfix)"
 then
