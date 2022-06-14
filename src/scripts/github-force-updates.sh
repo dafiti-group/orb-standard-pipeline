@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 echo ">>>> check pr list to request changes"
 if [[ $(gh pr list) ]]; then
   echo "PR open listed. Notify to update"
