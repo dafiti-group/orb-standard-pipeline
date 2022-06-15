@@ -1,4 +1,7 @@
-description: This job will be the new checkmarx context.
+description: |
+  This job will be the new checkmarx context.
+  Need context:
+    - CHECKMARX_CLOUD
 executor: small
 steps:
   - run:

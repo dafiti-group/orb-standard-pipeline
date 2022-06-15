@@ -42,6 +42,8 @@ usage:
             context: [DEPLOY_LIVE, SLACK]
             rollback: <<pipeline.parameters.rollback>>
             version: <<pipeline.parameters.rollback>>
+            deployment_path: argo/clusters/eks-live-dafiti/apps
+            filters: *head_filters
     security-flow:
       when:
         or:

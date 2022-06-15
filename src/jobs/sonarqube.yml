@@ -1,5 +1,6 @@
 description: >
   Used to run sonarqube needs context: SONAR
+  Needs contexts: [SONAR, SLACK]
 executor: sonarqube
 steps:
   - checkout

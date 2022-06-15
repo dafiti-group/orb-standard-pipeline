@@ -2,11 +2,15 @@
 
 cd ${PARAMETER_DEPLOYMENT_PATH} || exit 1
 IMAGE="tag: \"${CIRCLE_SHA1:0:7}\""
-if [ "${PARAMETER_ROLLBACK}" = true ]; then
-  IMAGE='tag: "${PARAMETER_VERSION}"'
+if [ "${PARAMETER_ROLLBACK}" -eq "1" ]; then
+  IMAGE="tag: \"${PARAMETER_VERSION}\""
 fi
 CONFIG_FILE="${CIRCLE_PROJECT_REPONAME}.yaml"
-sed -Ei "s|tag: \"[a-z0-9]+\"|${IMAGE}|" ${CONFIG_FILE}
+if [ ! -f "${CONFIG_FILE}" ]; then
+  echo "file ${PARAMETER_DEPLOYMENT_PATH}/${CONFIG_FILE} not found!"
+  exit 1
+fi
+sed -Ei "s|tag: \".*\"|${IMAGE}|" ${CONFIG_FILE}
 if [[ $(git diff) ]]; then
   git diff
   git add .

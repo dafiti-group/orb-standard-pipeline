@@ -1,5 +1,12 @@
 #!/bin/bash
 
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [[ "${CURRENT_BRANCH}" != "main" && "${CURRENT_BRANCH}" != "master" ]]; then
+  echo "This command is not allowed to run in a current branch that is not main or master"
+  exit 1
+fi
+
+echo ">>>> check pr list to request changes"
 if [[ $(gh pr list) ]]; then
   echo "PR open listed. Notify to update"
   gh pr list | awk '{print$1}' | while read -r line; do
@@ -11,10 +18,11 @@ if [[ $(gh pr list) ]]; then
 else
   echo "Noting to do, No PR found, done!"
 fi
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-MY_CUSTOM_CONDITION=$(git branch -a | grep -vE "main|master|HEAD|${CURRENT_BRANCH}" | grep -Eo "release.*|hotfix.*")
-if [[ $MY_CUSTOM_CONDITION ]]; then
-  git branch -a | grep -vE "main|master|HEAD|${CURRENT_BRANCH}" | grep -Eo "release.*|hotfix.*" | while read -r line; do
+
+echo ">>>> force updating branches"
+if git branch -a | grep -Eq "origin\/(release|hotfix)"
+then
+  git branch -a | grep "origin" | grep -Eo "release.*|hotfix.*" | while read -r line; do
     echo ">>>CURRENT-LINE: ${line}"
     git checkout $line
     git merge -X theirs origin/main

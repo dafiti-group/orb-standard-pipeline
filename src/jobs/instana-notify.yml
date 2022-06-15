@@ -1,14 +1,11 @@
 description: >
   Default instana norifyer.
-  Needed contexts:
-    - INSTANA #mandatory
-    - DEPLOY_QA # if target is qa
-    - DEPLOY_LIVE # if target is live
+  Needs contexts: [INSTANA, SLACK, (DEPLOY_LIVE|DEPLOY_QA)]
 parameters:
   service_name:
     type: string
     description: Name of you application service in instana apm
-    default: "${CIRCLE_PROJECT_REPONAME}.eks.dafiti.local"
+    default: "${CIRCLE_PROJECT_REPONAME}.eks.${ENV_SHORT}.dafiti.local"
 executor: instana
 steps:
   - pipeline-feedback/create_release:
