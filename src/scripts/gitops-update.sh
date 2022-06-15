@@ -3,15 +3,6 @@
 cd ${PARAMETER_DEPLOYMENT_PATH} || exit 1
 IMAGE="tag: \"${CIRCLE_SHA1:0:7}\""
 if [ "${PARAMETER_ROLLBACK}" -eq "1" ]; then
-  if [[ -z "${PARAMETER_VERSION}" ]]; then
-    echo "Missing parameter PARAMETER_VERSION"
-    exit 1
-  fi
-  VALIDATE_VERSION=$(git rev-parse --verify ${PARAMETER_VERSION})
-  if [[ -z "${VALIDATE_VERSION}" ]]; then
-    echo "Invalid hash version"
-    exit 1
-  fi
   IMAGE="tag: \"${PARAMETER_VERSION}\""
 fi
 CONFIG_FILE="${CIRCLE_PROJECT_REPONAME}.yaml"
@@ -19,7 +10,7 @@ if [ ! -f "${CONFIG_FILE}" ]; then
   echo "file ${PARAMETER_DEPLOYMENT_PATH}/${CONFIG_FILE} not found!"
   exit 1
 fi
-sed -Ei "s|tag: \"[a-z0-9]+\"|${IMAGE}|" ${CONFIG_FILE}
+sed -Ei "s|tag: \".*\"|${IMAGE}|" ${CONFIG_FILE}
 if [[ $(git diff) ]]; then
   git diff
   git add .

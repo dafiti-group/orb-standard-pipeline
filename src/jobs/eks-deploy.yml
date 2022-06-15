@@ -21,6 +21,16 @@ parameters:
     description: The commit hash to rollback your deployment use <<pipeline.parameters.rollback>>
 executor: small
 steps:
+  - when:
+      condition:
+        equal: [true, <<parameters.rollback>>]
+      steps:
+        - checkout
+        - run:
+            name: Validating version hash to rollback
+            environment:
+              PARAMETER_VERSION: <<parameters.version>>
+            command: <<include(scripts/validate-hash.sh)>>
   - config_git
   - clone_gitops:
       gitops: <<parameters.gitops>>
