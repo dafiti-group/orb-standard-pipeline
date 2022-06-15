@@ -2,17 +2,17 @@
 
 cd ${PARAMETER_DEPLOYMENT_PATH} || exit 1
 IMAGE="tag: \"${CIRCLE_SHA1:0:7}\""
-if [ "${PARAMETER_ROLLBACK}" = true ]; then
+if [ "${PARAMETER_ROLLBACK}" -eq "1" ]; then
   if [[ -z "${PARAMETER_VERSION}" ]]; then
-    echo "Missing parameter PARAMETER_VERSION";
+    echo "Missing parameter PARAMETER_VERSION"
     exit 1
   fi
-  VALIDATE_VERSION=$(git rev-parse ${PARAMETER_VERSION} --verify)
+  VALIDATE_VERSION=$(git rev-parse --verify ${PARAMETER_VERSION})
   if [[ -z "${VALIDATE_VERSION}" ]]; then
     echo "Invalid hash version"
     exit 1
   fi
-  IMAGE='tag: "${PARAMETER_VERSION}"'
+  IMAGE="tag: \"${PARAMETER_VERSION}\""
 fi
 CONFIG_FILE="${CIRCLE_PROJECT_REPONAME}.yaml"
 if [ ! -f "${CONFIG_FILE}" ]; then
