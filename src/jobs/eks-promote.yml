@@ -1,6 +1,6 @@
 description: >
   Used to get image tag from origin environment to replace into target environment
-  Needs contexts: [DEPLOY, SLACK]
+  Needs contexts: [TESTS, SLACK]
 parameters:
   origin:
     type: string

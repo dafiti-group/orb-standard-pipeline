@@ -1,7 +1,7 @@
 description: |
   Use the default layer of your `docker-compose.yml` file to run ci layer as
   `docker-compose run --rm ci` to run all needed tests.
-  Needs contexts: [SLACK, DEPLOY, (BUILD_AND_PUSH|DEPLOY_PRODUCTION|DEPLOY_QA)]
+  Needs contexts: [SLACK, TESTS, (BUILD_AND_PUSH|DEPLOY_LIVE|DEPLOY_QA)]
 parameters:
   build_args:
     type: string
