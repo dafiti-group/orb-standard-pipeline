@@ -30,4 +30,3 @@ steps:
   - slack/notify:
       event: pass
       custom: <<include(templates/success.json)>>
-

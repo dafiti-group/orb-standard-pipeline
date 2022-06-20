@@ -1,12 +1,9 @@
 description: |
   Example using new branch strategy and is used only to deploys in 3 environments: [qa, staging, live]
-  
   This example assume that your application is already using docker-compose run --rm ci to unit test everything!
-
   In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
   in your project settings or in your organization context, with the name of your team
   like @team or with a specific person id using <@USERID>
-
   Below you'll find some placeholders to replace like:
     - <path-to-gitops-deployment> in steps:
       - rollback-live

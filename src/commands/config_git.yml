@@ -7,4 +7,3 @@ steps:
   - run:
       name: config git to use GITHUB_ACCESS_TOKEN
       command: <<include(scripts/config-git.sh)>>
-
