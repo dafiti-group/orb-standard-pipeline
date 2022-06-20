@@ -1,10 +1,20 @@
 description: |
-  Example using new branch strategy
+  This workflow example is used only to deploys in 2 environments: [qa, live]
+
+  This example assume that your application is already using docker-compose run --rm ci to unit test everything!
+
   In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
   in your project settings or in your organization context, with the name of your team
   like @team or with a specific person id using <@USERID>
+
+  Below you'll find some placeholders to replace like:
+    - <path-to-gitops-deployment> in steps:
+      - rollback-live
+      - deploy-to-qa
+    - <your-application-service-name-in-apm> in steps:
+      - feedback-instana-qa
+      - feedback-instana-production
 usage:
-  version: 2.1
   parameters:
     rollback:
       type: boolean
@@ -42,7 +52,7 @@ usage:
             context: [DEPLOY_LIVE, SLACK]
             rollback: <<pipeline.parameters.rollback>>
             version: <<pipeline.parameters.version>>
-            deployment_path: argo/clusters/eks-live-dafiti/apps
+            deployment_path: "<path-to-gitops-deployment>"
             filters: *head_filters
     security-flow:
       when:
@@ -99,39 +109,18 @@ usage:
             name: deploy-to-qa
             target_env: qa
             context: [TESTS, SLACK]
-            deployment_path: argo/clusters/eks-qa-dafiti/apps
+            deployment_path: "<path-to-gitops-deployment>"
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
             context: [INSTANA, DEPLOY_QA, SLACK]
             requires: [deploy-to-qa]
-            service_name: "${CIRCLE_PROJECT_REPONAME}-qa.br.dafiti.local"
-        # new cluster actions =========================================================================================
-        - dft/hold-slack:
-            name: slack-notify-staging
-            step_name: ":alert: STAGIN needs action to deploy"
-            context: SLACK
-        - approval:
-            name: approve-to-staging
-            type: approval
-            requires: [deploy-to-qa]
-        - dft/eks-deploy:
-            name: promote-qa-to-staging
-            deployment_path: argo/clusters/eks-staging-dafiti/apps
-            target_env: staging
-            context: [TESTS, SLACK]
-            requires: [approve-to-staging]
-        - dft/instana-notify:
-            name: feedback-instana-staging
-            context: [INSTANA, DEPLOY_STAGING, SLACK]
-            requires: [promote-qa-to-staging]
-            service_name: "${CIRCLE_PROJECT_REPONAME}-staging.br.dafiti.local"
+            service_name: <your-application-service-name-in-apm>
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
             name: dft-deploy-approve-pr
             context: [TESTS, SLACK]
-            # if your application does not have staging cluster, change requires to deploy-to-qa
             requires: [promote-qa-to-staging]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
@@ -154,10 +143,11 @@ usage:
             destiny: clusters/production
             target: production
             context: [TESTS, SLACK]
-            requires: [approve-deploy-production, review-open-pr-to-force-update]
+            requires:
+              [approve-deploy-production, review-open-pr-to-force-update]
         - dft/instana-notify:
             name: feedback-instana-production
             context: [INSTANA, DEPLOY_LIVE, SLACK]
             requires: [promote-homolog-to-production]
-            service_name: "${CIRCLE_PROJECT_REPONAME}-production.br.dafiti.local"
+            service_name: <your-application-service-name-in-apm>
         # ===============================================================================================================

@@ -1,4 +1,4 @@
-## PR Type
+# PR Type
 
 What kind of change does this PR introduce?
 
