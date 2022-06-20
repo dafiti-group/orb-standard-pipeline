@@ -2,6 +2,7 @@ description: |
   This job will be the new checkmarx context.
   Need context:
     - CHECKMARX_CLOUD
+    - SLACK
 executor: small
 steps:
   - run:
