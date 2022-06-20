@@ -1,6 +1,6 @@
 description: |
   Job to create your application AWS ECR artifact and push docker images to it
-  Needs contexts: [SLACK, TESTS, (DEPLOY_LIVE|DEPLOY_QA|BUILD_AND_PUSH)]
+  Needs contexts: [SLACK, DEPLOY, (BUILD_AND_PUSH|DEPLOY_PRODUCTION|DEPLOY_QA)]
 executor: default
 parameters:
   rev_txt_path:

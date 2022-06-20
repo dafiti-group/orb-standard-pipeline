@@ -16,7 +16,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.0.0
+    dft: dafiti-group/orb-standard-pipeline@1.0.1
   # reserved filters anchors
   default_filters: &default_filters
     branches:
@@ -39,9 +39,9 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-live
-            context: [DEPLOY_LIVE, SLACK]
+            context: [DEPLOY, SLACK]
             rollback: <<pipeline.parameters.rollback>>
-            version: <<pipeline.parameters.rollback>>
+            version: <<pipeline.parameters.version>>
             deployment_path: argo/clusters/eks-live-dafiti/apps
             filters: *head_filters
     security-flow:
@@ -61,7 +61,7 @@ usage:
         # features & hotfix =============================================================================================
         - dft/unit-test:
             name: unit-test
-            context: [BUILD_AND_DEPLOY, SLACK]
+            context: [DEPLOY, SLACK, BUILD_AND_PUSH]
             filters: *default_filters
         - dft/sonarqube:
             name: sonarqube
@@ -70,14 +70,20 @@ usage:
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
-            name: slack-on-hold-start
-            step_name: ":alert: start pipeline to generate aws ecr registry"
-            context: SLACK
-            filters: *default_filters
+            name: slack-notify-hold-qa
+            context: [SLACK]
+            step_name: ":alert: a new release is awaiting your approve"
+            filters: *release_filters
         - approval:
             name: start-to-qa
             type: approval
             filters: *release_filters
+        - dft/hold-slack:
+            name: slack-notify-hold-hotfix
+            context: [SLACK]
+            step_name: ":alert: the hotfix is waiting your approval to deploy"
+            filters: *hotfix_filters
+            requires: [unit-test, sonarqube]
         - approval:
             name: approve-to-qa
             type: approval
@@ -86,14 +92,14 @@ usage:
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
             rev_txt_path: public/rev.txt
-            context: [BUILD_AND_DEPLOY, SLACK]
+            context: [SLACK, DEPLOY, BUILD_AND_PUSH]
             filters: *default_filters
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
-            deployment_path: argo/clusters/eks-qa-dafiti/apps
             target_env: qa
-            context: [DEPLOY_QA, SLACK]
+            context: [DEPLOY, SLACK]
+            deployment_path: argo/clusters/eks-qa-dafiti/apps
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
@@ -134,24 +140,24 @@ usage:
             context: [DEPLOY, SLACK]
             filters: *head_filters
         - dft/hold-slack:
-            name: slack-notify-production
-            step_name: ":alert: production needs action to deploy"
+            name: slack-notify-hold-production
             context: SLACK
+            step_name: ":alert: pipeline waiting approval to promote to production"
             filters: *head_filters
         - approval:
             type: approval
-            name: approve-deploy-live
+            name: approve-deploy-production
             filters: *head_filters
         - dft/eks-promote:
-            name: promote-homolog-to-live
+            name: promote-homolog-to-production
             origin: clusters/staging
-            destiny: clusters/live
-            target: live
+            destiny: clusters/production
+            target: production
             context: [DEPLOY, SLACK]
-            requires: [approve-deploy-live, review-open-pr-to-force-update]
+            requires: [approve-deploy-production, review-open-pr-to-force-update]
         - dft/instana-notify:
-            name: feedback-instana-live
-            context: [INSTANA, DEPLOY_LIVE, SLACK]
-            requires: [promote-homolog-to-live]
-            service_name: "${CIRCLE_PROJECT_REPONAME}-live.br.dafiti.local"
+            name: feedback-instana-production
+            context: [INSTANA, DEPLOY_PRODUCTION, SLACK]
+            requires: [promote-homolog-to-production]
+            service_name: "${CIRCLE_PROJECT_REPONAME}-production.br.dafiti.local"
         # ===============================================================================================================
