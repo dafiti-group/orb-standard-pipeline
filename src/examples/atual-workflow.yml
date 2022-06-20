@@ -1,0 +1,61 @@
+description: |
+  Example using a legacy branch strategy [master,qa].
+  This example assume that your application is already using docker-compose run --rm ci to unit test everything!
+  You only need to replace:
+    - <your-application-path-to-change-gitops> in deploy-qa and deploy-live
+    - <your-application-name> in instana-notify-qa and instana-notify-live
+usage:
+  version: 2.1
+  default_filter: &default_filter
+    branches:
+      only: [qa, master]
+  qa_filter: &qa_filter
+    branches:
+      only: [qa]
+  head_filter: &head_filter
+    branches:
+      only: [master]
+  orbs:
+    dft: dafiti-group/orb-standard-pipeline@v1.0.2
+  workflows:
+    deployment-flow:
+      # test gates ====================================================================================================
+      - dft/unit-test:
+          name: unit-test
+          context: [TEST, SLACK, BUILD_AND_PUSH]
+      - dft/sonarqube:
+          name: sonarqube
+          context: [SONAR, SLACK]
+      - dft/checkmarx:
+          name: checkmarx
+          context: [SLACK, CHECKMARX_CLOUD]
+      # ===============================================================================================================
+      - dft/ecr-build-and-push:
+          name: build-and-push
+          context: [TESTS, SLACK, BUILD_AND_PUSH]
+          filters: *default_filter
+          requires: [unit-test, sonarqube]
+      # qa deploy =====================================================================================================
+      - dft/eks-deploy:
+          name: deploy-qa
+          context: [TESTS, SLACK, BUILD_AND_DEPLOY]
+          deployment_path: <your-application-path-to-change-gitops>
+          filters: *qa_filter
+          requires: [build-and-push]
+      - dft/instana-notify:
+          name: instana-notify-qa
+          context: [INSTANA, DEPLOY_QA]
+          service_name: <your-application-name>
+          requires: [deploy-qa]
+      # live deploy ===================================================================================================
+      - dft/eks-deploy:
+          name: deploy-live
+          context: [TESTS, SLACK, BUILD_AND_DEPLOY]
+          deployment_path: <your-application-path-to-change-gitops>
+          filters: *head_filter
+          requires: [build-and-push]
+      - dft/instana-notify:
+          name: instana-notify-live
+          context: [INSTANA, DEPLOY_LIVE]
+          service_name: <your-application-name>
+          requires: [deploy-live]
