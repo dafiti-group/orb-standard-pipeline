@@ -1,4 +1,4 @@
-description: >
+description: |
   Default instana notify.
   Needs contexts: [INSTANA, SLACK, (DEPLOY_LIVE|DEPLOY_STAGING|DEPLOY_QA)]
 parameters:

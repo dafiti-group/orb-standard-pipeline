@@ -1,4 +1,4 @@
-description: >
+description: |
   Used to get image tag from origin environment to replace into target environment
   Needs contexts: [TESTS, SLACK]
 parameters:

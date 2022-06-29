@@ -1,4 +1,4 @@
-description: >
+description: |
   Used to force update into all open branches
   Put a review with request pending alert into all open PRs
   Needs contexts: [TESTS, SLACK]
