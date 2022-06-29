@@ -28,9 +28,12 @@ usage:
   orbs:
     dft: dafiti-group/orb-standard-pipeline@1.0.2
   # reserved filters anchors
-  default_filters: &default_filters
+  test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
+  deployment_filters: &deployment_filters
+    branches:
+      only: [/^release.*/, /^hotfix.*/]
   head_filters: &head_filters
     branches:
       only: [master, main]
@@ -50,18 +53,9 @@ usage:
         - dft/eks-deploy:
             name: rollback-live
             context: [DEPLOY_LIVE, SLACK]
-            rollback: <<pipeline.parameters.rollback>>
+            rollback: true
             version: <<pipeline.parameters.version>>
             deployment_path: <path-to-gitops-deployment>
-            filters: *head_filters
-    security-flow:
-      when:
-        or:
-          - equal: [false, <<pipeline.parameters.rollback>>]
-      jobs:
-        - dft/checkmarx:
-            name: checkmarx
-            context: [CHECKMARX_CLOUD, SLACK]
             filters: *head_filters
     deployment-flow:
       when:
@@ -72,11 +66,11 @@ usage:
         - dft/unit-test:
             name: unit-test
             context: [TESTS, SLACK, BUILD_AND_PUSH]
-            filters: *default_filters
+            filters: *test_filters
         - dft/sonarqube:
             name: sonarqube
             context: [SONAR, SLACK]
-            filters: *default_filters
+            filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
@@ -103,7 +97,7 @@ usage:
             name: ecr-build-and-push
             rev_txt_path: public/rev.txt
             context: [SLACK, TESTS, BUILD_AND_PUSH]
-            filters: *default_filters
+            filters: *deployment_filters
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
