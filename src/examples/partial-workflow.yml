@@ -33,7 +33,7 @@ usage:
       only: [master, main]
   release_filters: &release_filters
     branches:
-      only: [/^feature.*/]
+      only: [/^release.*/]
   hotfix_filters: &hotfix_filters
     branches:
       only: [/^hotfix.*/]
