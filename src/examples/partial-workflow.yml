@@ -12,6 +12,7 @@ description: |
       - feedback-instana-qa
       - feedback-instana-production
 usage:
+  version: 2.1
   parameters:
     rollback:
       type: boolean
