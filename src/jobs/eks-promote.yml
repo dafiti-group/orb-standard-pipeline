@@ -1,6 +1,6 @@
-description: >
+description: |
   Used to get image tag from origin environment to replace into target environment
-  Needs contexts: [SLACK, TESTS]
+  Needs contexts: [TESTS, SLACK]
 parameters:
   origin:
     type: string
@@ -30,4 +30,3 @@ steps:
   - slack/notify:
       event: pass
       custom: <<include(templates/success.json)>>
-

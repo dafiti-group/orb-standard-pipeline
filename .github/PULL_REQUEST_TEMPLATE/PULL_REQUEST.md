@@ -11,7 +11,7 @@ What kind of change does this PR introduce?
 - [ ] Other... Please describe:
 
 ## What is the current behavior?
-<!-- Please describe the current behavior that you are modifying, or link to a relevant issue. -->
+<!-- Please describe the current behavior that you are modifying or linking to a relevant issue. -->
 
 Issue Number: N/A
 

@@ -1,4 +1,5 @@
-description: >
+description: |
+  Step to validation quality of artefactor in pipeline.
   Used to run sonarqube needs context: SONAR
   Needs contexts: [SONAR, SLACK]
 executor: sonarqube

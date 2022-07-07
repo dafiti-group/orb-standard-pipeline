@@ -1,6 +1,6 @@
 description: |
   Used to update the gitops repository to k8s deployment
-  Needs contexts: [SLACK, TESTS]
+  Needs contexts: [TESTS,SLACK]
 parameters:
   deployment_path:
     type: string
