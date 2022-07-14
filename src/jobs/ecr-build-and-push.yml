@@ -3,6 +3,10 @@ description: |
   Needs contexts: [SLACK, TESTS, (BUILD_AND_PUSH|DEPLOY_LIVE|DEPLOY_QA)]
 executor: default
 parameters:
+  repo_name:
+    type: string
+    default: ${CIRCLE_PROJECT_REPONAME}
+    description: The aws ecr registry name
   rev_txt_path:
     type: string
     default: rev.txt
@@ -32,7 +36,7 @@ steps:
   - aws-ecr/build-and-push-image:
       checkout: false
       # create-repo: true # TODO: needs to talk about with SRE team
-      repo: ${CIRCLE_PROJECT_REPONAME}
+      repo: <<parameters.repo_name>>
       tag: <<parameters.build_tag>>
       extra-build-args: <<parameters.extra-build-args>>
   - slack/notify:
