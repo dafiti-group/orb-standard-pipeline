@@ -10,10 +10,12 @@ echo ">>>> check pr list to request changes"
 if [[ $(gh pr list) ]]; then
   echo "PR open listed. Notify to update"
   gh pr list | awk '{print$1}' | while read -r line; do
-    gh pr review $line --request-changes --body "The HEAD branch was updated!!! \
-      I'll merge the updates into your branch, so make sure you test and/or resolve conflicts. \
-      I'm requesting a review at this very moment, and I'll approve when this branch first deploy \
-      into staging!"
+    if [ "$(gh pr view $line --json author --jq '.author.login')" != "dft-deploy" ]; then
+      gh pr review $line --request-changes --body "The HEAD branch was updated!!! \
+        I'll merge the updates into your branch, so make sure you test and/or resolve conflicts. \
+        I'm requesting a review at this very moment, and I'll approve when this branch first deploy \
+        into staging!"
+    done
   done
 else
   echo "Noting to do, No PR found, done!"
