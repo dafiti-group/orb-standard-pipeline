@@ -131,8 +131,8 @@ usage:
             filters: *head_filters
         - dft/eks-promote:
             name: promote-homolog-to-production
-            origin: clusters/staging/backstage.yaml
-            destiny: clusters/production/kustomization.yaml
+            origin: clusters/staging/backstage
+            destiny: clusters/production/kustomization
             target: production
             context: [TESTS, SLACK]
             requires:
