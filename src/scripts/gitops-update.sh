@@ -5,7 +5,7 @@ IMAGE="tag: \"${CIRCLE_SHA1:0:7}\""
 if [ "${PARAMETER_ROLLBACK}" -eq "1" ]; then
   IMAGE="tag: \"${PARAMETER_VERSION}\""
 fi
-CONFIG_FILE="${CIRCLE_PROJECT_REPONAME}.yaml"
+CONFIG_FILE="${PARAMETER_FILE_NAME:-$CIRCLE_PROJECT_REPONAME}.yaml"
 if [ ! -f "${CONFIG_FILE}" ]; then
   echo "file ${PARAMETER_DEPLOYMENT_PATH}/${CONFIG_FILE} not found!"
   exit 1

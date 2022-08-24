@@ -24,7 +24,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.0.2
+    dft: dafiti-group/orb-standard-pipeline@1.0.3
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -131,8 +131,8 @@ usage:
             filters: *head_filters
         - dft/eks-promote:
             name: promote-homolog-to-production
-            origin: clusters/staging
-            destiny: clusters/production
+            origin: clusters/staging/backstage.yaml
+            destiny: clusters/production/kustomization.yaml
             target: production
             context: [TESTS, SLACK]
             requires:

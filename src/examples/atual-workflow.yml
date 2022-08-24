@@ -23,7 +23,7 @@ usage:
     branches:
       only: [master]
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@v1.0.2
+    dft: dafiti-group/orb-standard-pipeline@1.0.3
   workflows:
     deployment-flow:
       jobs:

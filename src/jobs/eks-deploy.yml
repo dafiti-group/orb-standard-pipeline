@@ -10,7 +10,11 @@ parameters:
   gitops:
     type: string
     default: argo
-    description: A parameter to command clone_gitops repo
+    description: |
+      The repository name to be cloned to change the image tag in deployment yaml file
+      available options is:
+        - argo (for legacy deployments)
+        - gitops (for new deployments strategy)
   rollback:
     type: boolean
     default: false
@@ -19,6 +23,14 @@ parameters:
     type: string
     default: ""
     description: The commit hash to rollback your deployment use <<pipeline.parameters.rollback>>
+  file_name:
+    type: string
+    default: ""
+    description: |
+      The name of the file to be updated with the new image tag without the extension ex:
+      - backstage
+      - kustomize
+      Default value is CIRCLE_PROJECT_REPONAME that is the name of your repository in GitHub
 executor: small
 steps:
   - when:
@@ -40,6 +52,7 @@ steps:
         PARAMETER_DEPLOYMENT_PATH: <<parameters.deployment_path>>
         PARAMETER_ROLLBACK: <<parameters.rollback>>
         PARAMETER_VERSION: <<parameters.version>>
+        PARAMETER_FILE_NAME: <<parameters.file_name>>
       command: <<include(scripts/gitops-update.sh)>>
   - slack/notify:
       event: fail
