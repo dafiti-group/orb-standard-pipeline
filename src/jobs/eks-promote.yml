@@ -8,6 +8,22 @@ parameters:
   destiny:
     type: string
     description: path to destiny file to past to
+  origin_file:
+    type: string
+    default: ""
+    description: |
+      filename without extension go get image tag for deployment ex:
+      if file is `backstage.yaml` use only `backstage`
+      if file is `kustomize.yaml` use only `kustomize`
+      Default value is CIRCLE_PROJECT_REPONAME that is the name of your repository in GitHub
+  destiny_file:
+    type: string
+    default: ""
+    description: |
+      filename without extension for update image tag from ex:
+      if file is `backstage.yaml` use only `backstage`
+      if file is `kustomize.yaml` use only `kustomize`
+      Default value is CIRCLE_PROJECT_REPONAME that is the name of your repository in GitHub
   gitops:
     type: string
     default: argo
@@ -21,8 +37,10 @@ steps:
       name: Promote image from <<parameters.origin>> to <<parameters.destiny>>
       environment:
         PARAMETER_START_FOLDER: <<parameters.gitops>>
-        PARAMETERS_ORIGIN_FILE: <<parameters.origin>>
-        PARAMETERS_DESTINY_FILE: <<parameters.destiny>>
+        PARAMETERS_ORIGIN_PATH: <<parameters.origin>>
+        PARAMETERS_ORIGIN_FILE: <<parameters.origin_file>>
+        PARAMETERS_DESTINY_PATH: <<parameters.destiny>>
+        PARAMETERS_DESTINY_FILE: <<parameters.destiny_file>>
       command: <<include(scripts/gitops-promote.sh)>>
   - slack/notify:
       event: fail
