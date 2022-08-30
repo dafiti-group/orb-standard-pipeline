@@ -15,7 +15,7 @@ if [[ $(gh pr list) ]]; then
         I'll merge the updates into your branch, so make sure you test and/or resolve conflicts. \
         I'm requesting a review at this very moment, and I'll approve when this branch first deploy \
         into staging!"
-    done
+    fi
   done
 else
   echo "Noting to do, No PR found, done!"
