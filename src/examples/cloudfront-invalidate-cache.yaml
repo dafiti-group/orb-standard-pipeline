@@ -1,0 +1,13 @@
+description: |
+  This example show how to use the cloudfront cache invalidator
+  to be used in any kind of application that need to invalidate caches
+usage:
+  version: 2.1
+  orbs:
+    dft: dafiti-group/orb-standard-pipeline@dev:first
+  workflows:
+    wherever:
+      jobs:
+        - dft/invalidate-cache:
+            context: DEPLOY_QA
+            cloudfront_id: XPTO12324

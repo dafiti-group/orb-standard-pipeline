@@ -1,0 +1,14 @@
+description: |
+  Used to invalidate cache in cloudfront using aws cli
+parameters:
+  cloudfront_id:
+    type: string
+    description: The Id to be used in the aws cli command
+executor: small
+steps:
+  - aws-cli/setup
+  - run:
+      name: invalidate cache
+      environment:
+        PARAMETER_CLOUDFRONT_ID: <<parameters.cloudfront_id>>
+      command: <<include(scripts/invalidate-cache.sh)>>
