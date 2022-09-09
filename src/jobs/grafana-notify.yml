@@ -12,6 +12,7 @@ parameters:
       - live
       - qa
       - stg
+      - dev
       - local
     default: live
 executor: small
