@@ -26,7 +26,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.0.3
+    dft: dafiti-group/orb-standard-pipeline@1.0.6
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -110,6 +110,11 @@ usage:
             context: [INSTANA, DEPLOY_QA, SLACK]
             requires: [deploy-to-qa]
             service_name: <your-application-service-name-in-apm>
+        - dft/grafana-notify:
+            name: grafana-notify-qa
+            context: [GRAFANA,SLACK]
+            target_env: qa
+            requires: [deploy-to-qa]
         # staging actions =============================================================================================
         - dft/hold-slack:
             name: slack-notify-staging
@@ -130,6 +135,11 @@ usage:
             context: [INSTANA, DEPLOY_STAGING, SLACK]
             requires: [promote-qa-to-staging]
             service_name: <your-application-service-name-in-apm>
+        - dft/grafana-notify:
+            name: grafana-notify-stg
+            context: [GRAFANA,SLACK]
+            target_env: stg
+            requires: [promote-qa-to-staging]
         # =============================================================================================================
         - dft/github-approve:
             name: dft-deploy-approve-pr
@@ -162,4 +172,9 @@ usage:
             context: [INSTANA, DEPLOY_LIVE, SLACK]
             requires: [promote-homolog-to-production]
             service_name: <your-application-service-name-in-apm>
+        - dft/grafana-notify:
+            name: grafana-notify-live
+            context: [GRAFANA,SLACK]
+            target_env: live
+            requires: [promote-homolog-to-production]
         # ===============================================================================================================

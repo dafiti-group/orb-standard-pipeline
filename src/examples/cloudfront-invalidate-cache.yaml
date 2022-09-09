@@ -4,9 +4,9 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@dev:first
+    dft: dafiti-group/orb-standard-pipeline@1.0.6
   workflows:
-    wherever:
+    deployment-flow:
       jobs:
         - dft/invalidate-cache:
             context: DEPLOY_QA

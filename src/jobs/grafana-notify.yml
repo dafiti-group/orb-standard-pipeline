@@ -1,0 +1,27 @@
+description: |
+  Default grafana notify.
+
+  Needs contexts: [GRAFANA, SLACK]
+
+  Read more in: https://argocd-notifications.readthedocs.io/en/stable/services/grafana/
+parameters:
+  target_env:
+    type: enum
+    description: The env to annotate in grafana
+    enum:
+      - live
+      - qa
+      - stg
+      - dev
+      - local
+    default: live
+executor: small
+steps:
+  - run:
+      name: Notify grafana
+      environment:
+        PARAMETER_ENV: <<parameters.target_env>>
+      command: <<include(scripts/grafana-notify.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

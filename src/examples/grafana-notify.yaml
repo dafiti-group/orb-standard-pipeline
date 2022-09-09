@@ -1,0 +1,13 @@
+description: |
+  This example show how to use the grafana-notify in your application
+  to annotate any chart
+usage:
+  version: 2.1
+  orbs:
+    dft: dafiti-group/orb-standard-pipeline@1.0.6
+  workflows:
+    deployment-flow:
+      jobs:
+        - dft/grafana-notify:
+            context: [GRAFANA,SLACK]
+            target_env: live

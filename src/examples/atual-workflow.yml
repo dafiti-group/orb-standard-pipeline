@@ -23,7 +23,7 @@ usage:
     branches:
       only: [master]
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.0.3
+    dft: dafiti-group/orb-standard-pipeline@1.0.6
   workflows:
     deployment-flow:
       jobs:
@@ -55,6 +55,11 @@ usage:
             context: [INSTANA, DEPLOY_QA]
             service_name: <your-application-service-name-in-apm>
             requires: [deploy-qa]
+        - dft/grafana-notify:
+            name: grafana-notify-qa
+            context: [GRAFANA,SLACK]
+            target_env: qa
+            requires: [deploy-qa]
         # live deploy ===================================================================================================
         - dft/eks-deploy:
             name: deploy-live
@@ -66,4 +71,9 @@ usage:
             name: instana-notify-live
             context: [INSTANA, DEPLOY_LIVE]
             service_name: <your-application-service-name-in-apm>
+            requires: [deploy-live]
+        - dft/grafana-notify:
+            name: grafana-notify-live
+            context: [GRAFANA,SLACK]
+            target_env: live
             requires: [deploy-live]
