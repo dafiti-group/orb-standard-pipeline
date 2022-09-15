@@ -1,0 +1,23 @@
+description: |
+  This job is responsible to deploy lambda functions using AWS SAM cli
+parameters:
+  s3-bucket:
+    type: string
+    description: the name of the bucket to upload artifact
+  runner:
+    type: string
+    default: cimg/node:lts
+    description: |
+      base image to run the pipeline
+# executor: <<parameters.runner>>
+docker:
+  - image: <<parameters.runner>>
+resource_class: small
+steps:
+  - checkout
+  - sam/install
+  - run:
+      name: Deploy lambda funcion
+      environment:
+        SAM_DEPLOY_PARAMETER_S3: <<parameters.s3-bucket>>
+      command: <<include(scripts/sam-deploy.sh)>>
