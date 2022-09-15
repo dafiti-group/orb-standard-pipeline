@@ -14,5 +14,5 @@ orbs:
   aws-ecr: circleci/aws-ecr@7.3.0 # needs one of context: BUILD_AND_DEPLOY | DEPLOY_QA
   cxflow: checkmarx-ts/cxflow@1.0.6 # needs context: CHECKMARX_CLOUD
   github-cli: circleci/github-cli@2.1.0 # needs one of  context: (DEPLOY | BUILD_AND_DEPLOY | DEPLOY_QA)
-  pipeline-feedback: instana/pipeline-feedback@1.2.0 # needs context: [INSTANA, (BUILD_AND_DEPLOY|DEPLOY_QA)]
+  pipeline-feedback: instana/pipeline-feedback@2.0.0 # needs context: [INSTANA, (BUILD_AND_DEPLOY|DEPLOY_QA)]
   slack: circleci/slack@4.10.1 # needs context: SLACK
