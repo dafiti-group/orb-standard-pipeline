@@ -7,7 +7,7 @@ fi
 
 sam build
 
-cd .aws-sam/build
+cd .aws-sam/build || exit 1
 
 sam package \
   --template-file template.yaml \
