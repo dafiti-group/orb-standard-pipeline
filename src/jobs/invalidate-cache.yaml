@@ -1,5 +1,7 @@
 description: |
   Used to invalidate cache in cloudfront using aws cli
+  Needs:
+    context: [SLACK,(DEPLOY_LIVE|DEPLOY_STAGING|DEPLOY_QA)]
 parameters:
   cloudfront_id:
     type: string
@@ -12,3 +14,6 @@ steps:
       environment:
         PARAMETER_CLOUDFRONT_ID: <<parameters.cloudfront_id>>
       command: <<include(scripts/invalidate-cache.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

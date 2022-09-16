@@ -5,7 +5,6 @@ if [[ -z "${SAM_DEPLOY_PARAMETER_S3}" ]]; then
   exit 1
 fi
 
-# sam build --use-container --build-image public.ecr.aws/sam/build-nodejs16.x:1.56.1-20220907224346
 sam build
 
 cd .aws-sam/build

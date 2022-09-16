@@ -1,0 +1,4 @@
+description: A base instance to run only command without stack
+docker:
+  - image: cimg/base:stable
+

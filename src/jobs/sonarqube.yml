@@ -1,11 +1,11 @@
 description: |
   Step to validation quality of artefactor in pipeline.
   Used to run sonarqube needs context: SONAR
-  Needs contexts: [SONAR, SLACK]
+  Needs:
+    context: [SONAR, SLACK]
 executor: sonarqube
 steps:
   - checkout
-  - config_docker
   - run:
       name: Run Sonar
       command: <<include(scripts/sonar-scanner.sh)>>
