@@ -3,12 +3,72 @@ description: |
   Used to run sonarqube needs context: SONAR
   Needs:
     context: [SONAR, SLACK]
-executor: sonarqube
+parameters:
+  runner:
+    type: executor
+    default: sonarqube
+    description: |
+      base image to run the pipeline
+      Available options inside orb is [node, golang, default]
+      To use those executors from this orb, use the sintaxe :
+      ```yaml
+        version: 2.1
+        ...
+        executors:
+          my-executor:
+            docker:
+              - image: my-image:lts
+        workflows:
+          deployment-flow:
+            jobs:
+              ...
+              - dft/sam-test:
+                  name: unit-test
+                  runner: dft/node
+              - dft/sam-test:
+                  name: unit-test
+                  runner: dft/golang
+              # using outside orb executor
+              - dft/sam-test:
+                  name: unit-test
+                  runner: my-executor
+      ```
+      To use a customized runner, see this documentation https://circleci.com/docs/reusing-config#executor
+      Use CircleCI images -> https://circleci.com/developer/images
+  custom_command:
+    type: boolean
+    default: false
+    description: when custom command to run sonar-scanner
+  build_args:
+    type: string
+    default: ""
+    description: >
+      Used to pass aditional docker build args like: `--build-arg GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}`
+executor: <<parameters.runner>>
 steps:
   - checkout
-  - run:
-      name: Run Sonar
-      command: <<include(scripts/sonar-scanner.sh)>>
+  - when:
+      condition:
+        equal: [true, <<parameters.custom_command>>]
+      steps:
+        - config_docker
+        - aws-ecr/ecr-login
+        - run:
+            name: default workarround to fix docker-dafiti_default_network issue
+            command: docker network create docker-dafiti_default || true
+        - run:
+            name: Build sonar image scanner
+            command: docker-compose build <<parameters.build_args>> sonar
+        - run:
+            name: Run sonar scanner
+            command: docker-compose run --rm sonar
+  - when:
+      condition:
+        equal: [false, <<parameters.custom_command>>]
+      steps:
+        - run:
+            name: Run Sonar
+            command: <<include(scripts/sonar-scanner.sh)>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>

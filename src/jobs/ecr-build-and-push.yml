@@ -2,7 +2,6 @@ description: |
   Job to create your application AWS ECR artifact and push docker images to it
   Needs:
     context: [SLACK, TESTS, (BUILD_AND_PUSH|DEPLOY_LIVE|DEPLOY_QA)]
-executor: base
 parameters:
   repo_name:
     type: string
@@ -28,18 +27,61 @@ parameters:
     description: |
       The artifact tag name or names comma separated
       Default value is the first 7 characters of current commit and latest tag
+  custom_steps:
+    type: steps
+    description: |
+      Custom step to run before docker build
+    default: []
+  runner:
+    type: executor
+    default: base
+    description: |
+      base image to run the pipeline
+      Available options inside orb is [node, golang]
+      To use those executors from this orb, use the sintaxe :
+      ```yaml
+        version: 2.1
+        ...
+        executors:
+          my-executor:
+            docker:
+              - image: my-image:lts
+        workflows:
+          deployment-flow:
+            jobs:
+              ...
+              - dft/sam-test:
+                  name: unit-test
+                  runner: dft/node
+              - dft/sam-test:
+                  name: unit-test
+                  runner: dft/golang
+              # using outside orb executor
+              - dft/sam-test:
+                  name: unit-test
+                  runner: my-executor
+      ```
+      To use a customized runner, see this documentation https://circleci.com/docs/reusing-config#executor
+      Use CircleCI images -> https://circleci.com/developer/images
+  dockerfile:
+    type: string
+    default: Dockerfile
+    description: The path/file name of customized docker file
+executor: <<parameters.runner>>
 steps:
   - checkout
   - config_docker
   - aws-ecr/ecr-login
   - rev_txt:
       rev_txt_path: <<parameters.rev_txt_path>>
+  - steps: <<parameters.custom_steps>>
   - aws-ecr/build-and-push-image:
       checkout: false
       # create-repo: true # TODO: needs to talk about with SRE team
       repo: <<parameters.repo_name>>
       tag: <<parameters.build_tag>>
       extra-build-args: <<parameters.extra-build-args>>
+      dockerfile: <<parameters.dockerfile>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
