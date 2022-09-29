@@ -38,7 +38,9 @@ parameters:
   custom_command:
     type: boolean
     default: false
-    description: when custom command to run sonar-scanner
+    description: |
+      Boolean flag to switch to execut sonarqube scaner in docker-compose.yaml sonar service name.
+      Use only if the default executor does not works for your application
   build_args:
     type: string
     default: ""

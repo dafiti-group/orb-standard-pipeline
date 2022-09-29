@@ -55,7 +55,7 @@ usage:
             context: [TESTS, SLACK]
             rollback: <<pipeline.parameters.rollback>>
             version: <<pipeline.parameters.version>>
-            deployment_path: argo/clusters/eks-live-dafiti-latam/apps
+            deployment_path: <path-to-gitops-deployment>
             filters: *head_filters
     deployment-flow:
       when:
@@ -100,17 +100,21 @@ usage:
             context: [SLACK, TESTS, BUILD_AND_PUSH]
             filters: *deployment_filters
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+            runner: dft/java17
+            dockerfile: src/main/docker/Dockerfile.native
             custom_steps:
               - run:
                   name: Build quakus native
                   command: |
-                    ./gradlew build -x test -Dquarkus.package.type=native -Dquarkus.native.remote-container-build=true -Dquarkus.native.container-runtime=docker -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-mandrel:21.3.0.0-Final-java17
-            runner: dft/java17
-            dockerfile: src/main/docker/Dockerfile.native
+                    ./gradlew build -x test \
+                      -Dquarkus.package.type=native \
+                      -Dquarkus.native.remote-container-build=true \
+                      -Dquarkus.native.container-runtime=docker \
+                      -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-mandrel:21.3.0.0-Final-java17
         - dft/eks-deploy:
             name: deploy-to-qa
             context: [TESTS, SLACK]
-            deployment_path: argo/clusters/eks-qa-dafiti-latam/apps
+            deployment_path: <path-to-gitops-deployment>
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
@@ -171,8 +175,8 @@ usage:
         - dft/eks-promote:
             name: promote-homolog-to-live
             # origin: argo/clusters/eks-stg-dafiti-latam/apps # uncomment when staging is up and running
-            origin: argo/clusters/eks-qa-dafiti-latam/apps
-            destiny: argo/clusters/eks-live-dafiti-latam/apps
+            origin: <path-to-gitops-deployment>
+            destiny: <path-to-gitops-deployment>
             origin_file: ${CIRCLE_PROJECT_REPONAME}
             destiny_file: ${CIRCLE_PROJECT_REPONAME}
             context: [TESTS, SLACK]
