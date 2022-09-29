@@ -24,7 +24,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.0.8
+    dft: dafiti-group/orb-standard-pipeline@1.1.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -110,7 +110,7 @@ usage:
             service_name: <your-application-service-name-in-apm>
         - dft/grafana-notify:
             name: grafana-notify-qa
-            context: [GRAFANA,SLACK]
+            context: [GRAFANA, SLACK]
             target_env: qa
             requires: [deploy-to-qa]
         # =============================================================================================================
@@ -149,7 +149,7 @@ usage:
             service_name: <your-application-service-name-in-apm>
         - dft/grafana-notify:
             name: grafana-notify-live
-            context: [GRAFANA,SLACK]
+            context: [GRAFANA, SLACK]
             target_env: live
             requires: [promote-homolog-to-production]
         # ===============================================================================================================

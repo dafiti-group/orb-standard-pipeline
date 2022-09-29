@@ -1,5 +1,5 @@
 description: |
-  Example using new branch strategy and is used only to deploys in 3 environments: [qa, staging, live]
+  Example to Java Quarkus application with custom to run step `dft/sonarqube` and `dft/ecr-build-and-push` and using new branch strategy and is used only to deploys in 3 environments: [qa, staging, live]
   This example assume that your application is already using docker-compose run --rm ci to unit test everything!
   In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
   in your project settings or in your organization context, with the name of your team
@@ -52,10 +52,10 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-live
-            context: [DEPLOY_LIVE, SLACK]
-            rollback: true
+            context: [TESTS, SLACK]
+            rollback: <<pipeline.parameters.rollback>>
             version: <<pipeline.parameters.version>>
-            deployment_path: <path-to-gitops-deployment>
+            deployment_path: argo/clusters/eks-live-dafiti-latam/apps
             filters: *head_filters
     deployment-flow:
       when:
@@ -69,14 +69,16 @@ usage:
             filters: *test_filters
         - dft/sonarqube:
             name: sonarqube
-            context: [SONAR, SLACK]
+            custom_command: true
+            runner: dft/default
+            context: [SONAR, SLACK, BUILD_AND_PUSH]
             filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
             name: slack-notify-hold-qa
             context: [SLACK]
-            step_name: ":alert: a new release is awaiting your approve"
+            step_name: "A new release is awaiting your approve"
             filters: *release_filters
         - approval:
             name: start-to-qa
@@ -85,7 +87,7 @@ usage:
         - dft/hold-slack:
             name: slack-notify-hold-hotfix
             context: [SLACK]
-            step_name: ":alert: the hotfix is waiting your approval to deploy"
+            step_name: "The hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
             requires: [unit-test, sonarqube]
         - approval:
@@ -95,21 +97,26 @@ usage:
             requires: [unit-test, sonarqube]
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
-            rev_txt_path: public/rev.txt
             context: [SLACK, TESTS, BUILD_AND_PUSH]
             filters: *deployment_filters
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+            custom_steps:
+              - run:
+                  name: Build quakus native
+                  command: |
+                    ./gradlew build -x test -Dquarkus.package.type=native -Dquarkus.native.remote-container-build=true -Dquarkus.native.container-runtime=docker -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-mandrel:21.3.0.0-Final-java17
+            runner: dft/java17
+            dockerfile: src/main/docker/Dockerfile.native
         - dft/eks-deploy:
             name: deploy-to-qa
-            target_env: qa
             context: [TESTS, SLACK]
-            deployment_path: <path-to-gitops-deployment>
+            deployment_path: argo/clusters/eks-qa-dafiti-latam/apps
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
             context: [INSTANA, DEPLOY_QA, SLACK]
-            requires: [deploy-to-qa]
             service_name: <your-application-service-name-in-apm>
+            requires: [deploy-to-qa]
         - dft/grafana-notify:
             name: grafana-notify-qa
             context: [GRAFANA, SLACK]
@@ -144,7 +151,8 @@ usage:
         - dft/github-approve:
             name: dft-deploy-approve-pr
             context: [TESTS, SLACK]
-            requires: [promote-qa-to-staging]
+            # requires: [promote-qa-to-staging] # when staging is up and running, use this instead of the below
+            requires: [deploy-to-qa]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
@@ -152,27 +160,28 @@ usage:
             context: [TESTS, SLACK]
             filters: *head_filters
         - dft/hold-slack:
-            name: slack-notify-hold-production
-            context: SLACK
-            step_name: ":alert: pipeline waiting approval to promote to production"
+            name: slack-notify-hold-live
+            context: [SLACK]
+            step_name: "Pipeline waiting approval to promote to live"
             filters: *head_filters
         - approval:
             type: approval
-            name: approve-deploy-production
+            name: approve-deploy-live
             filters: *head_filters
         - dft/eks-promote:
-            name: promote-homolog-to-production
-            origin: clusters/staging
-            destiny: clusters/production
-            target: production
+            name: promote-homolog-to-live
+            # origin: argo/clusters/eks-stg-dafiti-latam/apps # uncomment when staging is up and running
+            origin: argo/clusters/eks-qa-dafiti-latam/apps
+            destiny: argo/clusters/eks-live-dafiti-latam/apps
+            origin_file: ${CIRCLE_PROJECT_REPONAME}
+            destiny_file: ${CIRCLE_PROJECT_REPONAME}
             context: [TESTS, SLACK]
-            requires:
-              [approve-deploy-production, review-open-pr-to-force-update]
+            requires: [approve-deploy-live, review-open-pr-to-force-update]
         - dft/instana-notify:
-            name: feedback-instana-production
+            name: feedback-instana-live
             context: [INSTANA, DEPLOY_LIVE, SLACK]
-            requires: [promote-homolog-to-production]
             service_name: <your-application-service-name-in-apm>
+            requires: [promote-homolog-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
             context: [GRAFANA, SLACK]

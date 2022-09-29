@@ -1,9 +1,13 @@
 version: 2.1
 
-description: >
+description: |
   Dafiti group default orb.
 
   Used to standardize all dafiti-group pipelines
+
+  In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
+  in your project settings or in your organization context, with the name of your team
+  like @team or with a specific person id using <@USERID>
 
 display:
   home_url: "https://github.com/dafiti-group/orb-standard-pipeline"
