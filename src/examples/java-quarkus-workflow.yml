@@ -70,7 +70,7 @@ usage:
         - dft/sonarqube:
             name: sonarqube
             custom_command: true
-            runner: dft/default
+            runner: dft/base
             context: [SONAR, SLACK, BUILD_AND_PUSH]
             filters: *test_filters
         # ===============================================================================================================
