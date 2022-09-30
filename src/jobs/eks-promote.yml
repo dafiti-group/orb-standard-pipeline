@@ -1,6 +1,7 @@
 description: |
   Used to get image tag from origin environment to replace into target environment
-  Needs contexts: [TESTS, SLACK]
+  Needs:
+    context: [TESTS, SLACK]
 parameters:
   origin:
     type: string
@@ -28,7 +29,7 @@ parameters:
     type: string
     default: argo
     description: The repo name to clone deployments to change image tags
-executor: default
+executor: base
 steps:
   - config_git
   - clone_gitops:

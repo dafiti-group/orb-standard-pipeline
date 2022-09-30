@@ -1,7 +1,8 @@
 description: |
   Used to force update into all open branches
   Put a review with request pending alert into all open PRs
-  Needs contexts: [TESTS, SLACK]
+  Needs:
+    context: [TESTS, SLACK]
 executor: small
 steps:
   - checkout

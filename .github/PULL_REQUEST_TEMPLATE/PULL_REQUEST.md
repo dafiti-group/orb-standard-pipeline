@@ -15,6 +15,12 @@ What kind of change does this PR introduce?
 
 Issue Number: N/A
 
+## The new version
+
+New release version candidate: v1..?
+
+>Reviewers, please check if the release candidate is present in the changes of this PR in the examples section!
+
 ## What is the new behavior?
 
 ## Does this PR introduce a breaking change?

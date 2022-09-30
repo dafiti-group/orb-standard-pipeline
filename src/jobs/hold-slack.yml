@@ -1,6 +1,7 @@
 description: |
   Used to notify a step of type APPROVAL on slack channel
-  Needs contexts: [SLACK]
+  Needs:
+    context: [SLACK]
 parameters:
   step_name:
     type: string

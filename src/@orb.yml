@@ -1,9 +1,13 @@
 version: 2.1
 
-description: >
+description: |
   Dafiti group default orb.
 
   Used to standardize all dafiti-group pipelines
+
+  In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
+  in your project settings or in your organization context, with the name of your team
+  like @team or with a specific person id using <@USERID>
 
 display:
   home_url: "https://github.com/dafiti-group/orb-standard-pipeline"
@@ -12,6 +16,7 @@ display:
 orbs:
   aws-cli: circleci/aws-cli@2.0.3 # needs one of context: BUILD_AND_DEPLOY | DEPLOY_QA
   aws-ecr: circleci/aws-ecr@7.3.0 # needs one of context: BUILD_AND_DEPLOY | DEPLOY_QA
+  sam: circleci/aws-sam-serverless@3.0 # needs one of context: BUILD_AND_DEPLOY | DEPLOY_QA
   cxflow: checkmarx-ts/cxflow@1.0.6 # needs context: CHECKMARX_CLOUD
   github-cli: circleci/github-cli@2.1.0 # needs one of  context: (DEPLOY | BUILD_AND_DEPLOY | DEPLOY_QA)
   pipeline-feedback: instana/pipeline-feedback@2.0.0 # needs context: [INSTANA, (BUILD_AND_DEPLOY|DEPLOY_QA)]
