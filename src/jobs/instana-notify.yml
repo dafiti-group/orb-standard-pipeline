@@ -18,7 +18,7 @@ steps:
           ]
         }
 
-  # TODO: waiting owner PR to be closed to bumb orb version
+  # TODO: waiting owner PR to be closed to bumb orb version https://github.com/instana/pipeline-feedback-orb/pull/14
   # - pipeline-feedback/create_release:
   #     release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
   #     release_scope: $(echo $PARAMETER_GENERATED_BODY)
