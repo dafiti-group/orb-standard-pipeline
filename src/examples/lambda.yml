@@ -63,7 +63,6 @@ usage:
             name: feedback-instana-qa
             context: [INSTANA, DEPLOY_QA, SLACK]
             requires: [deploy-to-qa]
-            service_name: <your-application-service-name-in-apm>
         - dft/grafana-notify:
             name: grafana-notify-qa
             context: [GRAFANA, SLACK]
@@ -100,7 +99,6 @@ usage:
             name: feedback-instana-production
             context: [INSTANA, DEPLOY_LIVE, SLACK]
             requires: [deploy-to-live]
-            service_name: <your-application-service-name-in-apm>
         - dft/grafana-notify:
             name: grafana-notify-live
             context: [GRAFANA, SLACK]

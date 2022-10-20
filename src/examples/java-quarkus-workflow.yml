@@ -9,10 +9,6 @@ description: |
       - rollback-live
       - deploy-to-qa
       - promote-qa-to-staging
-    - <your-application-service-name-in-apm> in steps:
-      - feedback-instana-qa
-      - feedback-instana-staging
-      - feedback-instana-production
 usage:
   version: 2.1
   parameters:
@@ -119,7 +115,6 @@ usage:
         - dft/instana-notify:
             name: feedback-instana-qa
             context: [INSTANA, DEPLOY_QA, SLACK]
-            service_name: <your-application-service-name-in-apm>
             requires: [deploy-to-qa]
         - dft/grafana-notify:
             name: grafana-notify-qa
@@ -145,7 +140,6 @@ usage:
             name: feedback-instana-staging
             context: [INSTANA, DEPLOY_STAGING, SLACK]
             requires: [promote-qa-to-staging]
-            service_name: <your-application-service-name-in-apm>
         - dft/grafana-notify:
             name: grafana-notify-stg
             context: [GRAFANA, SLACK]
@@ -184,7 +178,6 @@ usage:
         - dft/instana-notify:
             name: feedback-instana-live
             context: [INSTANA, DEPLOY_LIVE, SLACK]
-            service_name: <your-application-service-name-in-apm>
             requires: [promote-homolog-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live

@@ -6,9 +6,15 @@ parameters:
   service_name:
     type: string
     description: Name of you application service in instana apm
-    default: "${CIRCLE_PROJECT_REPONAME}.eks.${ENV_SHORT}.dafiti.local"
+    default: "${CIRCLE_PROJECT_REPONAME}.${ENV_SHORT}.dafiti.local"
 executor: instana
 steps:
+  - run:
+      name: fill_templates
+      environment:
+        PARAMETER_TEMPLATE: <<include(templates/instana_notify.json)>>
+        PARAMETER_SERVICE_NAME: <<parameters.service_name>>
+      command: <<include(scripts/instana_notify.sh)>>
   - pipeline-feedback/create_release:
       release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
       release_scope: |
