@@ -1,0 +1,34 @@
+description: >
+  Create a new Pipeline Feedback release in Instana.
+
+parameters:
+  endpoint:
+    type: env_var_name
+    description: >
+      The name of the environment variable that contains the URL of your Instana tenant unit, e.g.: https://apm-awesome.instana.io.
+      For self-managed (a.k.a., on-premise) setups, you can also add the port to use, e.g.: https://instana.awesome.com:1444.
+    default: INSTANA_ENDPOINT_URL
+  api_token:
+    type: env_var_name
+    description: >
+      The name of the environment variable that contains a valid API token with the "Configuration of releases" permissions.
+    default: INSTANA_API_TOKEN
+  release_name:
+    type: string
+    description: The name of this release in Instana.
+  release_scope:
+    type: string
+    description: >
+      JSON-encoded scoping information for the release.
+      If not provided, the release will be marked as global to your tenant unit.
+    default: "{}"
+
+steps:
+  - run:
+      environment:
+        INSTANA_ENDPOINT_URL_NAME: <<parameters.endpoint>>
+        INSTANA_API_TOKEN_NAME: <<parameters.api_token>>
+        INSTANA_RELEASE_NAME: <<parameters.release_name>>
+        INSTANA_RELEASE_SCOPE: <<parameters.release_scope>>
+      name: Create new release
+      command: <<include(scripts/create_release.sh)>>
