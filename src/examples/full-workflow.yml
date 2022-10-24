@@ -22,7 +22,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.0
+    dft: dafiti-group/orb-standard-pipeline@1.1.1
   # reserved filters anchors
   test_filters: &test_filters
     branches:
