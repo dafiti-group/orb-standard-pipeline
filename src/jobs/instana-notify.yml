@@ -6,17 +6,22 @@ parameters:
   service_name:
     type: string
     description: Name of you application service in instana apm
-    default: "${CIRCLE_PROJECT_REPONAME}.eks.${ENV_SHORT}.dafiti.local"
+    default: ${CIRCLE_PROJECT_REPONAME}.${ENV_SHORT}.dafiti.local
 executor: instana
 steps:
-  - pipeline-feedback/create_release:
+  - create_release:
       release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
       release_scope: |
         {
           "services": [
-            {"name": "<< parameters.service_name >>"}
+            {"name": "<<parameters.service_name>>"}
           ]
         }
+
+  # TODO: waiting owner PR to be closed to bumb orb version https://github.com/instana/pipeline-feedback-orb/pull/14
+  # - pipeline-feedback/create_release:
+  #     release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
+  #     release_scope: $(echo $PARAMETER_GENERATED_BODY)
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>

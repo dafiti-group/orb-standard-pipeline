@@ -8,9 +8,6 @@ description: |
     - <path-to-gitops-deployment> in steps:
       - rollback-live
       - deploy-to-qa
-    - <your-application-service-name-in-apm> in steps:
-      - feedback-instana-qa
-      - feedback-instana-production
 usage:
   version: 2.1
   parameters:
@@ -24,7 +21,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.0
+    dft: dafiti-group/orb-standard-pipeline@1.1.1
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -107,7 +104,6 @@ usage:
             name: feedback-instana-qa
             context: [INSTANA, DEPLOY_QA, SLACK]
             requires: [deploy-to-qa]
-            service_name: <your-application-service-name-in-apm>
         - dft/grafana-notify:
             name: grafana-notify-qa
             context: [GRAFANA, SLACK]
@@ -126,30 +122,28 @@ usage:
             context: [TESTS, SLACK]
             filters: *head_filters
         - dft/hold-slack:
-            name: slack-notify-hold-production
+            name: slack-notify-hold-live
             context: SLACK
-            step_name: ":alert: pipeline waiting approval to promote to production"
+            step_name: ":alert: pipeline waiting approval to promote to live"
             filters: *head_filters
         - approval:
             type: approval
-            name: approve-deploy-production
+            name: approve-deploy-live
             filters: *head_filters
         - dft/eks-promote:
-            name: promote-homolog-to-production
+            name: promote-homolog-to-live
             origin: clusters/staging/backstage
-            destiny: clusters/production/kustomization
-            target: production
+            destiny: clusters/live/kustomization
+            target: live
             context: [TESTS, SLACK]
-            requires:
-              [approve-deploy-production, review-open-pr-to-force-update]
+            requires: [approve-deploy-live, review-open-pr-to-force-update]
         - dft/instana-notify:
-            name: feedback-instana-production
+            name: feedback-instana-live
             context: [INSTANA, DEPLOY_LIVE, SLACK]
-            requires: [promote-homolog-to-production]
-            service_name: <your-application-service-name-in-apm>
+            requires: [promote-homolog-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
             context: [GRAFANA, SLACK]
             target_env: live
-            requires: [promote-homolog-to-production]
+            requires: [promote-homolog-to-live]
         # ===============================================================================================================

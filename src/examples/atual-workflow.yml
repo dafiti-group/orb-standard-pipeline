@@ -5,9 +5,6 @@ description: |
     -<path-to-gitops-deployment>in steps:
       - deploy-qa
       - deploy-live
-    - <your-application-service-name-in-apm> in steps:
-      - instana-notify-qa
-      - instana-notify-live
   In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
   in your project settings or in your organization context, with the name of your team
   like @team or with a specific person id using <@USERID>
@@ -23,7 +20,7 @@ usage:
     branches:
       only: [master]
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.0
+    dft: dafiti-group/orb-standard-pipeline@1.1.1
   workflows:
     deployment-flow:
       jobs:
@@ -53,7 +50,6 @@ usage:
         - dft/instana-notify:
             name: instana-notify-qa
             context: [INSTANA, DEPLOY_QA]
-            service_name: <your-application-service-name-in-apm>
             requires: [deploy-qa]
         - dft/grafana-notify:
             name: grafana-notify-qa
@@ -70,7 +66,6 @@ usage:
         - dft/instana-notify:
             name: instana-notify-live
             context: [INSTANA, DEPLOY_LIVE]
-            service_name: <your-application-service-name-in-apm>
             requires: [deploy-live]
         - dft/grafana-notify:
             name: grafana-notify-live
