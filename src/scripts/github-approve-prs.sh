@@ -14,6 +14,7 @@ if [[ $(gh pr list -H ${CIRCLE_BRANCH}) ]]; then
       gh pr review $line --approve --body "Thi PR is ready to merge!"
     else
       gh pr close $line
+      git push -d origin ${CIRCLE_BRANCH}
     fi
   done
 else
