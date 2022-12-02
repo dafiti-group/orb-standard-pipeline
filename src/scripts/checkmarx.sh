@@ -77,8 +77,8 @@ RESULT=$(curl \
   --show-error \
   --header "Authorization: Bearer ${BEARE_TOKEN}")
 
-PROJECT=$(echo ${RESULT} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")' | grep -E "*${CIRCLE_PROJECT_REPONAME}$")
-BRANCH=$(echo ${RESULT} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")' | grep -E "*${PROJECT_BRANH_NAME}$")
+PROJECT=$(echo ${RESULT} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")' | grep -E "^[0-9]+\s${CIRCLE_PROJECT_REPONAME}$")
+BRANCH=$(echo ${RESULT} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")' | grep -E "^[0-9]+\s${PROJECT_BRANH_NAME}$")
 
 if [[ ${PROJECT} == '' ]]; then
   echo "Project not found: ${RESULT}"
