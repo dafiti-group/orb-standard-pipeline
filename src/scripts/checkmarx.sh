@@ -1,9 +1,18 @@
-# set -x
-# the cx-flow/executor does not have jq and curl, installing
-apk add curl jq || exit 1
-
 # Validating environments
+echo "
+=================================================
+   ___         ___ _  __   _   ____
+  / _ \ ___ _ / _/(_)/ /_ (_) / __/___  _  __
+ / // // _ \`// _// // __// / / _/ / _ \| |/ /
+/____/ \_,_//_/ /_/ \__//_/ /___//_//_/|___/
+                               for monsters
+=================================================
+"
 echo "Validating envs!"
+if [[ -z "$GITHUB_ACCESS_TOKEN" ]]; then
+  echo "Missing GITHUB_ACCESS_TOKEN environment used in cxflow/scan command"
+  exit 1
+fi
 if [[ -z "$CHECKMARX_URL" ]]; then
   echo "Missing CHECKMARX_URL environment"
   exit 1
@@ -20,11 +29,29 @@ if [[ -z "$CHECKMARX_CLIENT_SECRET" ]]; then
   echo "Missing CHECKMARX_CLIENT_SECRET environment"
   exit 1
 fi
+if [[ -z "$CHECKMARX_PRESET" ]]; then
+  echo "Missing CHECKMARX_PRESET environment used in cxflow/scan command"
+  exit 1
+fi
+if [[ -z "$CHECKMARX_TEAM" ]]; then
+  echo "Missing CHECKMARX_TEAM environment used in cxflow/scan command"
+  exit 1
+fi
 
 echo "Set up the initials envs of the context"
 # Regex to accept patterns in Checkmarx API
-TEMP_BRANCH_NAME=$(echo ${CIRCLE_BRANCH} | sed 's|\/|-|g' | tr '[:upper:]' '[:lower:]')
-PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}.${TEMP_BRANCH_NAME}"
+PARAMETER_BRANCH_NAME_SANITIZED=$(echo ${CIRCLE_BRANCH} | sed 's|\/|-|g' | tr '[:upper:]' '[:lower:]')
+PARAMETER_PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}.${PARAMETER_BRANCH_NAME_SANITIZED}"
+# CREATING THE ENV TO HANDLE SYMBOLIC LINKS IN THE NEXT STEP
+PARAMETER_SYMBOLIC_FILES=""
+if [[ $(find -type l) ]]; then
+  PARAMETER_SYMBOLIC_FILES=$(find -type l | cut -c 3- | paste -sd ",")
+fi
+# EXPORTING ENVS TO BE USED IN THE cxflow/scan command ============================================
+echo "export PARAMETER_SYMBOLIC_FILES=${PARAMETER_SYMBOLIC_FILES}" >>"${BASH_ENV}"
+echo "export PARAMETER_BRANCH_NAME_SANITIZED=${PARAMETER_BRANCH_NAME_SANITIZED}" >>"${BASH_ENV}"
+echo "export PARAMETER_PROJECT_BRANCH_NAME=${PARAMETER_PROJECT_BRANCH_NAME}" >>"${BASH_ENV}"
+# =================================================================================================
 
 # Checkmarx API - create_branch method
 function create_branch() {
@@ -38,7 +65,7 @@ function create_branch() {
       --show-error \
       --header 'Content-Type: application/json' \
       --header "Authorization: Bearer ${BEARE_TOKEN}" \
-      --data-raw "{\"name\": \"${PROJECT_BRANCH_NAME}\"}"
+      --data-raw "{\"name\": \"${PARAMETER_PROJECT_BRANCH_NAME}\"}"
   )
   echo "Request create branch executed with success, validating response."
   if [[ $(echo ${CREATE_BRANCH_RESPONSE} | jq '.id') == null ]]; then
@@ -81,24 +108,23 @@ PROJECT_LIST_RESPONSE=$(curl \
   --fail \
   --show-error \
   --header "Authorization: Bearer ${BEARE_TOKEN}")
+
 echo "Projects list request executed with success, searching for project and branch in the list...."
+
 PROJECT_LIST=$(echo ${PROJECT_LIST_RESPONSE} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")')
 
 if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
   PROJECT=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$")
   PROJECT_ID=$(echo ${PROJECT} | awk '{print$1}')
   echo "Project Found ${PROJECT}"
-  echo "export PARAMETER_CHECKMARX_PROJECT_NAME=${PROJECT_BRANCH_NAME}" >>$BASH_ENV
 
-  if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${PROJECT_BRANCH_NAME}$"; then
-    BRANCH=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${PROJECT_BRANCH_NAME}$")
+  if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${PARAMETER_PROJECT_BRANCH_NAME}$"; then
+    BRANCH=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${PARAMETER_PROJECT_BRANCH_NAME}$")
     echo "Bransh already exists: ${BRANCH}"
   else
     echo "Branch not found, trying to create one!"
     create_branch
   fi
 else
-  echo "Project not found: \n ${PROJECT_LIST}"
-  echo "export PARAMETER_CHECKMARX_PROJECT_NAME=${CIRCLE_PROJECT_REPONAME}" >>$BASH_ENV
-  exit 0
+  echo "Project not found, ready to execute next step. The project listed is: \n ${PROJECT_LIST}"
 fi
