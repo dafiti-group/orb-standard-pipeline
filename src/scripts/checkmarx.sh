@@ -1,6 +1,9 @@
-#!/bin/bash
+# set -x
+# the cx-flow/executor does not have jq and curl, installing
+apk add curl jq || exit 1
 
-# Validation encironments
+# Validating environments
+echo "Validating envs!"
 if [[ -z "$CHECKMARX_URL" ]]; then
   echo "Missing CHECKMARX_URL environment"
   exit 1
@@ -18,14 +21,15 @@ if [[ -z "$CHECKMARX_CLIENT_SECRET" ]]; then
   exit 1
 fi
 
+echo "Set up the initials envs of the context"
 # Regex to accept patterns in Checkmarx API
 TEMP_BRANCH_NAME=$(echo ${CIRCLE_BRANCH} | sed 's|\/|-|g' | tr '[:upper:]' '[:lower:]')
-PROJECT_BRANH_NAME="${CIRCLE_PROJECT_REPONAME}.${TEMP_BRANCH_NAME}"
+PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}.${TEMP_BRANCH_NAME}"
 
 # Checkmarx API - create_branch method
 function create_branch() {
 
-  RESULT=$(
+  CREATE_BRANCH_RESPONSE=$(
     curl \
       --location \
       --request POST "${CHECKMARX_URL}/cxrestapi/projects/${PROJECT_ID}/branch" \
@@ -34,18 +38,19 @@ function create_branch() {
       --show-error \
       --header 'Content-Type: application/json' \
       --header "Authorization: Bearer ${BEARE_TOKEN}" \
-      --data-raw "{\"name\": \"${PROJECT_BRANH_NAME}\"}"
+      --data-raw "{\"name\": \"${PROJECT_BRANCH_NAME}\"}"
   )
-
-  if [[ $(echo ${RESULT} | jq '.id') == null ]]; then
-    echo "Branch could not be created: ${RESULT}"
+  echo "Request create branch executed with success, validating response."
+  if [[ $(echo ${CREATE_BRANCH_RESPONSE} | jq '.id') == null ]]; then
+    echo "Branch could not be created: ${CREATE_BRANCH_RESPONSE}"
     exit 1
   fi
-
+  echo "Branch created with success! ${CREATE_BRANCH_RESPONSE}"
 }
 
+echo "auth to get token..."
 # Checkmarx API - Auth method
-RESULT=$(
+AUTH_RESPONSE=$(
   curl \
     --location \
     --request POST "${CHECKMARX_URL}/cxrestapi/auth/identity/connect/token" \
@@ -61,35 +66,39 @@ RESULT=$(
     --data-urlencode "client_secret=${CHECKMARX_CLIENT_SECRET}"
 )
 
-BEARE_TOKEN=$(echo ${RESULT} | jq -r '.access_token')
+BEARE_TOKEN=$(echo ${AUTH_RESPONSE} | jq -r '.access_token')
 
 if [[ "${BEARE_TOKEN}" == null ]]; then
   echo "Auth failed: ${RESULT}"
   exit 1
 fi
-
+echo "Auth success, listing projects..."
 # Checkmarx API - project_exists method
-RESULT=$(curl \
+PROJECT_LIST_RESPONSE=$(curl \
   --location \
   --request GET "${CHECKMARX_URL}/cxrestapi/projects" \
   --silent \
   --fail \
   --show-error \
   --header "Authorization: Bearer ${BEARE_TOKEN}")
+echo "Projects list request executed with success, searching for project and branch in the list...."
+PROJECT_LIST=$(echo ${PROJECT_LIST_RESPONSE} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")')
 
-PROJECT=$(echo ${RESULT} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")' | grep -E "^[0-9]+\s${CIRCLE_PROJECT_REPONAME}$")
-BRANCH=$(echo ${RESULT} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")' | grep -E "^[0-9]+\s${PROJECT_BRANH_NAME}$")
-
-if [[ ${PROJECT} == '' ]]; then
-  echo "Project not found: ${RESULT}"
-  exit 1
-else
-  echo "Project Found ${PROJECT}"
-fi
-
-if [[ ${BRANCH} == '' ]]; then
+if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
+  PROJECT=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$")
   PROJECT_ID=$(echo ${PROJECT} | awk '{print$1}')
-  create_branch
+  echo "Project Found ${PROJECT}"
+  echo "export PARAMETER_CHECKMARX_PROJECT_NAME=${PROJECT_BRANCH_NAME}" >>$BASH_ENV
+
+  if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${PROJECT_BRANCH_NAME}$"; then
+    BRANCH=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${PROJECT_BRANCH_NAME}$")
+    echo "Bransh already exists: ${BRANCH}"
+  else
+    echo "Branch not found, trying to create one!"
+    create_branch
+  fi
 else
-  echo "Branch already exists ${BRANCH}"
+  echo "Project not found: \n ${PROJECT_LIST}"
+  echo "export PARAMETER_CHECKMARX_PROJECT_NAME=${CIRCLE_PROJECT_REPONAME}" >>$BASH_ENV
+  exit 0
 fi

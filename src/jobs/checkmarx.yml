@@ -1,12 +1,41 @@
 description: |
   This job will be the new checkmarx context.
   Needs
-    context: [CHECKMARX_CLOUD,SLACK]
-executor: small
+    context: [CHECKMARX_CLOUD,SLACK,TEST]
+executor: cxflow/default
+circleci_ip_ranges: true
 steps:
   - run:
-      name: executing checkmarx
-      command: echo "OK"
+      name: Verify if project branch exists
+      command: <<include(scripts/checkmarx.sh)>>
+  # - cxflow/scan:
+  #     preset: $CX_PRESET
+  #     team: $CX_TEAM
+  #     incremental: true
+  #     # PARAMETER_CHECKMARX_PROJECT_NAME is populated in scripts/checkmarx.sh script ;)
+  #     project: ${PARAMETER_CHECKMARX_PROJECT_NAME}
+  #     sca-accessControlUrl: 'https://platform.checkmarx.net'
+  #     sca-apiUrl: 'https://api.scacheckmarx.com'
+  #     sca-appUrl: 'https://sca.scacheckmarx.com'
+  #     bug-tracker: GitHub
+  #     params: >-
+  #       --cx-flow.zip-exclude=$(ls -l)
+  #       --checkmarx.settings-override=true
+  #       --cx-flow.thresholds.High=0
+  #       --cx-flow.thresholds.Medium=5
+  #       --cx-flow.filterStatus=New
+  #       --cx-flow.filterStatus=Reoccured
+  #       --namespace=dafiti-group
+  #       --repo-name="${CIRCLE_PROJECT_REPONAME}"
+  #       --branch="${CIRCLE_BRANCH}"
+  #       --cx-flow.filterSeverity=High
+  #       --cx-flow.filterSeverity=Medium
+  #       --github.url="https://github.com"
+  #       --github.api-url="https://api.github.com/repos/"
+  #       --github.token="${GITHUB_ACCESS_TOKEN}"
+  #       --github.block-merge=true
+  #       --github.error-merge:true
+  #       --github.max-delay=3
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
