@@ -44,13 +44,15 @@ PARAMETER_BRANCH_NAME_SANITIZED=$(echo ${CIRCLE_BRANCH} | sed 's|\/|-|g' | tr '[
 PARAMETER_PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}.${PARAMETER_BRANCH_NAME_SANITIZED}"
 # CREATING THE ENV TO HANDLE SYMBOLIC LINKS IN THE NEXT STEP
 PARAMETER_SYMBOLIC_FILES=""
-if [[ $(find -type l) ]]; then
-  PARAMETER_SYMBOLIC_FILES=$(find -type l | cut -c 3- | paste -sd ",")
+if [[ $(find . -type l) ]]; then
+  PARAMETER_SYMBOLIC_FILES=$(find . -type l | cut -c 3- | paste -sd ",")
 fi
 # EXPORTING ENVS TO BE USED IN THE cxflow/scan command ============================================
-echo "export PARAMETER_SYMBOLIC_FILES=${PARAMETER_SYMBOLIC_FILES}" >>"${BASH_ENV}"
-echo "export PARAMETER_BRANCH_NAME_SANITIZED=${PARAMETER_BRANCH_NAME_SANITIZED}" >>"${BASH_ENV}"
-echo "export PARAMETER_PROJECT_BRANCH_NAME=${PARAMETER_PROJECT_BRANCH_NAME}" >>"${BASH_ENV}"
+{
+  echo "export PARAMETER_SYMBOLIC_FILES=${PARAMETER_SYMBOLIC_FILES}"
+  echo "export PARAMETER_BRANCH_NAME_SANITIZED=${PARAMETER_BRANCH_NAME_SANITIZED}"
+  echo "export PARAMETER_PROJECT_BRANCH_NAME=${PARAMETER_PROJECT_BRANCH_NAME}"
+} >> "${BASH_ENV}"
 # =================================================================================================
 
 # Checkmarx API - create_branch method
@@ -126,5 +128,6 @@ if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
     create_branch
   fi
 else
-  echo "Project not found, ready to execute next step. The project listed is: \n ${PROJECT_LIST}"
+  echo "Project not found, ready to execute next step. The project listed is: "
+  echo "${PROJECT_LIST}"
 fi
