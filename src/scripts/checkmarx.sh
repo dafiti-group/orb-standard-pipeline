@@ -118,7 +118,7 @@ LOOPING TO FIND BRANCHS TO DELETE IN CHECKMARX....
       TMP=$(echo $line | rev | cut -d\. -f1 | rev)
       ID=$(echo "$line" | awk '{print$1}')
 
-      if [[ ! "${BRANCH_LIST[*]}" =~ "$TMP" ]]; then
+      if [[ ! "${BRANCH_LIST[*]}" =~ ${TMP} ]]; then
         echo "Branch: ${TMP} not found. Deleting checkmarx project ID:${ID}"
         delete_branch $ID
       else
