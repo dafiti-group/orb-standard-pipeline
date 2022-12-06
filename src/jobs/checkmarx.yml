@@ -9,15 +9,14 @@ parameters:
     type: string
     default: main
     description: |
-      The name of the HEAD branch to be excluded in the remote branch list to
-      exclude old branchs on checkmarx
+      The HEAD branch name to be skipped as a target to be deleted from checkmarx project
 steps:
   - run:
       name: install image dependencies
       command: apk add curl jq git openssl || exit 1
   - checkout
   - run:
-      name: Verify if project branch exists and delete branches for checkmarx when not present in github
+      name: Checkmarx branching validation, creation, and delete steps.
       environment:
         HEAD_BRANCH_NAME: <<parameters.branch_head_name>>
       command: <<include(scripts/checkmarx.sh)>>

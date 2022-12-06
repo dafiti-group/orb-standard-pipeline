@@ -1,4 +1,3 @@
-# Validating environments
 echo "
 =================================================
    ___         ___ _  __   _   ____
@@ -43,7 +42,7 @@ if [[ -z "$CHECKMARX_TEAM" ]]; then
 fi
 
 echo "Set up the initials envs of the context"
-# Regex to accept patterns in Checkmarx API
+# Sanitizing the branch name to be in compliance with checkmarx branch name roles
 PARAMETER_BRANCH_NAME_SANITIZED=$(echo ${CIRCLE_BRANCH} | sed 's|\/|-|g' | sed 's|_|-|g' | tr '[:upper:]' '[:lower:]')
 PARAMETER_PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}.${PARAMETER_BRANCH_NAME_SANITIZED}"
 # CREATING THE ENV TO HANDLE SYMBOLIC LINKS IN THE NEXT STEP
@@ -81,6 +80,7 @@ function create_branch() {
   fi
   echo "Branch created with success! ${CREATE_BRANCH_RESPONSE}"
 }
+# Checkmarx API - delete_branch method
 function delete_branch() {
   echo "deleting project ID: ${*}"
   DELETE_BRANCH_RESPONSE=$(
@@ -96,7 +96,7 @@ function delete_branch() {
   )
   echo "Branch deleted with success! ${DELETE_BRANCH_RESPONSE}"
 }
-
+# Local helper function to compare branch list to be excluded from Checkmarx
 function search_branchs_to_delete_in_checkmarx() {
   echo "Searching for branchs to delete in checkmarx"
   git config --global --add safe.directory "*"
@@ -126,7 +126,7 @@ LOOPING TO FIND BRANCHS TO DELETE IN CHECKMARX....
       fi
     done
   else
-    echo "emtpy vars!"
+    echo "No branchs to validate, skiping..."
   fi
 }
 
@@ -156,13 +156,15 @@ if [[ "${BEARER_TOKEN}" == null ]]; then
 fi
 echo "Auth success, listing projects..."
 # Checkmarx API - project_exists method
-PROJECT_LIST_RESPONSE=$(curl \
-  --location \
-  --request GET "${CHECKMARX_URL}/cxrestapi/projects" \
-  --silent \
-  --fail-with-body \
-  --show-error \
-  --header "Authorization: Bearer ${BEARER_TOKEN}")
+PROJECT_LIST_RESPONSE=$(
+  curl \
+    --location \
+    --request GET "${CHECKMARX_URL}/cxrestapi/projects" \
+    --silent \
+    --fail-with-body \
+    --show-error \
+    --header "Authorization: Bearer ${BEARER_TOKEN}"
+)
 
 echo "Projects list request executed with success, Searching the project and branch in the list..."
 
