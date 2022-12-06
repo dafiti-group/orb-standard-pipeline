@@ -44,7 +44,7 @@ fi
 
 echo "Set up the initials envs of the context"
 # Regex to accept patterns in Checkmarx API
-PARAMETER_BRANCH_NAME_SANITIZED=$(echo ${CIRCLE_BRANCH} | sed 's|(\/\|_)|-|g' | tr '[:upper:]' '[:lower:]')
+PARAMETER_BRANCH_NAME_SANITIZED=$(echo ${CIRCLE_BRANCH} | sed 's|\/|-|g' | sed 's|_|-|g' | tr '[:upper:]' '[:lower:]')
 PARAMETER_PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}.${PARAMETER_BRANCH_NAME_SANITIZED}"
 # CREATING THE ENV TO HANDLE SYMBOLIC LINKS IN THE NEXT STEP
 PARAMETER_SYMBOLIC_FILES=""
@@ -61,13 +61,14 @@ fi
 
 # Checkmarx API - create_branch method
 function create_branch() {
+  echo "Creating project branch: ${PARAMETER_PROJECT_BRANCH_NAME} for project ID: ${PROJECT_ID}"
 
   CREATE_BRANCH_RESPONSE=$(
     curl \
       --location \
       --request POST "${CHECKMARX_URL}/cxrestapi/projects/${PROJECT_ID}/branch" \
       --silent \
-      --fail \
+      --fail-with-body \
       --show-error \
       --header 'Content-Type: application/json' \
       --header "Authorization: Bearer ${BEARER_TOKEN}" \
@@ -81,13 +82,13 @@ function create_branch() {
   echo "Branch created with success! ${CREATE_BRANCH_RESPONSE}"
 }
 function delete_branch() {
-  echo "deleting project ID: ${@}"
+  echo "deleting project ID: ${*}"
   DELETE_BRANCH_RESPONSE=$(
     curl \
       --location \
-      --request DELETE "${CHECKMARX_URL}/cxrestapi/help/projects/${@}" \
+      --request DELETE "${CHECKMARX_URL}/cxrestapi/help/projects/${*}" \
       --silent \
-      --fail \
+      --fail-with-body \
       --show-error \
       --header 'Content-Type: application/json;v=1.0' \
       --header "Authorization: Bearer ${BEARER_TOKEN}" \
@@ -100,9 +101,9 @@ function search_branchs_to_delete_in_checkmarx() {
   echo "Searching for branchs to delete in checkmarx"
   git config --global --add safe.directory "*"
   ALL_BRANCHS=$(git branch --list --remotes | sed -E 's|^\s+||g')
-  BRANCH_LIST=$(echo "${ALL_BRANCHS}" | grep -v ${HEAD_BRANCH_NAME} | sed 's|origin\/||g' | sed -E 's|(\/\|_)|-|g' | tr '[:upper:]' '[:lower:]')
+  BRANCH_LIST=$(echo "${ALL_BRANCHS}" | grep -v ${HEAD_BRANCH_NAME} | sed 's|origin\/||g' | sed 's|\/|-|g' | sed 's|_|-|g' | tr '[:upper:]' '[:lower:]')
   CHECKMARX_LOCAL_PROJECTS=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}\..*" | grep -v ${HEAD_BRANCH_NAME})
-  if [[ ! -z "${BRANCH_LIST}" && ! -z "${CHECKMARX_LOCAL_PROJECTS}" ]]; then
+  if [[ -n "${BRANCH_LIST}" && -n "${CHECKMARX_LOCAL_PROJECTS}" ]]; then
     echo "
 =============================================
 github branch names sanitized:
@@ -113,11 +114,11 @@ ${CHECKMARX_LOCAL_PROJECTS}
 =============================================
 LOOPING TO FIND BRANCHS TO DELETE IN CHECKMARX....
 "
-    echo "${CHECKMARX_LOCAL_PROJECTS}" | while read line; do
+    echo "${CHECKMARX_LOCAL_PROJECTS}" | while read -r line; do
       TMP=$(echo $line | rev | cut -d\. -f1 | rev)
       ID=$(echo "$line" | awk '{print$1}')
 
-      if [[ ! "${BRANCH_LIST[*]}" =~ "${TMP}" ]]; then
+      if [[ ! "${BRANCH_LIST[*]}" =~ "$TMP" ]]; then
         echo "Branch: ${TMP} not found. Deleting checkmarx project ID:${ID}"
         delete_branch $ID
       else
@@ -136,7 +137,7 @@ AUTH_RESPONSE=$(
     --location \
     --request POST "${CHECKMARX_URL}/cxrestapi/auth/identity/connect/token" \
     --silent \
-    --fail \
+    --fail-with-body \
     --show-error \
     --header 'Content-Type: application/x-www-form-urlencoded' \
     --data-urlencode "username=${CHECKMARX_USERNAME}" \
@@ -159,7 +160,7 @@ PROJECT_LIST_RESPONSE=$(curl \
   --location \
   --request GET "${CHECKMARX_URL}/cxrestapi/projects" \
   --silent \
-  --fail \
+  --fail-with-body \
   --show-error \
   --header "Authorization: Bearer ${BEARER_TOKEN}")
 
