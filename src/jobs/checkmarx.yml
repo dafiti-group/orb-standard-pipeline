@@ -4,13 +4,22 @@ description: |
     context: [CHECKMARX_CLOUD,SLACK,TESTS]
 executor: cxflow/default
 circleci_ip_ranges: true
+parameters:
+  branch_head_name:
+    type: string
+    default: main
+    description: |
+      The name of the HEAD branch to be excluded in the remote branch list to
+      exclude old branchs on checkmarx
 steps:
   - run:
       name: install image dependencies
       command: apk add curl jq git openssl || exit 1
   - checkout
   - run:
-      name: Verify if project branch exists
+      name: Verify if project branch exists and delete branches for checkmarx when not present in github
+      environment:
+        HEAD_BRANCH_NAME: <<parameters.branch_head_name>>
       command: <<include(scripts/checkmarx.sh)>>
   - cxflow/scan:
       preset: $CHECKMARX_PRESET
@@ -19,9 +28,9 @@ steps:
       # PARAMETER_PROJECT_BRANCH_NAME is populated in scripts/checkmarx.sh script ;)
       # PARAMETER_BRANCH_NAME_SANITIZED is created in scripts/checkmarx.sh to remove invalid characters to cxflow rules
       project: ${PARAMETER_PROJECT_BRANCH_NAME}
-      sca-accessControlUrl: 'https://platform.checkmarx.net'
-      sca-apiUrl: 'https://api.scacheckmarx.com'
-      sca-appUrl: 'https://sca.scacheckmarx.com'
+      sca-accessControlUrl: "https://platform.checkmarx.net"
+      sca-apiUrl: "https://api.scacheckmarx.com"
+      sca-appUrl: "https://sca.scacheckmarx.com"
       bug-tracker: GitHub
       params: >-
         --cx-flow.zip-exclude="${PARAMETER_SYMBOLIC_FILES}"
@@ -30,7 +39,7 @@ steps:
         --cx-flow.thresholds.Medium=5
         --cx-flow.filterStatus=New
         --cx-flow.filterStatus=Reoccured
-        --namespace=dafiti-group
+        --namespace="${CIRCLE_PROJECT_USERNAME}"
         --repo-name="${CIRCLE_PROJECT_REPONAME}"
         --branch="${PARAMETER_BRANCH_NAME_SANITIZED}"
         --cx-flow.filterSeverity=High
