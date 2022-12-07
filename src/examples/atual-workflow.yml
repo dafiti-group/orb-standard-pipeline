@@ -33,7 +33,7 @@ usage:
             context: [SONAR, SLACK]
         - dft/checkmarx:
             name: checkmarx
-            context: [SLACK, CHECKMARX_CLOUD]
+            context: [SLACK, GITHUB, CHECKMARX_CLOUD]
         # ===============================================================================================================
         - dft/ecr-build-and-push:
             name: build-and-push
