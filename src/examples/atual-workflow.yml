@@ -20,14 +20,14 @@ usage:
     branches:
       only: [master]
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.2
+    dft: dafiti-group/orb-standard-pipeline@1.2.0
   workflows:
     deployment-flow:
       jobs:
         # test gates ====================================================================================================
         - dft/unit-test:
             name: unit-test
-            context: [TEST, SLACK, BUILD_AND_PUSH]
+            context: [SLACK, GITHUB, BUILD_AND_PUSH]
         - dft/sonarqube:
             name: sonarqube
             context: [SONAR, SLACK]
@@ -37,13 +37,13 @@ usage:
         # ===============================================================================================================
         - dft/ecr-build-and-push:
             name: build-and-push
-            context: [TESTS, SLACK, BUILD_AND_PUSH]
+            context: [SLACK, GITHUB, BUILD_AND_PUSH]
             filters: *default_filter
-            requires: [unit-test, sonarqube]
+            requires: [unit-test, sonarqube, checkmarx]
         # qa deploy =====================================================================================================
         - dft/eks-deploy:
             name: deploy-qa
-            context: [TESTS, SLACK, BUILD_AND_DEPLOY]
+            context: [SLACK, GITHUB, BUILD_AND_DEPLOY]
             deployment_path: <path-to-gitops-deployment>
             filters: *qa_filter
             requires: [build-and-push]
@@ -59,7 +59,7 @@ usage:
         # live deploy ===================================================================================================
         - dft/eks-deploy:
             name: deploy-live
-            context: [TESTS, SLACK, BUILD_AND_DEPLOY]
+            context: [SLACK, GITHUB, BUILD_AND_DEPLOY]
             deployment_path: <path-to-gitops-deployment>
             filters: *head_filter
             requires: [build-and-push]
@@ -69,6 +69,6 @@ usage:
             requires: [deploy-live]
         - dft/grafana-notify:
             name: grafana-notify-live
-            context: [GRAFANA, SLACK]
+            context: [SLACK, GRAFANA]
             target_env: live
             requires: [deploy-live]

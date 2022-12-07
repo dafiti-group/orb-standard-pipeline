@@ -2,7 +2,7 @@ description: |
   Used to force update into all open branches
   Put a review with request pending alert into all open PRs
   Needs:
-    context: [TESTS, SLACK]
+    context: [SLACK, GITHUB]
 executor: small
 steps:
   - checkout

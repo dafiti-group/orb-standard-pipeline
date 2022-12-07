@@ -1,7 +1,7 @@
 description: |
   Used to update the gitops repository to k8s deployment
   Needs:
-    context: [TESTS,SLACK]
+    context: [SLACK, GITHUB]
 parameters:
   deployment_path:
     type: string

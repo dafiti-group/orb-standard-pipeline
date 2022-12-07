@@ -1,7 +1,7 @@
 description: |
   Used to get image tag from origin environment to replace into target environment
   Needs:
-    context: [TESTS, SLACK]
+    context: [SLACK, GITHUB]
 parameters:
   origin:
     type: string

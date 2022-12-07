@@ -22,7 +22,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.2
+    dft: dafiti-group/orb-standard-pipeline@1.2.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -48,7 +48,7 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-live
-            context: [DEPLOY_LIVE, SLACK]
+            context: [SLACK, DEPLOY_LIVE]
             rollback: true
             version: <<pipeline.parameters.version>>
             deployment_path: <path-to-gitops-deployment>
@@ -61,11 +61,15 @@ usage:
         # features & hotfix =============================================================================================
         - dft/unit-test:
             name: unit-test
-            context: [TESTS, SLACK, BUILD_AND_PUSH]
+            context: [SLACK, GITHUB, BUILD_AND_PUSH]
             filters: *test_filters
         - dft/sonarqube:
             name: sonarqube
-            context: [SONAR, SLACK]
+            context: [SLACK, SONAR]
+            filters: *test_filters
+        - dft/checkmarx:
+            name: checkmarx
+            context: [SLACK, GITHUB, CHECKMARX_CLOUD]
             filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
@@ -83,31 +87,32 @@ usage:
             context: [SLACK]
             step_name: ":alert: the hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube]
+            requires: [unit-test, sonarqube, checkmarx]
         - approval:
             name: approve-to-qa
             type: approval
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube]
+            requires: [unit-test, sonarqube, checkmarx]
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
             rev_txt_path: public/rev.txt
-            context: [SLACK, TESTS, BUILD_AND_PUSH]
+            context: [SLACK, GITHUB, BUILD_AND_PUSH]
             filters: *deployment_filters
-            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+            requires:
+              [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
             target_env: qa
-            context: [TESTS, SLACK]
+            context: [SLACK, GITHUB]
             deployment_path: <path-to-gitops-deployment>
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
-            context: [INSTANA, DEPLOY_QA, SLACK]
+            context: [SLACK, INSTANA, DEPLOY_QA]
             requires: [deploy-to-qa]
         - dft/grafana-notify:
             name: grafana-notify-qa
-            context: [GRAFANA, SLACK]
+            context: [SLACK, GRAFANA]
             target_env: qa
             requires: [deploy-to-qa]
         # staging actions =============================================================================================
@@ -123,27 +128,27 @@ usage:
             name: promote-qa-to-staging
             deployment_path: <path-to-gitops-deployment>
             target_env: staging
-            context: [TESTS, SLACK]
+            context: [SLACK, GITHUB]
             requires: [approve-to-staging]
         - dft/instana-notify:
             name: feedback-instana-staging
-            context: [INSTANA, DEPLOY_STAGING, SLACK]
+            context: [SLACK, INSTANA, DEPLOY_STAGING]
             requires: [promote-qa-to-staging]
         - dft/grafana-notify:
             name: grafana-notify-stg
-            context: [GRAFANA, SLACK]
+            context: [SLACK, GRAFANA]
             target_env: stg
             requires: [promote-qa-to-staging]
         # =============================================================================================================
         - dft/github-approve:
             name: dft-deploy-approve-pr
-            context: [TESTS, SLACK]
+            context: [SLACK, GITHUB]
             requires: [promote-qa-to-staging]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
             name: review-open-pr-to-force-update
-            context: [TESTS, SLACK]
+            context: [SLACK, GITHUB]
             filters: *head_filters
         - dft/hold-slack:
             name: slack-notify-hold-production
@@ -159,16 +164,16 @@ usage:
             origin: clusters/staging
             destiny: clusters/production
             target: production
-            context: [TESTS, SLACK]
+            context: [SLACK, GITHUB]
             requires:
               [approve-deploy-production, review-open-pr-to-force-update]
         - dft/instana-notify:
             name: feedback-instana-production
-            context: [INSTANA, DEPLOY_LIVE, SLACK]
+            context: [SLACK, INSTANA, DEPLOY_LIVE]
             requires: [promote-homolog-to-production]
         - dft/grafana-notify:
             name: grafana-notify-live
-            context: [GRAFANA, SLACK]
+            context: [SLACK, GRAFANA]
             target_env: live
             requires: [promote-homolog-to-production]
         # ===============================================================================================================

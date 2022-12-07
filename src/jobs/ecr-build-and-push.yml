@@ -1,7 +1,7 @@
 description: |
   Job to create your application AWS ECR artifact and push docker images to it
   Needs:
-    context: [SLACK, TESTS, (BUILD_AND_PUSH|DEPLOY_LIVE|DEPLOY_QA)]
+    context: [SLACK, GITHUB, (BUILD_AND_PUSH|DEPLOY_LIVE|DEPLOY_QA)]
 parameters:
   repo_name:
     type: string

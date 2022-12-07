@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.2
+    dft: dafiti-group/orb-standard-pipeline@1.2.0
   test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
@@ -25,11 +25,15 @@ usage:
         # features & hotfix =============================================================================================
         - dft/sam-test:
             name: unit-test
-            context: [TESTS, SLACK, DEPLOY_QA]
+            context: [SLACK, GITHUB, DEPLOY_QA]
             filters: *test_filters
         - dft/sonarqube:
             name: sonarqube
-            context: [SONAR, SLACK]
+            context: [SLACK, SONAR]
+            filters: *test_filters
+        - dft/checkmarx:
+            name: checkmarx
+            context: [SLACK, GITHUB, CHECKMARX_CLOUD]
             filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
@@ -47,38 +51,39 @@ usage:
             context: [SLACK]
             step_name: "The hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube]
+            requires: [unit-test, sonarqube, checkmarx]
         - approval:
             name: approve-to-qa
             type: approval
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube]
+            requires: [unit-test, sonarqube, checkmarx]
         - dft/sam-deploy:
             name: deploy-to-qa
             s3-bucket: dft-qa-repo
-            context: [DEPLOY_QA, SLACK]
+            context: [SLACK, DEPLOY_QA]
             filters: *deployment_filters
-            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+            requires:
+              [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
         - dft/instana-notify:
             name: feedback-instana-qa
-            context: [INSTANA, DEPLOY_QA, SLACK]
+            context: [SLACK, INSTANA, DEPLOY_QA]
             requires: [deploy-to-qa]
         - dft/grafana-notify:
             name: grafana-notify-qa
-            context: [GRAFANA, SLACK]
+            context: [SLACK, GRAFANA]
             target_env: qa
             requires: [deploy-to-qa]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
             name: dft-deploy-approve-pr
-            context: [TESTS, SLACK]
+            context: [SLACK, GITHUB]
             requires: [deploy-to-qa]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
             name: review-open-pr-to-force-update
-            context: [TESTS, SLACK]
+            context: [SLACK, GITHUB]
             filters: *head_filters
         - dft/hold-slack:
             name: slack-notify-hold-production
@@ -92,16 +97,16 @@ usage:
         - dft/sam-deploy:
             name: deploy-to-live
             s3-bucket: dft-live-repo
-            context: [DEPLOY_LIVE, SLACK]
+            context: [SLACK, DEPLOY_LIVE]
             requires:
               [approve-deploy-production, review-open-pr-to-force-update]
         - dft/instana-notify:
             name: feedback-instana-production
-            context: [INSTANA, DEPLOY_LIVE, SLACK]
+            context: [SLACK, INSTANA, DEPLOY_LIVE]
             requires: [deploy-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
-            context: [GRAFANA, SLACK]
+            context: [SLACK, GRAFANA]
             target_env: live
             requires: [deploy-to-live]
         # ===============================================================================================================

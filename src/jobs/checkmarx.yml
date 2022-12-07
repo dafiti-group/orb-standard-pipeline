@@ -1,7 +1,7 @@
 description: |
   This job will be the new checkmarx context.
   Needs
-    context: [CHECKMARX_CLOUD, SLACK, TESTS]
+    context: [SLACK, GITHUB, CHECKMARX_CLOUD]
 executor: cxflow/default
 circleci_ip_ranges: true
 parameters:

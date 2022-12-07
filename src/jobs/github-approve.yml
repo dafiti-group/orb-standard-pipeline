@@ -1,7 +1,7 @@
 description: |
   Used to approve PRs or put a review with request pending alert into all open PRs
   Needs:
-    context: [TESTS,SLACK]
+    context: [SLACK, GITHUB]
 executor: small
 steps:
   - checkout
