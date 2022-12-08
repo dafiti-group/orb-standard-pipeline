@@ -26,8 +26,9 @@ workflows:
           requires:
             [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
           # Use a context to hold your publishing token.
-          context: orb-publishing
+          context: [orb-publishing, GITHUB]
           filters: *filters
+          github-token: GITHUB_ACCESS_TOKEN
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:
           pipeline-number: << pipeline.number >>
