@@ -123,6 +123,7 @@ LOOPING TO FIND BRANCHS TO DELETE IN CHECKMARX....
   else
     echo "No branchs to validate, skiping..."
   fi
+
 }
 
 echo "Auth method to get the access token..."
@@ -177,7 +178,9 @@ if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
     echo "Branch not found, trying to create one!"
     create_branch
   fi
-  search_branchs_to_delete_in_checkmarx
+  if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}\..*$"; then
+    search_branchs_to_delete_in_checkmarx
+  fi
 else
   PARAMETER_PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}"
   echo "Project not found, ready to execute next step. The project listed is: "
