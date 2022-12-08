@@ -50,12 +50,7 @@ PARAMETER_SYMBOLIC_FILES=""
 if [[ $(find . -type l) ]]; then
   PARAMETER_SYMBOLIC_FILES=$(find . -type l | cut -c 3- | paste -sd ",")
 fi
-# EXPORTING ENVS TO BE USED IN THE cxflow/scan command ============================================
-{
-  echo "export PARAMETER_SYMBOLIC_FILES=${PARAMETER_SYMBOLIC_FILES}"
-  echo "export PARAMETER_BRANCH_NAME_SANITIZED=${PARAMETER_BRANCH_NAME_SANITIZED}"
-  echo "export PARAMETER_PROJECT_BRANCH_NAME=${PARAMETER_PROJECT_BRANCH_NAME}"
-} >>"${BASH_ENV}"
+
 # =================================================================================================
 
 # Checkmarx API - create_branch method
@@ -166,14 +161,14 @@ PROJECT_LIST_RESPONSE=$(
     --header "Authorization: Bearer ${BEARER_TOKEN}"
 )
 
-echo "Projects list request executed with success, Searching the project and branch in the list..."
+echo "Projects list request executed with success, Searching for project: ${CIRCLE_PROJECT_REPONAME}"
 
 PROJECT_LIST=$(echo ${PROJECT_LIST_RESPONSE} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")')
 
 if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
   PROJECT=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$")
   PROJECT_ID=$(echo ${PROJECT} | awk '{print$1}')
-  echo "Project Found ${PROJECT}"
+  echo "Project Found: ${PROJECT} . Verifing if branch: ${PARAMETER_BRANCH_NAME_SANITIZED} exists."
 
   if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${PARAMETER_PROJECT_BRANCH_NAME}$"; then
     BRANCH=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${PARAMETER_PROJECT_BRANCH_NAME}$")
@@ -184,8 +179,17 @@ if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
   fi
   search_branchs_to_delete_in_checkmarx
 else
+  PARAMETER_PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}"
   echo "Project not found, ready to execute next step. The project listed is: "
   echo "${PROJECT_LIST}"
 fi
+
+echo "Exporting context env to next steps"
+# EXPORTING ENVS TO BE USED IN THE cxflow/scan command ============================================
+{
+  echo "export PARAMETER_SYMBOLIC_FILES=${PARAMETER_SYMBOLIC_FILES}"
+  echo "export PARAMETER_BRANCH_NAME_SANITIZED=${PARAMETER_BRANCH_NAME_SANITIZED}"
+  echo "export PARAMETER_PROJECT_BRANCH_NAME=${PARAMETER_PROJECT_BRANCH_NAME}"
+} >>"${BASH_ENV}"
 
 echo "Finished with success!!!"
