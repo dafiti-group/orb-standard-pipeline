@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ -z "$GITHUB_ACCESS_TOKEN" ]]; then
-  echo "Missing GITHUB_ACCESS_TOKEN environment"
+if [[ -z "$GITHUB_TOKEN" ]]; then
+  echo "Missing GITHUB_TOKEN environment"
   exit 1
 fi
 if [[ -z "$GITHUB_USER_NAME" ]]; then
@@ -13,6 +13,6 @@ if [[ -z "$GITHUB_USER_EMAIL" ]]; then
   exit 1
 fi
 
-git config --global url."https://${GITHUB_ACCESS_TOKEN}@github.com/".insteadOf "git@github.com:"
+git config --global url."https://${GITHUB_TOKEN}@github.com/".insteadOf "git@github.com:"
 git config --global user.email "${GITHUB_USER_NAME}"
 git config --global user.name "${GITHUB_USER_EMAIL}"

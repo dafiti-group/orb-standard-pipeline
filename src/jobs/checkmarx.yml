@@ -1,7 +1,7 @@
 description: |
   This job will be the new checkmarx context.
   Needs
-    context: [SLACK, GITHUB, CHECKMARX_CLOUD]
+    context: [DEFAULT]
 executor: cxflow/default
 circleci_ip_ranges: true
 parameters:
@@ -45,7 +45,7 @@ steps:
         --cx-flow.filterSeverity=Medium
         --github.url="https://github.com"
         --github.api-url="https://api.github.com/repos/"
-        --github.token="${GITHUB_ACCESS_TOKEN}"
+        --github.token="${GITHUB_TOKEN}"
         --github.block-merge=true
         --github.error-merge:true
         --github.max-delay=3

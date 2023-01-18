@@ -8,8 +8,8 @@ echo "
 =================================================
 "
 echo "Validating envs!"
-if [[ -z "$GITHUB_ACCESS_TOKEN" ]]; then
-  echo "Missing GITHUB_ACCESS_TOKEN environment used in cxflow/scan command"
+if [[ -z "$GITHUB_TOKEN" ]]; then
+  echo "Missing GITHUB_TOKEN environment used in cxflow/scan command"
   exit 1
 fi
 if [[ -z "$HEAD_BRANCH_NAME" ]]; then

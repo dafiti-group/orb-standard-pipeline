@@ -1,7 +1,7 @@
 description: |
   This job is responsible to test lambda functions
   Needs:
-    context: [SLACK, GITHUB, (DEPLOY_LIVE|DEPLOY_STAGING|DEPLOY_QA)]
+    context: [DEFAULT, (LIVE|QA)]
 parameters:
   runner:
     type: executor

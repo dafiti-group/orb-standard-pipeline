@@ -47,7 +47,7 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-live
-            context: [SLACK, DEPLOY_LIVE]
+            context: [DEFAULT]
             rollback: true
             version: <<pipeline.parameters.version>>
             deployment_path: "<path-to-gitops-deployment>"
@@ -60,21 +60,21 @@ usage:
         # features & hotfix =============================================================================================
         - dft/unit-test:
             name: unit-test
-            context: [SLACK, GITHUB, BUILD_AND_PUSH]
+            context: [DEFAULT]
             filters: *test_filters
         - dft/sonarqube:
             name: sonarqube
-            context: [SLACK, SONAR]
+            context: [DEFAULT]
             filters: *test_filters
         - dft/checkmarx:
             name: checkmarx
-            context: [SLACK, GITHUB, CHECKMARX_CLOUD]
+            context: [DEFAULT]
             filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
             name: slack-notify-hold-qa
-            context: [SLACK]
+            context: [DEFAULT]
             step_name: ":alert: a new release is awaiting your approve"
             filters: *release_filters
         - approval:
@@ -83,7 +83,7 @@ usage:
             filters: *release_filters
         - dft/hold-slack:
             name: slack-notify-hold-hotfix
-            context: [SLACK]
+            context: [DEFAULT]
             step_name: ":alert: the hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
             requires: [unit-test, sonarqube, checkmarx]
@@ -95,40 +95,40 @@ usage:
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
             rev_txt_path: public/rev.txt
-            context: [SLACK, GITHUB, BUILD_AND_PUSH]
+            context: [DEFAULT]
             filters: *deployment_filters
             requires:
               [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
             target_env: qa
-            context: [SLACK, GITHUB]
+            context: [DEFAULT]
             deployment_path: "<path-to-gitops-deployment>"
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
-            context: [SLACK, INSTANA, DEPLOY_QA]
+            context: [DEFAULT, QA]
             requires: [deploy-to-qa]
         - dft/grafana-notify:
             name: grafana-notify-qa
-            context: [SLACK, GRAFANA]
+            context: [DEFAULT]
             target_env: qa
             requires: [deploy-to-qa]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
             name: dft-deploy-approve-pr
-            context: [SLACK, GITHUB]
+            context: [DEFAULT]
             requires: [deploy-to-qa]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
             name: review-open-pr-to-force-update
-            context: [SLACK, GITHUB]
+            context: [DEFAULT]
             filters: *head_filters
         - dft/hold-slack:
             name: slack-notify-hold-live
-            context: SLACK
+            context: [DEFAULT]
             step_name: ":alert: pipeline waiting approval to promote to live"
             filters: *head_filters
         - approval:
@@ -140,15 +140,15 @@ usage:
             origin: clusters/staging/backstage
             destiny: clusters/live/kustomization
             target: live
-            context: [SLACK, GITHUB]
+            context: [DEFAULT]
             requires: [approve-deploy-live, review-open-pr-to-force-update]
         - dft/instana-notify:
             name: feedback-instana-live
-            context: [SLACK, INSTANA, DEPLOY_LIVE]
+            context: [DEFAULT, LIVE]
             requires: [promote-homolog-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
-            context: [SLACK, GRAFANA]
+            context: [DEFAULT]
             target_env: live
             requires: [promote-homolog-to-live]
         # ===============================================================================================================

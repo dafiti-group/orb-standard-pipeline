@@ -9,5 +9,5 @@ usage:
     deployment-flow:
       jobs:
         - dft/invalidate-cache:
-            context: DEPLOY_QA
+            context: [DEFAULT, QA]
             cloudfront_id: XPTO12324

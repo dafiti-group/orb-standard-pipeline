@@ -1,6 +1,6 @@
 description: >
   Used to clone the GitOps repo to change image tag into k8s deployment.
-  Needs context with GITHUB_ACCESS_TOKEN with a personal access token into it
+  Needs context with GITHUB_TOKEN with a personal access token into it
 parameters:
   gitops:
     type: string

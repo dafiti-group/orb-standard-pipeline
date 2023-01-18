@@ -26,12 +26,13 @@ workflows:
           requires:
             [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
           # Use a context to hold your publishing token.
-          context: [orb-publishing, GITHUB]
+          context: [orb-publishing, DEFAULT]
           filters: *filters
-          github-token: GITHUB_ACCESS_TOKEN
+          github-token: GITHUB_TOKEN
       # Triggers the next workflow in the Orb Development Kit.
       - orb-tools/continue:
           pipeline-number: << pipeline.number >>
           vcs-type: << pipeline.project.type >>
           requires: [orb-tools/publish]
           filters: *filters
+# VS Code Extension Version: 1.5.1

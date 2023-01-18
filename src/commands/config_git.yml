@@ -1,9 +1,9 @@
 description: >
   Needs:
-    - GITHUB_ACCESS_TOKEN with a personal access token into it
+    - GITHUB_TOKEN with a personal access token into it
     - GITHUB_USER_NAME
     - GITHUB_USER_EMAIL
 steps:
   - run:
-      name: config git to use GITHUB_ACCESS_TOKEN
+      name: config git to use GITHUB_TOKEN
       command: <<include(scripts/config-git.sh)>>

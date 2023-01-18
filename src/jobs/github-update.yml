@@ -2,13 +2,12 @@ description: |
   Used to force update into all open branches
   Put a review with request pending alert into all open PRs
   Needs:
-    context: [SLACK, GITHUB]
+    context: [DEFAULT]
 executor: small
 steps:
   - checkout
   - config_git
-  - github-cli/setup:
-      token: GITHUB_ACCESS_TOKEN
+  - github-cli/setup
   - run:
       name: Check if this repo has open PRs
       command: <<include(scripts/github-force-updates.sh)>>

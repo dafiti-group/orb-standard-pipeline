@@ -9,5 +9,5 @@ usage:
     deployment-flow:
       jobs:
         - dft/grafana-notify:
-            context: [SLACK, GRAFANA]
+            context: [DEFAULT]
             target_env: live

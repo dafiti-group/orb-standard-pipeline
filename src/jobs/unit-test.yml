@@ -2,13 +2,13 @@ description: |
   Use the default layer of your `docker-compose.yml` file to run ci layer as
   `docker-compose run --rm ci` to run all needed tests.
   Needs:
-    context: [SLACK, GITHUB, (BUILD_AND_PUSH|DEPLOY_LIVE|DEPLOY_QA)]
+    context: [DEFAULT]
 parameters:
   build_args:
     type: string
     default: ""
     description: >
-      Used to pass aditional docker build args like: `--build-arg GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}`
+      Used to pass aditional docker build args like: `--build-arg GITHUB_TOKEN=${GITHUB_TOKEN}`
 executor: base
 steps:
   - checkout

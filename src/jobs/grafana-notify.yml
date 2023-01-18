@@ -2,7 +2,7 @@ description: |
   Default grafana notify.
 
   Needs:
-    context: [SLACK, GRAFANA]
+    context: [DEFAULT]
 
   Read more in: https://argocd-notifications.readthedocs.io/en/stable/services/grafana/
 parameters:
