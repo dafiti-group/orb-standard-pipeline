@@ -1,7 +1,7 @@
 description: |
   This job is responsible to test lambda functions
   Needs:
-    context: [DEFAULT, (LIVE|QA)]
+    context: [DEFAULT]
 parameters:
   runner:
     type: executor
