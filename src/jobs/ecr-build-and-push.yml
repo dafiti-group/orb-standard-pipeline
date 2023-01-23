@@ -14,12 +14,12 @@ parameters:
   extra-build-args:
     type: string
     default: >-
-      --build-arg GITHUB_TOKEN=${GITHUB_TOKEN}
+      --build-arg GITHUB_ACCESS_TOKEN=${GITHUB_TOKEN}
     description: |
       Extra docker build image parameters
       By default the GITHUB_TOKEN is already included, if you need to pass
       more extra build args, you need to pass full list of your build args like
-        --build-arg GITHUB_TOKEN=${GITHUB_TOKEN}
+        --build-arg GITHUB_ACCESS_TOKEN=${GITHUB_TOKEN}
         --build-arg ANOTHER_PARAMETER=${ANOTHER_PARAMETER}
   build_tag:
     type: string
