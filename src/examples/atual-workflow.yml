@@ -20,7 +20,7 @@ usage:
     branches:
       only: [master]
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.2.0
+    dft: dafiti-group/orb-standard-pipeline@2.0.0
   workflows:
     deployment-flow:
       jobs:
@@ -31,9 +31,10 @@ usage:
         - dft/sonarqube:
             name: sonarqube
             context: [DEFAULT]
-        - dft/checkmarx:
-            name: checkmarx
-            context: [DEFAULT]
+        # WFA
+        # - dft/checkmarx:
+        #     name: checkmarx
+        #     context: [DEFAULT]
         # ===============================================================================================================
         - dft/ecr-build-and-push:
             name: build-and-push

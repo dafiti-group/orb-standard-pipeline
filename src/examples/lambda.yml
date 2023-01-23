@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.2.0
+    dft: dafiti-group/orb-standard-pipeline@2.0.0
   test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
@@ -31,10 +31,11 @@ usage:
             name: sonarqube
             context: [DEFAULT]
             filters: *test_filters
-        - dft/checkmarx:
-            name: checkmarx
-            context: [DEFAULT]
-            filters: *test_filters
+        # WFA
+        # - dft/checkmarx:
+        #     name: checkmarx
+        #     context: [DEFAULT]
+        #     filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:

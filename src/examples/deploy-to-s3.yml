@@ -1,5 +1,3 @@
-
-
 description: |
   An example showing how to deploy some artifacts inside a S3 bucket
 usage:
@@ -27,6 +25,20 @@ usage:
   workflows:
     deployment-flow:
       jobs:
+        # features & hotfix =============================================================================================
+        - dft/unit-test:
+            name: unit-test
+            context: [DEFAULT]
+            filters: *test_filters
+        - dft/sonarqube:
+            name: sonarqube
+            context: [DEFAULT]
+            filters: *test_filters
+        # WFA
+        # - dft/checkmarx:
+        #     name: checkmarx
+        #     context: [DEFAULT]
+        #     filters: *test_filters
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
             name: slack-notify-hold-qa
@@ -50,7 +62,7 @@ usage:
             # requires: [unit-test, sonarqube]
         - dft/deploy-to-s3:
             name: build-and-upload-qa
-            bucket: 's3://dft-static-qa/react-external-components'
+            bucket: "s3://dft-static-qa/react-external-components"
             context: [DEFAULT, QA]
             filters: *deployment_filters
             requires: [approve-to-qa, start-to-qa]
@@ -59,6 +71,7 @@ usage:
             target_env: qa
             context: [DEFAULT]
             requires: [build-and-upload-qa]
+        # =========================================================================
         # TODO: when the staging cluster is available, uncoment the section below
         # - approval:
         #     name: approve-to-staging
@@ -97,7 +110,7 @@ usage:
             filters: *head_filters
         - dft/deploy-to-s3:
             name: build-and-upload-live
-            bucket: 's3://dft-stor-us-east/react-external-components'
+            bucket: "s3://dft-stor-us-east/react-external-components"
             context: [DEFAULT, LIVE_AWS_DAFITI]
             filters: *head_filters
             requires: [approve-deploy-live]
