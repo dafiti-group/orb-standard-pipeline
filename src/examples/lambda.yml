@@ -52,12 +52,12 @@ usage:
             context: [DEFAULT]
             step_name: "The hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube, checkmarx]
+            requires: [unit-test, sonarqube]
         - approval:
             name: approve-to-qa
             type: approval
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube, checkmarx]
+            requires: [unit-test, sonarqube]
         - dft/sam-deploy:
             name: deploy-to-qa
             s3-bucket: dft-qa-repo

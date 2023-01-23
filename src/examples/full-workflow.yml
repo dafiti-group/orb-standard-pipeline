@@ -88,12 +88,12 @@ usage:
             context: [DEFAULT]
             step_name: ":alert: the hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube, checkmarx]
+            requires: [unit-test, sonarqube]
         - approval:
             name: approve-to-qa
             type: approval
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube, checkmarx]
+            requires: [unit-test, sonarqube]
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
             rev_txt_path: public/rev.txt

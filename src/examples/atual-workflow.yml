@@ -40,7 +40,7 @@ usage:
             name: build-and-push
             context: [DEFAULT]
             filters: *default_filter
-            requires: [unit-test, sonarqube, checkmarx]
+            requires: [unit-test, sonarqube]
         # qa deploy =====================================================================================================
         - dft/eks-deploy:
             name: deploy-qa
