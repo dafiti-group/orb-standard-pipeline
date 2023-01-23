@@ -45,7 +45,7 @@ parameters:
     type: string
     default: ""
     description: >
-      Used to pass aditional docker build args like: `--build-arg GITHUB_ACCESS_TOKEN=${GITHUB_TOKEN}`
+      Used to pass aditional docker build args like: `--build-arg GITHUB_TOKEN=${GITHUB_TOKEN}`
 executor: <<parameters.runner>>
 steps:
   - checkout
