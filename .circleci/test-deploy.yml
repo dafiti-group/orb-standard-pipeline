@@ -26,7 +26,7 @@ workflows:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
       - command-tests:
           filters: *filters
-          context: [TESTS]
+          context: [DEFAULT]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
