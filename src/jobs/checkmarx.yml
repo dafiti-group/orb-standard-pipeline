@@ -1,12 +1,54 @@
 description: |
   This job will be the new checkmarx context.
   Needs
-    context: [CHECKMARX_CLOUD,SLACK]
-executor: small
+    context: [DEFAULT]
+executor: cxflow/default
+circleci_ip_ranges: true
+parameters:
+  branch_head_name:
+    type: string
+    default: main
+    description: |
+      The HEAD branch name to be skipped as a target to be deleted from checkmarx project
 steps:
   - run:
-      name: executing checkmarx
-      command: echo "OK"
+      name: install image dependencies
+      command: apk add curl jq git openssl || exit 1
+  - checkout
+  - run:
+      name: Checkmarx branching validation, creation, and delete steps.
+      environment:
+        HEAD_BRANCH_NAME: <<parameters.branch_head_name>>
+      command: <<include(scripts/checkmarx.sh)>>
+  - cxflow/scan:
+      preset: $CHECKMARX_PRESET
+      team: $CHECKMARX_TEAM
+      incremental: true
+      # PARAMETER_PROJECT_BRANCH_NAME is populated in scripts/checkmarx.sh script ;)
+      # PARAMETER_BRANCH_NAME_SANITIZED is created in scripts/checkmarx.sh to remove invalid characters to cxflow rules
+      project: ${PARAMETER_PROJECT_BRANCH_NAME}
+      sca-accessControlUrl: "https://platform.checkmarx.net"
+      sca-apiUrl: "https://api.scacheckmarx.com"
+      sca-appUrl: "https://sca.scacheckmarx.com"
+      bug-tracker: GitHub
+      params: >-
+        --cx-flow.zip-exclude="${PARAMETER_SYMBOLIC_FILES}"
+        --checkmarx.settings-override=true
+        --cx-flow.thresholds.High=0
+        --cx-flow.thresholds.Medium=5
+        --cx-flow.filterStatus=New
+        --cx-flow.filterStatus=Reoccured
+        --namespace="${CIRCLE_PROJECT_USERNAME}"
+        --repo-name="${CIRCLE_PROJECT_REPONAME}"
+        --branch="${PARAMETER_BRANCH_NAME_SANITIZED}"
+        --cx-flow.filterSeverity=High
+        --cx-flow.filterSeverity=Medium
+        --github.url="https://github.com"
+        --github.api-url="https://api.github.com/repos/"
+        --github.token="${GITHUB_TOKEN}"
+        --github.block-merge=true
+        --github.error-merge:true
+        --github.max-delay=3
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>

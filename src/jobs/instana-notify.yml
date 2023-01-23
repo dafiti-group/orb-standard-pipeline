@@ -1,7 +1,7 @@
 description: |
   Default instana notify.
   Needs:
-    context: [INSTANA, SLACK, (DEPLOY_LIVE|DEPLOY_STAGING|DEPLOY_QA)]
+    context: [DEFAULT, (LIVE|QA)]
 parameters:
   service_name:
     type: string

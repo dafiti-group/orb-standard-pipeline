@@ -4,10 +4,10 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.2
+    dft: dafiti-group/orb-standard-pipeline@2.0.0
   workflows:
     deployment-flow:
       jobs:
         - dft/grafana-notify:
-            context: [GRAFANA, SLACK]
+            context: [DEFAULT]
             target_env: live

@@ -21,7 +21,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.2
+    dft: dafiti-group/orb-standard-pipeline@2.0.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -47,7 +47,7 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-live
-            context: [DEPLOY_LIVE, SLACK]
+            context: [DEFAULT]
             rollback: true
             version: <<pipeline.parameters.version>>
             deployment_path: "<path-to-gitops-deployment>"
@@ -60,17 +60,22 @@ usage:
         # features & hotfix =============================================================================================
         - dft/unit-test:
             name: unit-test
-            context: [TESTS, SLACK, BUILD_AND_PUSH]
+            context: [DEFAULT]
             filters: *test_filters
         - dft/sonarqube:
             name: sonarqube
-            context: [SONAR, SLACK]
+            context: [DEFAULT]
             filters: *test_filters
+        # WFA
+        # - dft/checkmarx:
+        #     name: checkmarx
+        #     context: [DEFAULT]
+        #     filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
             name: slack-notify-hold-qa
-            context: [SLACK]
+            context: [DEFAULT]
             step_name: ":alert: a new release is awaiting your approve"
             filters: *release_filters
         - approval:
@@ -79,7 +84,7 @@ usage:
             filters: *release_filters
         - dft/hold-slack:
             name: slack-notify-hold-hotfix
-            context: [SLACK]
+            context: [DEFAULT]
             step_name: ":alert: the hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
             requires: [unit-test, sonarqube]
@@ -91,39 +96,40 @@ usage:
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
             rev_txt_path: public/rev.txt
-            context: [SLACK, TESTS, BUILD_AND_PUSH]
+            context: [DEFAULT]
             filters: *deployment_filters
-            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+            requires:
+              [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
             target_env: qa
-            context: [TESTS, SLACK]
+            context: [DEFAULT]
             deployment_path: "<path-to-gitops-deployment>"
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
-            context: [INSTANA, DEPLOY_QA, SLACK]
+            context: [DEFAULT, QA]
             requires: [deploy-to-qa]
         - dft/grafana-notify:
             name: grafana-notify-qa
-            context: [GRAFANA, SLACK]
+            context: [DEFAULT]
             target_env: qa
             requires: [deploy-to-qa]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
             name: dft-deploy-approve-pr
-            context: [TESTS, SLACK]
+            context: [DEFAULT]
             requires: [deploy-to-qa]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
             name: review-open-pr-to-force-update
-            context: [TESTS, SLACK]
+            context: [DEFAULT]
             filters: *head_filters
         - dft/hold-slack:
             name: slack-notify-hold-live
-            context: SLACK
+            context: [DEFAULT]
             step_name: ":alert: pipeline waiting approval to promote to live"
             filters: *head_filters
         - approval:
@@ -135,15 +141,15 @@ usage:
             origin: clusters/staging/backstage
             destiny: clusters/live/kustomization
             target: live
-            context: [TESTS, SLACK]
+            context: [DEFAULT]
             requires: [approve-deploy-live, review-open-pr-to-force-update]
         - dft/instana-notify:
             name: feedback-instana-live
-            context: [INSTANA, DEPLOY_LIVE, SLACK]
+            context: [DEFAULT, LIVE]
             requires: [promote-homolog-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
-            context: [GRAFANA, SLACK]
+            context: [DEFAULT]
             target_env: live
             requires: [promote-homolog-to-live]
         # ===============================================================================================================

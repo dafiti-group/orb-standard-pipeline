@@ -1,7 +1,7 @@
 description: |
   This job is responsible to deploy lambda functions using AWS SAM cli
   Needs:
-    context: [TESTS,SLACK,(DEPLOY_LIVE|DEPLOY_STAGING|DEPLOY_QA)]
+    context: [DEFAULT, (LIVE|QA)]
 parameters:
   s3-bucket:
     type: string

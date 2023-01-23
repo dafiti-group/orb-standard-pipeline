@@ -1,8 +1,8 @@
 description: |
   Step to validation quality of artefactor in pipeline.
-  Used to run sonarqube needs context: SONAR
+  Used to run sonarqube needs context: DEFAULT
   Needs:
-    context: [SONAR, SLACK]
+    context: [DEFAULT]
 parameters:
   runner:
     type: executor
@@ -45,7 +45,7 @@ parameters:
     type: string
     default: ""
     description: >
-      Used to pass aditional docker build args like: `--build-arg GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}`
+      Used to pass aditional docker build args like: `--build-arg GITHUB_TOKEN=${GITHUB_TOKEN}`
 executor: <<parameters.runner>>
 steps:
   - checkout

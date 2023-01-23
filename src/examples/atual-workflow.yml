@@ -20,55 +20,56 @@ usage:
     branches:
       only: [master]
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.2
+    dft: dafiti-group/orb-standard-pipeline@2.0.0
   workflows:
     deployment-flow:
       jobs:
         # test gates ====================================================================================================
         - dft/unit-test:
             name: unit-test
-            context: [TEST, SLACK, BUILD_AND_PUSH]
+            context: [DEFAULT]
         - dft/sonarqube:
             name: sonarqube
-            context: [SONAR, SLACK]
-        - dft/checkmarx:
-            name: checkmarx
-            context: [SLACK, CHECKMARX_CLOUD]
+            context: [DEFAULT]
+        # WFA
+        # - dft/checkmarx:
+        #     name: checkmarx
+        #     context: [DEFAULT]
         # ===============================================================================================================
         - dft/ecr-build-and-push:
             name: build-and-push
-            context: [TESTS, SLACK, BUILD_AND_PUSH]
+            context: [DEFAULT]
             filters: *default_filter
             requires: [unit-test, sonarqube]
         # qa deploy =====================================================================================================
         - dft/eks-deploy:
             name: deploy-qa
-            context: [TESTS, SLACK, BUILD_AND_DEPLOY]
+            context: [DEFAULT]
             deployment_path: <path-to-gitops-deployment>
             filters: *qa_filter
             requires: [build-and-push]
         - dft/instana-notify:
             name: instana-notify-qa
-            context: [INSTANA, DEPLOY_QA]
+            context: [DEFAULT, QA]
             requires: [deploy-qa]
         - dft/grafana-notify:
             name: grafana-notify-qa
-            context: [GRAFANA, SLACK]
+            context: [DEFAULT]
             target_env: qa
             requires: [deploy-qa]
         # live deploy ===================================================================================================
         - dft/eks-deploy:
             name: deploy-live
-            context: [TESTS, SLACK, BUILD_AND_DEPLOY]
+            context: [DEFAULT]
             deployment_path: <path-to-gitops-deployment>
             filters: *head_filter
             requires: [build-and-push]
         - dft/instana-notify:
             name: instana-notify-live
-            context: [INSTANA, DEPLOY_LIVE]
+            context: [DEFAULT, LIVE]
             requires: [deploy-live]
         - dft/grafana-notify:
             name: grafana-notify-live
-            context: [GRAFANA, SLACK]
+            context: [DEFAULT]
             target_env: live
             requires: [deploy-live]

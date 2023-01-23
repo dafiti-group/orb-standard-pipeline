@@ -1,0 +1,24 @@
+description: |
+  Deploys artifacts to a S3 bucket, based on a Dockerfile build. IMPORTANT: The last step on the Dockerfile is supposed to contain only the artifacts to be deployed! Using a scratch image recommended!
+  Needs:
+    context: [DEFAULT, (LIVE|QA|LIVE_AWS_DAFITI)]
+parameters:
+  bucket:
+    type: string
+    description: The bucket to deploy the artifacts, including the path inside the bucket
+executor: base
+steps:
+  - checkout
+  - config_docker
+  #using DOCKER_BUILDKIT=1 to output the files generated inside the build
+  - run:
+      name: build artifact
+      command: DOCKER_BUILDKIT=1 docker build -t deploy-to-s3 -o out .
+  - store_artifacts:
+      path: out/
+  - aws-s3/sync:
+      from: /home/circleci/project/out
+      to: <<parameters.bucket>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

@@ -1,7 +1,7 @@
 description: |
   Job to create your application AWS ECR artifact and push docker images to it
   Needs:
-    context: [SLACK, TESTS, (BUILD_AND_PUSH|DEPLOY_LIVE|DEPLOY_QA)]
+    context: [DEFAULT]
 parameters:
   repo_name:
     type: string
@@ -14,12 +14,12 @@ parameters:
   extra-build-args:
     type: string
     default: >-
-      --build-arg GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
+      --build-arg GITHUB_TOKEN=${GITHUB_TOKEN}
     description: |
       Extra docker build image parameters
-      By default the GITHUB_ACCESS_TOKEN is already included, if you need to pass
+      By default the GITHUB_TOKEN is already included, if you need to pass
       more extra build args, you need to pass full list of your build args like
-        --build-arg GITHUB_ACCESS_TOKEN=${GITHUB_ACCESS_TOKEN}
+        --build-arg GITHUB_TOKEN=${GITHUB_TOKEN}
         --build-arg ANOTHER_PARAMETER=${ANOTHER_PARAMETER}
   build_tag:
     type: string

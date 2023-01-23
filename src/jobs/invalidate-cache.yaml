@@ -1,7 +1,7 @@
 description: |
   Used to invalidate cache in cloudfront using aws cli
   Needs:
-    context: [SLACK,(DEPLOY_LIVE|DEPLOY_STAGING|DEPLOY_QA)]
+    context: [DEFAULT, (LIVE|QA)]
 parameters:
   cloudfront_id:
     type: string

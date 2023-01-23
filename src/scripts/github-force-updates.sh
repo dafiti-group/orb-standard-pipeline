@@ -27,7 +27,7 @@ then
   git branch -a | grep "origin" | grep -Eo "release.*|hotfix.*" | while read -r line; do
     echo ">>>CURRENT-LINE: ${line}"
     git checkout $line
-    git merge -X theirs origin/main
+    git merge -X theirs origin/${CURRENT_BRANCH}
     git push --force
   done
 else

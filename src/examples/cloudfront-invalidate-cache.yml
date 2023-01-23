@@ -4,10 +4,10 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@1.1.2
+    dft: dafiti-group/orb-standard-pipeline@2.0.0
   workflows:
     deployment-flow:
       jobs:
         - dft/invalidate-cache:
-            context: DEPLOY_QA
+            context: [DEFAULT, QA]
             cloudfront_id: XPTO12324
