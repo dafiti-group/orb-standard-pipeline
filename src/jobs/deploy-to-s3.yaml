@@ -9,9 +9,7 @@ parameters:
 executor: base
 steps:
   - checkout
-  - setup_remote_docker:
-      docker_layer_caching: false
-      version: 20.10.14
+  - config_docker
   #using DOCKER_BUILDKIT=1 to output the files generated inside the build
   - run:
       name: build artifact
