@@ -1,7 +1,7 @@
 #!/bin/bash
 
 LOCAL_HEAD_GIT_BRANCH=$(git branch --list --remote | grep "origin/HEAD ->" | awk -F"/" '{print$3}')
-LOCAL_PARSED_BOT_NAME=$(echo $LOCAL_DFT_BOT_NAME | envsubst)
+LOCAL_PARSED_BOT_NAME=$(eval echo $LOCAL_DFT_BOT_NAME)
 if [[ $(gh pr list -B ${LOCAL_HEAD_GIT_BRANCH}) ]]; then
   echo "PR open listed. Notify to update"
   gh pr list -B ${LOCAL_HEAD_GIT_BRANCH} | awk '{print$1}' | while read -r line; do
