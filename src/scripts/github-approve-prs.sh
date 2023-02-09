@@ -5,9 +5,9 @@ LOCAL_PARSED_BOT_NAME=$(eval echo $LOCAL_DFT_BOT_NAME)
 if [[ $(gh pr list -B ${LOCAL_HEAD_GIT_BRANCH}) ]]; then
   echo "PR open listed. Notify to update"
   gh pr list -B ${LOCAL_HEAD_GIT_BRANCH} | awk '{print$1}' | while read -r line; do
-    read -r LOCAL_AUTHOR LOCAL_BRANCH_ORIGIN <<<"$(gh pr view $line --json 'headRefName,author' --jq '[.author.login,.headRefName] | join(" ")')"
-    LOCAL_STRING="PR $line of author: ${LOCAL_AUTHOR} and origin: ${LOCAL_BRANCH_ORIGIN} target;${LOCAL_HEAD_GIT_BRANCH}"
-    if [[ "${LOCAL_AUTHOR}" != "${LOCAL_PARSED_BOT_NAME}" ]]; then
+    read -r LOCAL_PR_AUTHOR LOCAL_BRANCH_ORIGIN <<<"$(gh pr view $line --json 'headRefName,author' --jq '[.author.login,.headRefName] | join(" ")')"
+    LOCAL_STRING="PR $line of author: ${LOCAL_PR_AUTHOR} and origin: ${LOCAL_BRANCH_ORIGIN} target;${LOCAL_HEAD_GIT_BRANCH}"
+    if [[ "${LOCAL_PR_AUTHOR}" != "${LOCAL_PARSED_BOT_NAME}" ]]; then
       if [[ "${LOCAL_BRANCH_ORIGIN}" != "${CIRCLE_BRANCH}" ]]; then
         LOCAL_ACTION="blocked"
         gh pr review $line --request-changes --body ":robot: ${LOCAL_PARSED_BOT_NAME} blocked this PR because other pipeline changed the \`image.tag\` hash of this artifact in the test environment. \
