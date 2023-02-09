@@ -20,8 +20,8 @@ if [ ! -f "${DESTINY_FILE}" ]; then
   echo "file ${DESTINY_FILE} not found"
   exit 1
 fi
-IMAGE=$(grep -E "tag\: \"[a-z0-9]+\"" ${ORIGIN_FILE})
-sed -Ei "s|\s+tag: \"[a-z0-9]+\"|${IMAGE}|" ${DESTINY_FILE}
+IMAGE=$(grep -E "tag\:.*" ${ORIGIN_FILE})
+sed -Ei "s|\s+tag\:.*|${IMAGE}|" ${DESTINY_FILE}
 cd ${PARAMETER_START_FOLDER} || exit 1
 if [[ $(git diff) ]]; then
   git diff
