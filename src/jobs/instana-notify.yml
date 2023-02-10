@@ -7,21 +7,40 @@ parameters:
     type: string
     description: Name of you application service in instana apm
     default: ${CIRCLE_PROJECT_REPONAME}.${ENV_SHORT}.dafiti.local
-executor: instana
-steps:
-  - create_release:
-      release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
-      release_scope: |
+  release_scope:
+    type: string
+    # description: Default protocol service https://circleci.com/developer/orbs/orb/instana/pipeline-feedback?version=2.0.3#commands-create_release
+    description: >
+      JSON-encoded scoping information for the release. The usage of environment
+      variables is supported. Example:
+      ```json
         {
           "services": [
-            {"name": "<<parameters.service_name>>"}
+            {"name": "${CIRCLE_PROJECT_REPONAME}.${ENV}"},
+            {"name": "<depencecy application service name>"},
           ]
         }
-
-  # TODO: waiting owner PR to be closed to bumb orb version https://github.com/instana/pipeline-feedback-orb/pull/14
-  # - pipeline-feedback/create_release:
-  #     release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
-  #     release_scope: $(echo $PARAMETER_GENERATED_BODY)
+      ```
+      If not provided, the release will be marked as global to your tenant
+      unit.
+      Api Documentarion: https://instana.github.io/openapi/#operation/postRelease
+    default: |
+      {
+        "services": [
+          {"name": "${LOCAL_SERVICE_NAME}"}
+        ]
+      }
+executor: instana
+steps:
+  - run:
+      name: Build release scope
+      environment:
+        LOCAL_SERVICE_NAME: <<parameters.service_name>>
+        LOCAL_RELEASE_SCOPE: <<parameters.release_scope>>
+      command: <<include(scripts/create_release.sh)>>
+  - pipeline-feedback/create_release:
+      release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
+      release_scope: ${INTERNAL_INTERPOLATED_JSON}
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
