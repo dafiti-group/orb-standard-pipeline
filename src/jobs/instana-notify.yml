@@ -9,7 +9,21 @@ parameters:
     default: ${CIRCLE_PROJECT_REPONAME}.${ENV_SHORT}.dafiti.local
   release_scope:
     type: string
-    description: Default protocol service https://circleci.com/developer/orbs/orb/instana/pipeline-feedback?version=2.0.3#commands-create_release
+    # description: Default protocol service https://circleci.com/developer/orbs/orb/instana/pipeline-feedback?version=2.0.3#commands-create_release
+    description: >
+      JSON-encoded scoping information for the release. The usage of environment
+      variables is supported. Example:
+      ```json
+        {
+          "services": [
+            {"name": "${CIRCLE_PROJECT_REPONAME}.${ENV}"},
+            {"name": "<depencecy application service name>"},
+          ]
+        }
+      ```
+      If not provided, the release will be marked as global to your tenant
+      unit.
+      Api Documentarion: https://instana.github.io/openapi/#operation/postRelease
     default: |
       {
         "services": [
