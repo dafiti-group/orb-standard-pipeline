@@ -36,8 +36,6 @@ steps:
         --checkmarx.settings-override=true
         --cx-flow.thresholds.High=0
         --cx-flow.thresholds.Medium=5
-        --cx-flow.filterStatus=New
-        --cx-flow.filterStatus=Reoccured
         --namespace="${CIRCLE_PROJECT_USERNAME}"
         --repo-name="${CIRCLE_PROJECT_REPONAME}"
         --branch="${PARAMETER_BRANCH_NAME_SANITIZED}"
@@ -49,6 +47,7 @@ steps:
         --github.block-merge=true
         --github.error-merge:true
         --github.max-delay=3
+        ${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>

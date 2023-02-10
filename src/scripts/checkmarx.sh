@@ -165,8 +165,9 @@ PROJECT_LIST_RESPONSE=$(
 echo "Projects list request executed with success, Searching for project: ${CIRCLE_PROJECT_REPONAME}"
 
 PROJECT_LIST=$(echo ${PROJECT_LIST_RESPONSE} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")')
-
+PARAMETER_ADITIONAL_CHECKMARX_ARGS=""
 if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
+  PARAMETER_ADITIONAL_CHECKMARX_ARGS="--cx-flow.filterStatus=New --cx-flow.filterStatus=Reoccured"
   PROJECT=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$")
   PROJECT_ID=$(echo ${PROJECT} | awk '{print$1}')
   echo "Project Found: ${PROJECT} . Verifing if branch: ${PARAMETER_BRANCH_NAME_SANITIZED} exists."
@@ -193,6 +194,7 @@ echo "Exporting context env to next steps"
   echo "export PARAMETER_SYMBOLIC_FILES=${PARAMETER_SYMBOLIC_FILES}"
   echo "export PARAMETER_BRANCH_NAME_SANITIZED=${PARAMETER_BRANCH_NAME_SANITIZED}"
   echo "export PARAMETER_PROJECT_BRANCH_NAME=${PARAMETER_PROJECT_BRANCH_NAME}"
+  echo "export PARAMETER_ADITIONAL_CHECKMARX_ARGS=${PARAMETER_ADITIONAL_CHECKMARX_ARGS}"
 } >>"${BASH_ENV}"
 
 echo "Finished with success!!!"
