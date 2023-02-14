@@ -34,8 +34,6 @@ steps:
       params: >-
         --cx-flow.zip-exclude="${PARAMETER_SYMBOLIC_FILES}"
         --checkmarx.settings-override=true
-        --cx-flow.thresholds.High=0
-        --cx-flow.thresholds.Medium=5
         --namespace="${CIRCLE_PROJECT_USERNAME}"
         --repo-name="${CIRCLE_PROJECT_REPONAME}"
         --branch="${PARAMETER_BRANCH_NAME_SANITIZED}"

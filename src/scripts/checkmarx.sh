@@ -167,14 +167,14 @@ echo "Projects list request executed with success, Searching for project: ${CIRC
 PROJECT_LIST=$(echo ${PROJECT_LIST_RESPONSE} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")')
 PARAMETER_ADITIONAL_CHECKMARX_ARGS=""
 if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
-  PARAMETER_ADITIONAL_CHECKMARX_ARGS="--cx-flow.filterStatus=New --cx-flow.filterStatus=Reoccured"
+  PARAMETER_ADITIONAL_CHECKMARX_ARGS="--cx-flow.filterStatus=New --cx-flow.filterStatus=Reoccured --cx-flow.thresholds.High=0 --cx-flow.thresholds.Medium=1"
   PROJECT=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$")
   PROJECT_ID=$(echo ${PROJECT} | awk '{print$1}')
   echo "Project Found: ${PROJECT} . Verifing if branch: ${PARAMETER_BRANCH_NAME_SANITIZED} exists."
 
   if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${PARAMETER_PROJECT_BRANCH_NAME}$"; then
     BRANCH=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${PARAMETER_PROJECT_BRANCH_NAME}$")
-    echo "Bransh already exists: ${BRANCH}"
+    echo "Branch already exists: ${BRANCH}"
   else
     echo "Branch not found, trying to create one!"
     create_branch
