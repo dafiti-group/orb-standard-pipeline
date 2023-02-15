@@ -39,13 +39,16 @@ steps:
         --branch="${PARAMETER_BRANCH_NAME_SANITIZED}"
         --cx-flow.filterSeverity=High
         --cx-flow.filterSeverity=Medium
+        --cx-flow.filterStatus=New
+        --cx-flow.filterStatus=Reoccured
+        --cx-flow.thresholds.High=${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
+        --cx-flow.thresholds.Medium=${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
         --github.url="https://github.com"
         --github.api-url="https://api.github.com/repos/"
         --github.token="${GITHUB_TOKEN}"
         --github.block-merge=true
         --github.error-merge:true
         --github.max-delay=3
-        ${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>

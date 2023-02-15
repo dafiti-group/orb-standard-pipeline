@@ -167,7 +167,7 @@ echo "Projects list request executed with success, Searching for project: ${CIRC
 PROJECT_LIST=$(echo ${PROJECT_LIST_RESPONSE} | jq -r '.[] as $response | [$response.id,$response.name] | join(" ")')
 PARAMETER_ADITIONAL_CHECKMARX_ARGS=""
 if echo "${PROJECT_LIST}" | grep -Eq "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$"; then
-  PARAMETER_ADITIONAL_CHECKMARX_ARGS="--cx-flow.filterStatus=New --cx-flow.filterStatus=Reoccured --cx-flow.thresholds.High=0 --cx-flow.thresholds.Medium=1"
+  PARAMETER_ADITIONAL_CHECKMARX_ARGS="0"
   PROJECT=$(echo "${PROJECT_LIST}" | grep -Eo "^[0-9]+ ${CIRCLE_PROJECT_REPONAME}$")
   PROJECT_ID=$(echo ${PROJECT} | awk '{print$1}')
   echo "Project Found: ${PROJECT} . Verifing if branch: ${PARAMETER_BRANCH_NAME_SANITIZED} exists."
@@ -187,7 +187,8 @@ else
   echo "Project not found, ready to execute next step. The project listed is: "
   echo "${PROJECT_LIST}"
 fi
-
+echo "PARAMETER_ADITIONAL_CHECKMARX_ARGS: "
+echo ${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
 echo "Exporting context env to next steps"
 # EXPORTING ENVS TO BE USED IN THE cxflow/scan command ============================================
 {
