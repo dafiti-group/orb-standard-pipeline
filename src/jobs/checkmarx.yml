@@ -10,6 +10,13 @@ parameters:
     default: main
     description: |
       The HEAD branch name to be skipped as a target to be deleted from checkmarx project
+  project_type:
+    type: enum
+    default: new
+    description: The project type
+    enum:
+      - legacy
+      - new
 steps:
   - run:
       name: install image dependencies
@@ -19,6 +26,8 @@ steps:
       name: Checkmarx branching validation, creation, and delete steps.
       environment:
         HEAD_BRANCH_NAME: <<parameters.branch_head_name>>
+        PROJECT_TYPE: <<parameters.project_type>>
+        PARAMETER_METHODE: "project_exists"
       command: <<include(scripts/checkmarx.sh)>>
   - cxflow/scan:
       preset: $CHECKMARX_PRESET
@@ -40,15 +49,23 @@ steps:
         --cx-flow.filterSeverity=High
         --cx-flow.filterSeverity=Medium
         --cx-flow.filterStatus=New
+        --cx-flow.filter-status="New"
         --cx-flow.filterStatus=Reoccured
-        --cx-flow.thresholds.High=${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
-        --cx-flow.thresholds.Medium=${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
+        --cx-flow.thresholds.High=${THRESHOLDS_HIGH_CHECKMARX}
+        --cx-flow.thresholds.Medium=${THRESHOLDS_MEDIUM_CHECKMARX}
         --github.url="https://github.com"
         --github.api-url="https://api.github.com/repos/"
         --github.token="${GITHUB_TOKEN}"
         --github.block-merge=true
         --github.error-merge:true
         --github.max-delay=3
+        ${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
+  - run:
+      name: Checkmarx delete last scan ID.
+      when: on_fail
+      environment:
+        PARAMETER_METHODE: "get_last_scan_id"
+      command: <<include(scripts/checkmarx.sh)>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
