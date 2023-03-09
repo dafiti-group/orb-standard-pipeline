@@ -5,7 +5,7 @@ if [[ -z "${SAM_DEPLOY_PARAMETER_S3}" ]]; then
   exit 1
 fi
 
-sam build
+sam build --use-container
 
 cd .aws-sam/build || exit 1
 
