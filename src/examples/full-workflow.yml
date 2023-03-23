@@ -51,7 +51,7 @@ usage:
             context: [DEFAULT]
             rollback: true
             version: <<pipeline.parameters.version>>
-            deployment_path: <path-to-gitops-deployment>
+            app_env: dafiti-live
             filters: *head_filters
     deployment-flow:
       when:
@@ -104,8 +104,7 @@ usage:
         - dft/eks-deploy:
             name: deploy-to-qa
             target_env: qa
-            context: [DEFAULT]
-            deployment_path: <path-to-gitops-deployment>
+            context: [DEFAULT, QA]
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
             name: feedback-instana-qa
@@ -162,10 +161,8 @@ usage:
             filters: *head_filters
         - dft/eks-promote:
             name: promote-homolog-to-production
-            origin: clusters/staging
-            destiny: clusters/production
-            target: production
             context: [DEFAULT]
+            target: production
             requires:
               [approve-deploy-production, review-open-pr-to-force-update]
         - dft/instana-notify:

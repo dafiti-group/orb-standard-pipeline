@@ -3,15 +3,29 @@ description: |
   Needs:
     context: [DEFAULT]
 parameters:
+  country:
+    type: string
+    default: br
+  app_name:
+    type: string
+    default: ${CIRCLE_PROJECT_REPONAME}
+  origin_env:
+    type: string
+    default: qa
+  destiny_env:
+    type: string
+    default: dafiti-live
   origin:
     type: string
+    default: ""
     description: path to origin image hash to copy from
   destiny:
     type: string
+    default: ""
     description: path to destiny file to past to
   origin_file:
     type: string
-    default: ""
+    default: kustomization
     description: |
       filename without extension go get image tag for deployment ex:
       if file is `backstage.yaml` use only `backstage`
@@ -19,7 +33,7 @@ parameters:
       Default value is CIRCLE_PROJECT_REPONAME that is the name of your repository in GitHub
   destiny_file:
     type: string
-    default: ""
+    default: kustomization
     description: |
       filename without extension for update image tag from ex:
       if file is `backstage.yaml` use only `backstage`
@@ -27,7 +41,7 @@ parameters:
       Default value is CIRCLE_PROJECT_REPONAME that is the name of your repository in GitHub
   gitops:
     type: string
-    default: argo
+    default: gitops
     description: The repo name to clone deployments to change image tags
 executor: base
 steps:
@@ -38,10 +52,12 @@ steps:
       name: Promote image from <<parameters.origin>> to <<parameters.destiny>>
       environment:
         PARAMETER_START_FOLDER: <<parameters.gitops>>
-        PARAMETERS_ORIGIN_PATH: <<parameters.origin>>
-        PARAMETERS_ORIGIN_FILE: <<parameters.origin_file>>
-        PARAMETERS_DESTINY_PATH: <<parameters.destiny>>
-        PARAMETERS_DESTINY_FILE: <<parameters.destiny_file>>
+        PARAMETER_ORIGIN_PATH: <<parameters.origin>>
+        PARAMETER_COMPOSITE_ORIGIN_PATH: "<<parameters.gitops>>/apps/<<parameters.country>>/<<parameters.app_name>>/<<parameters.origin_env>>"
+        PARAMETER_ORIGIN_FILE: <<parameters.origin_file>>
+        PARAMETER_DESTINY_PATH: <<parameters.destiny>>
+        PARAMETER_COMPOSITE_DESTINY_PATH: "<<parameters.gitops>>/apps/<<parameters.country>>/<<parameters.app_name>>/<<parameters.destiny_env>>"
+        PARAMETER_DESTINY_FILE: <<parameters.destiny_file>>
       command: <<include(scripts/gitops-promote.sh)>>
   - slack/notify:
       event: fail
