@@ -6,23 +6,31 @@ parameters:
   country:
     type: string
     default: br
+    description: The name of the country folder inside gitops repo
   app_name:
     type: string
     default: ${CIRCLE_PROJECT_REPONAME}
+    description: the name of the app. Default is ${CIRCLE_PROJECT_REPONAME}
   origin_env:
     type: string
     default: qa
+    description: The name of the folder inside app_name that holds the deployment origin tag to be used to update destiny_env.
   destiny_env:
     type: string
     default: dafiti-live
+    description: The name of the folder inside app_name that holds the deployment tag to be used overrided by origin_env.
   origin:
     type: string
     default: ""
-    description: path to origin image hash to copy from
+    description: |
+      Used to override the default setup of `[gitops]/apps/[country]/[app_name]/[destiny_env]` folder pattern.
+      This parameters use literal folder path to be used to get the image tag to update destiny deployment.
   destiny:
     type: string
     default: ""
-    description: path to destiny file to past to
+    description: |
+      Used to override the default setup of `[gitops]/apps/[country]/[app_name]/[origin_env]` folder pattern.
+      This parameters use literal folder path to be used to update destiny deployment with de origin tag.
   origin_file:
     type: string
     default: kustomization
@@ -30,7 +38,7 @@ parameters:
       filename without extension go get image tag for deployment ex:
       if file is `backstage.yaml` use only `backstage`
       if file is `kustomize.yaml` use only `kustomize`
-      Default value is CIRCLE_PROJECT_REPONAME that is the name of your repository in GitHub
+      For legacy deployments using `argo`, please use the environment ${CIRCLE_PROJECT_REPONAME}
   destiny_file:
     type: string
     default: kustomization
@@ -38,7 +46,7 @@ parameters:
       filename without extension for update image tag from ex:
       if file is `backstage.yaml` use only `backstage`
       if file is `kustomize.yaml` use only `kustomize`
-      Default value is CIRCLE_PROJECT_REPONAME that is the name of your repository in GitHub
+      For legacy deployments using `argo`, please use the environment ${CIRCLE_PROJECT_REPONAME}
   gitops:
     type: string
     default: gitops
@@ -49,7 +57,7 @@ steps:
   - clone_gitops:
       gitops: <<parameters.gitops>>
   - run:
-      name: Promote image from <<parameters.origin>> to <<parameters.destiny>>
+      name: Promote image from <<parameters.origin_env>> to <<parameters.destiny_env>>
       environment:
         PARAMETER_START_FOLDER: <<parameters.gitops>>
         PARAMETER_ORIGIN_PATH: <<parameters.origin>>

@@ -22,8 +22,15 @@ if [ ! -f "${DESTINY_FILE}" ]; then
   echo "file ${DESTINY_FILE} not found"
   exit 1
 fi
-IMAGE=$(grep -E "tag\:.*" ${ORIGIN_FILE})
-sed -Ei "s|\s+tag\:.*|${IMAGE}|" ${DESTINY_FILE}
+
+NEW_TAG=$(grep "tag: " ${ORIGIN_FILE} | awk '{print$2}')
+OLD_TAG=$(grep "tag: " ${DESTINY_FILE} | awk '{print$2}')
+echo "NEW_TAG: ${NEW_TAG} OLD_TAG: ${OLD_TAG}"
+if [[ -z "$NEW_TAG" || -z "$OLD_TAG" ]]; then
+  echo "Error geting tags from files"
+fi
+sed -i "s|${OLD_TAG}|${NEW_TAG}|" ${DESTINY_FILE}
+
 cd ${PARAMETER_START_FOLDER} || exit 1
 if [[ $(git diff) ]]; then
   git diff

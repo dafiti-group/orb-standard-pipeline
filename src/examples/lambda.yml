@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@2.0.1
+    dft: dafiti-group/orb-standard-pipeline@3.0.0
   test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
@@ -66,7 +66,7 @@ usage:
             requires:
               [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
         - dft/instana-notify:
-            name: feedback-instana-qa
+            name: instana-feedback-qa
             context: [DEFAULT, QA]
             requires: [deploy-to-qa]
         - dft/grafana-notify:
@@ -83,26 +83,26 @@ usage:
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
-            name: review-open-pr-to-force-update
+            name: git-force-update
             context: [DEFAULT]
             filters: *head_filters
         - dft/hold-slack:
-            name: slack-notify-hold-production
+            name: slack-notify-hold-live
             context: [DEFAULT]
-            step_name: "Pipeline waiting approval to promote to production"
+            step_name: "Pipeline waiting approval to promote to live"
             filters: *head_filters
         - approval:
             type: approval
-            name: approve-deploy-production
+            name: approve-deploy-live
             filters: *head_filters
         - dft/sam-deploy:
             name: deploy-to-live
             s3-bucket: dft-live-repo
             context: [DEFAULT, LIVE]
             requires:
-              [approve-deploy-production, review-open-pr-to-force-update]
+              [approve-deploy-live, git-force-update]
         - dft/instana-notify:
-            name: feedback-instana-production
+            name: instana-feedback-live
             context: [DEFAULT, LIVE]
             requires: [deploy-to-live]
         - dft/grafana-notify:

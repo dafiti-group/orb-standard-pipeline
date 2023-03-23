@@ -4,11 +4,6 @@ description: |
   In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
   in your project settings or in your organization context, with the name of your team
   like @team or with a specific person id using <@USERID>
-  Below you'll find some placeholders to replace like:
-    - <path-to-gitops-deployment> in steps:
-      - rollback-live
-      - deploy-to-qa
-      - promote-qa-to-staging
 usage:
   version: 2.1
   parameters:
@@ -22,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@2.0.1
+    dft: dafiti-group/orb-standard-pipeline@3.0.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -48,10 +43,10 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-live
-            context: [DEFAULT]
-            rollback: <<pipeline.parameters.rollback>>
+            context: [DEFAULT, LIVE]
+            rollback: true
             version: <<pipeline.parameters.version>>
-            deployment_path: <path-to-gitops-deployment>
+            app_env: dafiti-live # need the name of the deployment inside gitops. Live is out of pattern
             filters: *head_filters
     deployment-flow:
       when:
@@ -115,11 +110,10 @@ usage:
                       -Dquarkus.native.builder-image=quay.io/quarkus/ubi-quarkus-mandrel:21.3.0.0-Final-java17
         - dft/eks-deploy:
             name: deploy-to-qa
-            context: [DEFAULT]
-            deployment_path: <path-to-gitops-deployment>
+            context: [DEFAULT, QA]
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
-            name: feedback-instana-qa
+            name: instana-feedback-qa
             context: [DEFAULT, QA]
             requires: [deploy-to-qa]
         - dft/grafana-notify:
@@ -130,7 +124,7 @@ usage:
         # staging actions =============================================================================================
         - dft/hold-slack:
             name: slack-notify-staging
-            step_name: ":alert: STAGIN needs action to deploy"
+            step_name: "STAGIN needs action to deploy"
             context: [DEFAULT]
         - approval:
             name: approve-to-staging
@@ -138,12 +132,10 @@ usage:
             requires: [deploy-to-qa]
         - dft/eks-deploy:
             name: promote-qa-to-staging
-            deployment_path: <path-to-gitops-deployment>
-            target_env: staging
-            context: [DEFAULT]
+            context: [DEFAULT, STAGING]
             requires: [approve-to-staging]
         - dft/instana-notify:
-            name: feedback-instana-staging
+            name: instana-feedback-staging
             context: [DEFAULT, STAGING]
             requires: [promote-qa-to-staging]
         - dft/grafana-notify:
@@ -155,12 +147,12 @@ usage:
         - dft/github-approve:
             name: dft-deploy-approve-pr
             context: [DEFAULT]
-            # requires: [promote-qa-to-staging] # when staging is up and running, use this instead of the below
-            requires: [deploy-to-qa]
+            requires: [promote-qa-to-staging] # when staging is up and running, use this instead of the below
+            # requires: [deploy-to-qa]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
-            name: review-open-pr-to-force-update
+            name: git-force-update
             context: [DEFAULT]
             filters: *head_filters
         - dft/hold-slack:
@@ -173,21 +165,17 @@ usage:
             name: approve-deploy-live
             filters: *head_filters
         - dft/eks-promote:
-            name: promote-homolog-to-live
-            # origin: argo/clusters/eks-stg-dafiti-latam/apps # uncomment when staging is up and running
-            origin: <path-to-gitops-deployment>
-            destiny: <path-to-gitops-deployment>
-            origin_file: ${CIRCLE_PROJECT_REPONAME}
-            destiny_file: ${CIRCLE_PROJECT_REPONAME}
+            name: promote-to-live
             context: [DEFAULT]
-            requires: [approve-deploy-live, review-open-pr-to-force-update]
+            origin_env: staging
+            requires: [approve-deploy-live, git-force-update]
         - dft/instana-notify:
             name: feedback-instana-live
             context: [DEFAULT, LIVE]
-            requires: [promote-homolog-to-live]
+            requires: [promote-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
             context: [DEFAULT]
             target_env: live
-            requires: [promote-homolog-to-production]
+            requires: [promote-to-live]
         # ===============================================================================================================

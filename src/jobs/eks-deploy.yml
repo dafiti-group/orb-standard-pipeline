@@ -6,12 +6,15 @@ parameters:
   country:
     type: string
     default: br
+    description: The name of the country folder inside gitops repo
   app_name:
     type: string
     default: ${CIRCLE_PROJECT_REPONAME}
+    description: the name of the app. Default is ${CIRCLE_PROJECT_REPONAME}
   app_env:
     type: string
     default: ${ENV_SHORT}
+    description: The name of the folder inside app_name that holds the deployment target of this change.
   deployment_path:
     type: string
     default: ""
@@ -58,7 +61,7 @@ steps:
   - clone_gitops:
       gitops: <<parameters.gitops>>
   - run:
-      name: change value in <<parameters.gitops>> repo
+      name: change value in <<parameters.gitops>> repo and env <<parameters.app_env>>
       environment:
         PARAMETER_COMPOSITE_PATH: "<<parameters.gitops>>/apps/<<parameters.country>>/<<parameters.app_name>>/<<parameters.app_env>>"
         PARAMETER_DEPLOYMENT_PATH: <<parameters.deployment_path>>
