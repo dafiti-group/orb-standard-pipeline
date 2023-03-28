@@ -46,7 +46,6 @@ usage:
             context: [DEFAULT, LIVE]
             rollback: true
             version: <<pipeline.parameters.version>>
-            app_env: dafiti-live
             filters: *head_filters
     deployment-flow:
       when:
@@ -94,8 +93,7 @@ usage:
             rev_txt_path: public/rev.txt
             context: [DEFAULT]
             filters: *deployment_filters
-            requires:
-              [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
+            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
             target_env: qa

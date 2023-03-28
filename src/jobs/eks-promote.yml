@@ -17,7 +17,7 @@ parameters:
     description: The name of the folder inside app_name that holds the deployment origin tag to be used to update destiny_env.
   destiny_env:
     type: string
-    default: dafiti-live
+    default: live
     description: The name of the folder inside app_name that holds the deployment tag to be used overrided by origin_env.
   origin:
     type: string

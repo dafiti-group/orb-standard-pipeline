@@ -46,7 +46,6 @@ usage:
             context: [DEFAULT, LIVE]
             rollback: true
             version: <<pipeline.parameters.version>>
-            app_env: dafiti-live # need the name of the deployment inside gitops. Live is out of pattern
             filters: *head_filters
     deployment-flow:
       when:
@@ -96,7 +95,7 @@ usage:
             context: [DEFAULT]
             filters: *deployment_filters
             requires:
-              [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
+              [unit-test, sonarqube, approve-to-qa, start-to-qa]
             runner: dft/java17
             dockerfile: src/main/docker/Dockerfile.native
             custom_steps:
@@ -124,7 +123,7 @@ usage:
         # staging actions =============================================================================================
         - dft/hold-slack:
             name: slack-notify-staging
-            step_name: "STAGIN needs action to deploy"
+            step_name: "STAGING needs action to deploy"
             context: [DEFAULT]
         - approval:
             name: approve-to-staging

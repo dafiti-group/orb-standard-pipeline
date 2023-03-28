@@ -56,7 +56,6 @@ usage:
         - dft/eks-deploy:
             name: deploy-live
             context: [DEFAULT, LIVE]
-            app_env: dafiti-live # because live is out of pattern, you need to pass the folder name here!
             filters: *head_filter
             requires: [build-and-push]
         - dft/instana-notify:

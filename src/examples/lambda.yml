@@ -64,7 +64,7 @@ usage:
             context: [DEFAULT, QA]
             filters: *deployment_filters
             requires:
-              [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
+              [unit-test, sonarqube, approve-to-qa, start-to-qa]
         - dft/instana-notify:
             name: instana-feedback-qa
             context: [DEFAULT, QA]
