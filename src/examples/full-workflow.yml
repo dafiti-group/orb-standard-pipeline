@@ -4,11 +4,6 @@ description: |
   In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
   in your project settings or in your organization context, with the name of your team
   like @team or with a specific person id using <@USERID>
-  Below you'll find some placeholders to replace like:
-    - <path-to-gitops-deployment> in steps:
-      - rollback-live
-      - deploy-to-qa
-      - promote-qa-to-staging
 usage:
   version: 2.1
   parameters:
@@ -22,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@2.0.1
+    dft: dafiti-group/orb-standard-pipeline@3.0.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -48,10 +43,9 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-live
-            context: [DEFAULT]
+            context: [DEFAULT, LIVE]
             rollback: true
             version: <<pipeline.parameters.version>>
-            deployment_path: <path-to-gitops-deployment>
             filters: *head_filters
     deployment-flow:
       when:
@@ -77,7 +71,7 @@ usage:
         - dft/hold-slack:
             name: slack-notify-hold-qa
             context: [DEFAULT]
-            step_name: ":alert: a new release is awaiting your approve"
+            step_name: "A new release is awaiting your approve"
             filters: *release_filters
         - approval:
             name: start-to-qa
@@ -86,7 +80,7 @@ usage:
         - dft/hold-slack:
             name: slack-notify-hold-hotfix
             context: [DEFAULT]
-            step_name: ":alert: the hotfix is waiting your approval to deploy"
+            step_name: "The hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
             requires: [unit-test, sonarqube]
         - approval:
@@ -100,15 +94,13 @@ usage:
             context: [DEFAULT]
             filters: *deployment_filters
             requires:
-              [unit-test, sonarqube, checkmarx, approve-to-qa, start-to-qa]
+              [unit-test, sonarqube, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
-            target_env: qa
-            context: [DEFAULT]
-            deployment_path: <path-to-gitops-deployment>
+            context: [DEFAULT, QA]
             requires: [approve-to-qa, ecr-build-and-push]
         - dft/instana-notify:
-            name: feedback-instana-qa
+            name: instana-feedback-qa
             context: [DEFAULT, QA]
             requires: [deploy-to-qa]
         - dft/grafana-notify:
@@ -119,7 +111,7 @@ usage:
         # staging actions =============================================================================================
         - dft/hold-slack:
             name: slack-notify-staging
-            step_name: ":alert: STAGIN needs action to deploy"
+            step_name: "STAGING needs action to deploy"
             context: [DEFAULT]
         - approval:
             name: approve-to-staging
@@ -127,12 +119,10 @@ usage:
             requires: [deploy-to-qa]
         - dft/eks-deploy:
             name: promote-qa-to-staging
-            deployment_path: <path-to-gitops-deployment>
-            target_env: staging
-            context: [DEFAULT]
+            context: [DEFAULT, STAGING]
             requires: [approve-to-staging]
         - dft/instana-notify:
-            name: feedback-instana-staging
+            name: instana-feedback-staging
             context: [DEFAULT, STAGING]
             requires: [promote-qa-to-staging]
         - dft/grafana-notify:
@@ -148,33 +138,30 @@ usage:
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
-            name: review-open-pr-to-force-update
+            name: git-force-update
             context: [DEFAULT]
             filters: *head_filters
         - dft/hold-slack:
-            name: slack-notify-hold-production
+            name: slack-notify-hold-live
             context: [DEFAULT]
-            step_name: ":alert: pipeline waiting approval to promote to production"
+            step_name: "Pipeline waiting approval to promote to live"
             filters: *head_filters
         - approval:
             type: approval
-            name: approve-deploy-production
+            name: approve-deploy-live
             filters: *head_filters
         - dft/eks-promote:
-            name: promote-homolog-to-production
-            origin: clusters/staging
-            destiny: clusters/production
-            target: production
+            name: promote-to-live
             context: [DEFAULT]
-            requires:
-              [approve-deploy-production, review-open-pr-to-force-update]
+            origin_env: staging
+            requires: [approve-deploy-live, git-force-update]
         - dft/instana-notify:
-            name: feedback-instana-production
+            name: instana-feedback-live
             context: [DEFAULT, LIVE]
-            requires: [promote-homolog-to-production]
+            requires: [promote-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
             context: [DEFAULT]
             target_env: live
-            requires: [promote-homolog-to-production]
+            requires: [promote-to-live]
         # ===============================================================================================================
