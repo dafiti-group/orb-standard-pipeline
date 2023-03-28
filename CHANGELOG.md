@@ -1,4 +1,4 @@
-# org-standard-pipeline
+# orb-standard-pipeline
 
 ## `[3.0.0] - 2023-03-28`
 
@@ -10,7 +10,7 @@
       name: deploy-to-(live|qa)
       context: [DEFAULT, (LIVE|QA)]
   ```
-  There are no need to pass the parameters `deployment_path` or even `gitops` to garget the `gitops` repository.
+  There are no need to pass the parameters `deployment_path` or even `gitops` to target the `gitops` repository.
   The default values of this job and the environments `LIVE QA DEFAULT` has the values needed to perform the deploy using only the context.
 - updated `eks-promote` to target default repository `gitops`.
   ```yaml
