@@ -8,4 +8,4 @@ validate: pack
 	circleci orb validate orb.yml
 
 dev: pack validate
-	circleci orb publish --skip-update-check "orb.yml" "dafiti-group/orb-standard-pipeline@dev:first"
+	circleci orb publish --skip-update-check "orb.yml" "dafiti-group/orb-standard-pipeline@dev:payment"

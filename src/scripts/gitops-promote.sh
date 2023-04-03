@@ -31,7 +31,7 @@ if [[ -z "$NEW_TAG" || -z "$OLD_TAG" ]]; then
 fi
 sed -i "s|${OLD_TAG}|${NEW_TAG}|" ${DESTINY_FILE}
 
-cd ${PARAMETER_START_FOLDER} || exit 1
+cd ${LOCAL_DESTINY_PATH} || exit 1
 if [[ $(git diff) ]]; then
   git diff
   git add .

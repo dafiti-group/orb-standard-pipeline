@@ -55,7 +55,9 @@ executor: base
 steps:
   - config_git
   - clone_gitops:
-      gitops: <<parameters.gitops>>
+      gitops: argo
+  - clone_gitops:
+      gitops: gitops
   - run:
       name: Promote image from <<parameters.origin_env>> to <<parameters.destiny_env>>
       environment:
