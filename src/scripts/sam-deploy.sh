@@ -18,4 +18,5 @@ sam package \
 sam deploy \
   --template-file package.yaml \
   --stack-name ${CIRCLE_PROJECT_REPONAME} \
-  --capabilities CAPABILITY_IAM
+  --capabilities CAPABILITY_IAM \
+  --on-failure DELETE
