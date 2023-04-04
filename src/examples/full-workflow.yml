@@ -17,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.0.0
+    dft: dafiti-group/orb-standard-pipeline@3.0.1
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -90,7 +90,7 @@ usage:
             requires: [unit-test, sonarqube]
         - dft/ecr-build-and-push:
             name: ecr-build-and-push
-            rev_txt_path: public/rev.txt
+            # rev_txt_path: public/rev.txt
             context: [DEFAULT]
             filters: *deployment_filters
             requires:
