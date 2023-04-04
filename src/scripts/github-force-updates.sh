@@ -24,7 +24,7 @@ fi
 echo ">>>> force updating branches"
 if git branch -a | grep -Eq "origin\/(release|hotfix)"
 then
-  git branch -a | grep "origin" | grep -Eo "release.*|hotfix.*" | while read -r line; do
+  git branch -a | grep -E "origin\/(release|hotfix)" | grep -Eo "release.*|hotfix.*" | while read -r line; do
     echo ">>>CURRENT-LINE: ${line}"
     git checkout $line
     git merge -X theirs origin/${CURRENT_BRANCH}

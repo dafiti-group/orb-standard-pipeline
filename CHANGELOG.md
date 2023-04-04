@@ -1,5 +1,22 @@
 # orb-standard-pipeline
 
+## `[3.0.1 2023-04-04]`
+
+### Changes
+
+- update `github-update` job to fix the `regex` to loop only branchs that starts with `release` or `hotfix`
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
+
+
 ## `[3.0.0] - 2023-03-28`
 
 ### Changes
