@@ -1,0 +1,15 @@
+description: |
+  This job is responsible to AWS SAM validate template.yaml
+  Needs:
+    context: [DEFAULT]
+parameters:
+executor: base
+steps:
+  - checkout
+  - sam/install
+  - run:
+      name: AWS SAM validate
+      command: sam validate
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>
