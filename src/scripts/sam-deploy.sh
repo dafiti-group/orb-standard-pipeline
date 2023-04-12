@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ -z "${SAM_DEPLOY_PARAMETER_S3}" ]]; then
-  echo "ENV SAM_DEPLOY_PARAMETER_S3 could not be empty!"
+if [[ -z "${PARAMETER_S3_BUCKET}" ]]; then
+  echo "ENV PARAMETER_S3_BUCKET could not be empty!"
   exit 1
 fi
 
@@ -13,7 +13,7 @@ sam package \
   --template-file template.yaml \
   --output-template-file package.yaml \
   --s3-prefix ${CIRCLE_PROJECT_REPONAME} \
-  --s3-bucket ${SAM_DEPLOY_PARAMETER_S3} ${PARAMETER_EXTRA_PACKAGE_ARGS}
+  --s3-bucket ${PARAMETER_S3_BUCKET} ${PARAMETER_EXTRA_PACKAGE_ARGS}
 
 sam deploy \
   --template-file package.yaml \

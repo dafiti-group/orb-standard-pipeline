@@ -28,7 +28,7 @@ steps:
   - run:
       name: Deploy lambda funcion
       environment:
-        SAM_DEPLOY_PARAMETER_S3: <<parameters.s3-bucket>>
+        PARAMETER_S3_BUCKET: <<parameters.s3-bucket>>
         PARAMETER_EXTRA_PACKAGE_ARGS: <<parameters.extra_package_args>>
         PARAMETER_EXTRA_DEPLOY_ARGS: <<parameters.extra_deploy_args>>
       command: <<include(scripts/sam-deploy.sh)>>
