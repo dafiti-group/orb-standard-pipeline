@@ -5,7 +5,7 @@ if [[ -z "${SAM_DEPLOY_PARAMETER_S3}" ]]; then
   exit 1
 fi
 
-sam build
+sam build --use-container
 
 cd .aws-sam/build || exit 1
 
@@ -13,10 +13,9 @@ sam package \
   --template-file template.yaml \
   --output-template-file package.yaml \
   --s3-prefix ${CIRCLE_PROJECT_REPONAME} \
-  --s3-bucket ${SAM_DEPLOY_PARAMETER_S3}
+  --s3-bucket ${SAM_DEPLOY_PARAMETER_S3} ${PARAMETER_EXTRA_PACKAGE_ARGS}
 
 sam deploy \
   --template-file package.yaml \
   --stack-name ${CIRCLE_PROJECT_REPONAME} \
-  --capabilities CAPABILITY_IAM \
-  --on-failure DELETE
+  --capabilities CAPABILITY_IAM  ${PARAMETER_EXTRA_DEPLOY_ARGS}
