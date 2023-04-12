@@ -1,5 +1,24 @@
 # orb-standard-pipeline
 
+## `[3.0.1 2023-04-04]`
+
+### Changes
+
+- update `github-update` job to fix the `regex` to loop only branchs that starts with `release` or `hotfix`
+- fix the issue #22 include `--on-failure DELETE` in the `sam-deploy` job.
+- fix the issue #20 include a parameter `path` to job `invalidate-cache` with default value `/*`
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
+
+
 ## `[3.0.0] - 2023-03-28`
 
 ### Changes

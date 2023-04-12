@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.0.0
+    dft: dafiti-group/orb-standard-pipeline@3.0.1
   test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
@@ -23,6 +23,10 @@ usage:
     deployment-flow:
       jobs:
         # features & hotfix =============================================================================================
+        - dft/sam-validate:
+            name: sam-validate-template
+            context: [DEFAULT]
+            filters: *test_filters
         - dft/sam-test:
             name: unit-test
             context: [DEFAULT]
@@ -52,19 +56,19 @@ usage:
             context: [DEFAULT]
             step_name: "The hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube]
+            requires: [unit-test, sonarqube, sam-validate-template]
         - approval:
             name: approve-to-qa
             type: approval
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube]
+            requires: [unit-test, sonarqube, sam-validate-template]
         - dft/sam-deploy:
             name: deploy-to-qa
             s3-bucket: dft-qa-repo
             context: [DEFAULT, QA]
             filters: *deployment_filters
             requires:
-              [unit-test, sonarqube, approve-to-qa, start-to-qa]
+              [unit-test, sonarqube, sam-validate-template, approve-to-qa, start-to-qa]
         - dft/instana-notify:
             name: instana-feedback-qa
             context: [DEFAULT, QA]

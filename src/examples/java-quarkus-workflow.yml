@@ -17,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.0.0
+    dft: dafiti-group/orb-standard-pipeline@3.0.1
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -94,8 +94,7 @@ usage:
             name: ecr-build-and-push
             context: [DEFAULT]
             filters: *deployment_filters
-            requires:
-              [unit-test, sonarqube, approve-to-qa, start-to-qa]
+            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
             runner: dft/java17
             dockerfile: src/main/docker/Dockerfile.native
             custom_steps:
@@ -121,33 +120,33 @@ usage:
             target_env: qa
             requires: [deploy-to-qa]
         # staging actions =============================================================================================
-        - dft/hold-slack:
-            name: slack-notify-staging
-            step_name: "STAGING needs action to deploy"
-            context: [DEFAULT]
-        - approval:
-            name: approve-to-staging
-            type: approval
-            requires: [deploy-to-qa]
-        - dft/eks-deploy:
-            name: promote-qa-to-staging
-            context: [DEFAULT, STAGING]
-            requires: [approve-to-staging]
-        - dft/instana-notify:
-            name: instana-feedback-staging
-            context: [DEFAULT, STAGING]
-            requires: [promote-qa-to-staging]
-        - dft/grafana-notify:
-            name: grafana-notify-stg
-            context: [DEFAULT]
-            target_env: stg
-            requires: [promote-qa-to-staging]
+        # - dft/hold-slack:
+        #     name: slack-notify-staging
+        #     step_name: "STAGING needs action to deploy"
+        #     context: [DEFAULT]
+        # - approval:
+        #     name: approve-to-staging
+        #     type: approval
+        #     requires: [deploy-to-qa]
+        # - dft/eks-deploy:
+        #     name: promote-qa-to-staging
+        #     context: [DEFAULT, STAGING]
+        #     requires: [approve-to-staging]
+        # - dft/instana-notify:
+        #     name: instana-feedback-staging
+        #     context: [DEFAULT, STAGING]
+        #     requires: [promote-qa-to-staging]
+        # - dft/grafana-notify:
+        #     name: grafana-notify-stg
+        #     context: [DEFAULT]
+        #     target_env: stg
+        #     requires: [promote-qa-to-staging]
         # =============================================================================================================
         - dft/github-approve:
             name: dft-deploy-approve-pr
             context: [DEFAULT]
-            requires: [promote-qa-to-staging] # when staging is up and running, use this instead of the below
-            # requires: [deploy-to-qa]
+            requires: [deploy-to-qa]
+            # requires: [promote-qa-to-staging] # when staging is up and running, use this instead of the below
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
@@ -166,8 +165,8 @@ usage:
         - dft/eks-promote:
             name: promote-to-live
             context: [DEFAULT]
-            origin_env: staging
             requires: [approve-deploy-live, git-force-update]
+            # origin_env: staging
         - dft/instana-notify:
             name: feedback-instana-live
             context: [DEFAULT, LIVE]

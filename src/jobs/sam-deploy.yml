@@ -6,45 +6,31 @@ parameters:
   s3-bucket:
     type: string
     description: the name of the bucket to upload artifact
-  runner:
-    type: executor
-    default: node
+  extra_package_args:
+    type: string
+    default: ""
     description: |
-      base image to run the pipeline
-      Available options inside orb is [node, golang]
-      To use those executors from this orb, use the sintaxe :
-      ```yaml
-        version: 2.1
-        ...
-        executors:
-          my-executor:
-            docker:
-              - image: my-image:lts
-        workflows:
-          deployment-flow:
-            jobs:
-              ...
-              - dft/sam-test:
-                  name: unit-test
-                  runner: dft/node
-              - dft/sam-test:
-                  name: unit-test
-                  runner: dft/golang
-              # using outside orb executor
-              - dft/sam-test:
-                  name: unit-test
-                  runner: my-executor
-      ```
-      To use a customized runner, see this documentation https://circleci.com/docs/reusing-config#executor
-      Use CircleCI images -> https://circleci.com/developer/images
-executor: <<parameters.runner>>
+      Extra arguments to command sam package
+      Could be any options available in `sam package --help`
+  extra_deploy_args:
+    type: string
+    default: >-
+      --on-failure DELETE
+    description: |
+      Extra arguments to command sam deploy
+      Could be any options available in `sam deploy --help`
+executor: base
 steps:
   - checkout
+  - config_docker
+  - config_git
   - sam/install
   - run:
       name: Deploy lambda funcion
       environment:
-        SAM_DEPLOY_PARAMETER_S3: <<parameters.s3-bucket>>
+        PARAMETER_S3_BUCKET: <<parameters.s3-bucket>>
+        PARAMETER_EXTRA_PACKAGE_ARGS: <<parameters.extra_package_args>>
+        PARAMETER_EXTRA_DEPLOY_ARGS: <<parameters.extra_deploy_args>>
       command: <<include(scripts/sam-deploy.sh)>>
   - slack/notify:
       event: fail
