@@ -23,7 +23,7 @@ executor: base
 steps:
   - checkout
   - config_docker
-  - config_github
+  - config_git
   - sam/install
   - run:
       name: Deploy lambda funcion
