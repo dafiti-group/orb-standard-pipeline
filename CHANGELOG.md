@@ -1,4 +1,19 @@
 # orb-standard-pipeline
+## `[3.0.2 2023-04-25]`
+
+### Changes
+
+- updated `dft/sam-deploy` to use `machine` instead of `docker` engine
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
 
 ## `[3.0.1 2023-04-04]`
 
