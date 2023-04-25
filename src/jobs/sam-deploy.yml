@@ -19,10 +19,10 @@ parameters:
     description: |
       Extra arguments to command sam deploy
       Could be any options available in `sam deploy --help`
-executor: base
+machine:
+  image: ubuntu-2204:2022.07.1
 steps:
   - checkout
-  - config_docker
   - config_git
   - sam/install
   - run:
