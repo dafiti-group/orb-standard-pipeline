@@ -8,11 +8,11 @@ Included `sonarqube` **COVERAGES**
 
 - The docker image of `sonarqube` executor changed from: `newtmitch/sonar-scanner:4` to: `onarsource/sonar-scanner-cli:4`
 - job `unit-test` include new parameters:
-  - **`has_coverage`**: bool to flag project that has coverage, default `false`
+  - **`has_coverage`**: `boolean` to flag project that has coverage, default `false`
   - **`coverage_file`** The name of the coverage file generated in test, default ""
-  - **`container_work_dir`** The base path inside container, Dafault "/app/"
+  - **`container_work_dir`** The base path inside container, default "/app/"
 - job `sonarqube` include new parameters:
-  - **`has_coverage`**: bool to flag project that has coverage, default `false`
+  - **`has_coverage`**: `boolean` to flag project that has coverage, default `false`
 
 ### Migrating to this version and using sonar coverage
 
