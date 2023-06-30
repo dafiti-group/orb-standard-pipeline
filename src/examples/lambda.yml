@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.0.2
+    dft: dafiti-group/orb-standard-pipeline@3.0.3
   test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
@@ -68,7 +68,13 @@ usage:
             context: [DEFAULT, QA]
             filters: *deployment_filters
             requires:
-              [unit-test, sonarqube, sam-validate-template, approve-to-qa, start-to-qa]
+              [
+                unit-test,
+                sonarqube,
+                sam-validate-template,
+                approve-to-qa,
+                start-to-qa,
+              ]
         - dft/instana-notify:
             name: instana-feedback-qa
             context: [DEFAULT, QA]
@@ -103,8 +109,7 @@ usage:
             name: deploy-to-live
             s3-bucket: dft-live-repo
             context: [DEFAULT, LIVE]
-            requires:
-              [approve-deploy-live, git-force-update]
+            requires: [approve-deploy-live, git-force-update]
         - dft/instana-notify:
             name: instana-feedback-live
             context: [DEFAULT, LIVE]
