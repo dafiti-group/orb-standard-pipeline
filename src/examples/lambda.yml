@@ -67,23 +67,7 @@ usage:
             s3-bucket: dft-qa-repo
             context: [DEFAULT, QA]
             filters: *deployment_filters
-            requires:
-              [
-                unit-test,
-                sonarqube,
-                sam-validate-template,
-                approve-to-qa,
-                start-to-qa,
-              ]
-        - dft/instana-notify:
-            name: instana-feedback-qa
-            context: [DEFAULT, QA]
-            requires: [deploy-to-qa]
-        - dft/grafana-notify:
-            name: grafana-notify-qa
-            context: [DEFAULT]
-            target_env: qa
-            requires: [deploy-to-qa]
+            requires: [ unit-test, sonarqube, sam-validate-template, approve-to-qa, start-to-qa ]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
@@ -111,7 +95,7 @@ usage:
             context: [DEFAULT, LIVE]
             requires: [approve-deploy-live, git-force-update]
         - dft/instana-notify:
-            name: instana-feedback-live
+            name: instana-notify-live
             context: [DEFAULT, LIVE]
             requires: [deploy-to-live]
         - dft/grafana-notify:

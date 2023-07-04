@@ -98,15 +98,6 @@ usage:
             name: deploy-to-qa
             context: [DEFAULT, QA]
             requires: [approve-to-qa, ecr-build-and-push]
-        - dft/instana-notify:
-            name: instana-feedback-qa
-            context: [DEFAULT, QA]
-            requires: [deploy-to-qa]
-        - dft/grafana-notify:
-            name: grafana-notify-qa
-            context: [DEFAULT]
-            target_env: qa
-            requires: [deploy-to-qa]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
@@ -133,7 +124,7 @@ usage:
             context: [DEFAULT]
             requires: [approve-deploy-live, git-force-update]
         - dft/instana-notify:
-            name: feedback-instana-live
+            name: instana-notify-live
             context: [DEFAULT, LIVE]
             requires: [promote-to-live]
         - dft/grafana-notify:

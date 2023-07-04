@@ -110,15 +110,6 @@ usage:
             name: deploy-to-qa
             context: [DEFAULT, QA]
             requires: [approve-to-qa, ecr-build-and-push]
-        - dft/instana-notify:
-            name: instana-feedback-qa
-            context: [DEFAULT, QA]
-            requires: [deploy-to-qa]
-        - dft/grafana-notify:
-            name: grafana-notify-qa
-            context: [DEFAULT]
-            target_env: qa
-            requires: [deploy-to-qa]
         # staging actions =============================================================================================
         # - dft/hold-slack:
         #     name: slack-notify-staging
@@ -132,15 +123,6 @@ usage:
         #     name: promote-qa-to-staging
         #     context: [DEFAULT, STAGING]
         #     requires: [approve-to-staging]
-        # - dft/instana-notify:
-        #     name: instana-feedback-staging
-        #     context: [DEFAULT, STAGING]
-        #     requires: [promote-qa-to-staging]
-        # - dft/grafana-notify:
-        #     name: grafana-notify-stg
-        #     context: [DEFAULT]
-        #     target_env: stg
-        #     requires: [promote-qa-to-staging]
         # =============================================================================================================
         - dft/github-approve:
             name: dft-deploy-approve-pr
@@ -168,7 +150,7 @@ usage:
             requires: [approve-deploy-live, git-force-update]
             # origin_env: staging
         - dft/instana-notify:
-            name: feedback-instana-live
+            name: instana-notify-live
             context: [DEFAULT, LIVE]
             requires: [promote-to-live]
         - dft/grafana-notify:
