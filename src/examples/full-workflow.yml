@@ -93,8 +93,7 @@ usage:
             # rev_txt_path: public/rev.txt
             context: [DEFAULT]
             filters: *deployment_filters
-            requires:
-              [unit-test, sonarqube, approve-to-qa, start-to-qa]
+            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
         - dft/eks-deploy:
             name: deploy-to-qa
             context: [DEFAULT, QA]

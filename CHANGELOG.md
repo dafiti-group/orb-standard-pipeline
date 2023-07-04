@@ -80,6 +80,19 @@ Included `sonarqube` **COVERAGES**
 
 ___
 
+## `[3.0.3 2023-06-30]`
+
+### Changes
+
+- fix block PR function, now just block PR that destiny is HEAD Branch
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
 ## `[3.0.2 2023-04-25]`
 
 ### Changes
