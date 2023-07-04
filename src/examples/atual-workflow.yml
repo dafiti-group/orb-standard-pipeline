@@ -16,7 +16,7 @@ usage:
     branches:
       only: [master]
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.0.3
+    dft: dafiti-group/orb-standard-pipeline@3.1.0
   workflows:
     deployment-flow:
       jobs:
@@ -43,15 +43,6 @@ usage:
             context: [DEFAULT, QA]
             filters: *qa_filter
             requires: [build-and-push]
-        - dft/instana-notify:
-            name: instana-notify-qa
-            context: [DEFAULT, QA]
-            requires: [deploy-qa]
-        - dft/grafana-notify:
-            name: grafana-notify-qa
-            context: [DEFAULT]
-            target_env: qa
-            requires: [deploy-qa]
         # live deploy ===================================================================================================
         - dft/eks-deploy:
             name: deploy-live

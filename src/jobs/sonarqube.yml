@@ -51,10 +51,20 @@ parameters:
     default: ""
     description: >
       Used to pass aditional sonar args like: `-Dsonar.java.binaries=.`
+  has_coverage:
+    type: boolean
+    default: false
+    description: Used to enable coverage
 
 executor: <<parameters.runner>>
 steps:
   - checkout
+  - when:
+      condition:
+        equal: [true, <<parameters.has_coverage>>]
+      steps:
+        - attach_workspace:
+            at: .
   - when:
       condition:
         equal: [true, <<parameters.custom_command>>]

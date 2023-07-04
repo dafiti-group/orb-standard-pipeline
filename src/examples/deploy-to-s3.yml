@@ -4,7 +4,7 @@ usage:
   version: 2.1
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.0.3
+    dft: dafiti-group/orb-standard-pipeline@3.1.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -66,11 +66,6 @@ usage:
             context: [DEFAULT, QA]
             filters: *deployment_filters
             requires: [approve-to-qa, start-to-qa]
-        - dft/grafana-notify:
-            name: grafana-notify-qa
-            target_env: qa
-            context: [DEFAULT]
-            requires: [build-and-upload-qa]
         # =========================================================================
         # TODO: when the staging cluster is available, uncoment the section below
         # - approval:
@@ -83,10 +78,6 @@ usage:
         #     context: [DEFAULT]
         #     requires:
         #       - approve-to-staging
-        # - dft/instana-notify:
-        #     name: instana-feedback-staging
-        #     context: [DEFAULT]
-        #     requires: [promote-qa-to-staging]
         # =========================================================================
         - dft/github-approve:
             name: dft-deploy-approve-pr
