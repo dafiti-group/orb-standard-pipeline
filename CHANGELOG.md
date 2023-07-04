@@ -6,7 +6,9 @@
 
 Included `sonarqube` **COVERAGES**
 
-- The docker image of `sonarqube` executor changed from: `newtmitch/sonar-scanner:4` to: `onarsource/sonar-scanner-cli:4`
+[More info at Confluence page](https://dafiti.jira.com/wiki/spaces/PLAT/pages/3778314987/Cobertura+de+testes)
+
+- The docker image of `sonarqube` executor changed from: `newtmitch/sonar-scanner:4` to: `sonarsource/sonar-scanner-cli:4`
 - job `unit-test` include new parameters:
   - **`has_coverage`**: `boolean` to flag project that has coverage, default `false`
   - **`coverage_file`** The name of the coverage file generated in test, default ""
