@@ -17,7 +17,7 @@ if [ ! -f "${CONFIG_FILE}" ]; then
 fi
 
 if [ "${PARAMETER_USE_YQ}" -eq "1" ]; then
-  yq -i '.helmCharts[0].valuesInline.image.tag = strenv(IMAGE)' $CONFIG_FILE
+  yq -i ".helmCharts[0].valuesInline.image.tag = \"${IMAGE}\"" $CONFIG_FILE
 else
   IMAGE="tag: \"${IMAGE}\""
   sed -Ei "s|tag: \".*\"|${IMAGE}|" ${CONFIG_FILE}
