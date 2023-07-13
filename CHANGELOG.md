@@ -1,5 +1,51 @@
 # orb-standard-pipeline
 
+## `[3.1.1 2023-07-12]`
+
+### Changes
+
+Fix jobs:
+
+- `eks-deploy`
+- `eks-promote`
+
+Booth of then now has a flag `use_yq` with default value `true` that change the behavior of the action to change image tag in deployment file.
+
+The default image `cimg/base:stable` has the binary `yq` <https://mikefarah.gitbook.io/yq/> already installed that make ease to change values in yaml file like a pro.
+
+This feature will only work when de deployment file is a `kustomization.yaml` file that has the yaml structure like:
+
+```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: example
+helmCharts:
+  - name: my-helm
+    version: 0.0.1
+    repo: https://my-repo.io
+    valuesInline:
+      image:
+        tag: "767ccdc" 
+```
+
+Then the command:
+
+```sh
+yq -i '.helmCharts[0].valuesInline.image.tag = "[new value]"'
+```
+
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
+
+
 ## `[3.1.0 2023-07-04]`
 
 ### Changes

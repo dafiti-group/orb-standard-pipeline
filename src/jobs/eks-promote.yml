@@ -51,6 +51,12 @@ parameters:
     type: string
     default: gitops
     description: The repo name to clone deployments to change image tags
+  use_yq:
+    type: boolean
+    default: true
+    description: |
+      Flag to use yq command to replace image tag instead of sed command
+      WARNING: use only if your project is using kustomization file!
 executor: base
 steps:
   - config_git
@@ -66,6 +72,8 @@ steps:
         PARAMETER_DESTINY_PATH: <<parameters.destiny>>
         PARAMETER_COMPOSITE_DESTINY_PATH: "<<parameters.gitops>>/apps/<<parameters.country>>/<<parameters.app_name>>/<<parameters.destiny_env>>"
         PARAMETER_DESTINY_FILE: <<parameters.destiny_file>>
+        PARAMETER_USE_YQ: <<parameters.use_yq>>
+
       command: <<include(scripts/gitops-promote.sh)>>
   - slack/notify:
       event: fail
