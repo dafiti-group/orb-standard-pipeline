@@ -17,9 +17,11 @@ if [ ! -f "${CONFIG_FILE}" ]; then
 fi
 
 if [ "${PARAMETER_USE_YQ}" -eq "1" ]; then
+  echo "Using YQ and new tag is: ${IMAGE}"
   yq -i ".helmCharts[0].valuesInline.image.tag = \"${IMAGE}\"" $CONFIG_FILE
 else
   IMAGE="tag: \"${IMAGE}\""
+  echo "Using SED and new tag is: ${IMAGE}"
   sed -Ei "s|tag: \".*\"|${IMAGE}|" ${CONFIG_FILE}
 fi
 

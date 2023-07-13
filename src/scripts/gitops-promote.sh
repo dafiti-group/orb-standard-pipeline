@@ -25,11 +25,12 @@ fi
 
 if [ "${PARAMETER_USE_YQ}" -eq "1" ]; then
   TAG=$(yq '.helmCharts[0].valuesInline.image.tag' ${ORIGIN_FILE})
+  echo "Using YQ and new tag is:${TAG}"
   yq -i ".helmCharts[0].valuesInline.image.tag = \"${TAG}\"" ${DESTINY_FILE}
 else
   NEW_TAG=$(grep "tag: " ${ORIGIN_FILE} | awk '{print$2}')
   OLD_TAG=$(grep "tag: " ${DESTINY_FILE} | awk '{print$2}')
-  echo "NEW_TAG: ${NEW_TAG} OLD_TAG: ${OLD_TAG}"
+  echo "Using SED, NEW_TAG: ${NEW_TAG} OLD_TAG: ${OLD_TAG}"
   if [[ -z "$NEW_TAG" || -z "$OLD_TAG" ]]; then
     echo "Error geting tags from files"
   fi
