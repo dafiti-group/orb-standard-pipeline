@@ -107,6 +107,22 @@ function create_branch() {
   fi
   echo "Branch created with success! ${CREATE_BRANCH_RESPONSE}"
 }
+# Checkmarx API - setup_project
+function setup_project() {
+  echo "Configuring project reference: ${PARAMETER_PROJECT_BRANCH_NAME} for project ID: ${PROJECT_ID}"
+
+    SETUP_PROJECT_RESPONSE=$(
+    curl \
+      --location \
+      --request POST "${CHECKMARX_URL}/cxrestapi/projects/${PROJECT_ID}/sourceCode/remoteSettings/git" \
+      --silent \
+      --show-error \
+      --header 'Content-Type: application/json' \
+      --header "Authorization: Bearer ${BEARER_TOKEN}" \
+      --data-raw "{\"url\": \"${CIRCLE_REPOSITORY_URL}\",\"branch\": \"${PARAMETER_PROJECT_BRANCH_NAME}\",\"privateKey\": \"${GITHUB_TOKEN}\"}"
+  )
+  echo "Project configured with success! ${SETUP_PROJECT_RESPONSE}"
+}
 # Checkmarx API - delete_branch method
 function delete_branch() {
   echo "deleting project ID: ${*}"
@@ -204,6 +220,7 @@ function project_exists() {
     if [[ ${BRANCH} == "" ]]; then
       echo "Branch not found, trying to create one!"
       create_branch
+      setup_project
     else
       echo "Branch already exists: ${BRANCH}"
     fi
