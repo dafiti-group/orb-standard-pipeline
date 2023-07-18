@@ -33,38 +33,13 @@ steps:
         PROJECT_TYPE: <<parameters.project_type>>
         PARAMETER_METHODE: "project_exists"
       command: <<include(scripts/checkmarx.sh)>>
-  - cxflow/scan:
-      preset: $CHECKMARX_PRESET
-      team: $CHECKMARX_TEAM
-      incremental: true
-      no-output-timeout: <<parameters.no-output-timeout>>
-      # PARAMETER_PROJECT_BRANCH_NAME is populated in scripts/checkmarx.sh script ;)
-      # PARAMETER_BRANCH_NAME_SANITIZED is created in scripts/checkmarx.sh to remove invalid characters to cxflow rules
-      project: ${PARAMETER_PROJECT_BRANCH_NAME}
-      sca-accessControlUrl: "https://platform.checkmarx.net"
-      sca-apiUrl: "https://api.scacheckmarx.com"
-      sca-appUrl: "https://sca.scacheckmarx.com"
-      bug-tracker: GitHub
-      params: >-
-        --cx-flow.zip-exclude="${PARAMETER_SYMBOLIC_FILES}"
-        --checkmarx.settings-override=true
-        --namespace="${CIRCLE_PROJECT_USERNAME}"
-        --repo-name="${CIRCLE_PROJECT_REPONAME}"
-        --branch="${PARAMETER_BRANCH_NAME_SANITIZED}"
-        --cx-flow.filterSeverity=High
-        --cx-flow.filterSeverity=Medium
-        --cx-flow.filterStatus=New
-        --cx-flow.filter-status="New"
-        --cx-flow.filterStatus=Reoccured
-        --cx-flow.thresholds.High=${THRESHOLDS_HIGH_CHECKMARX}
-        --cx-flow.thresholds.Medium=${THRESHOLDS_MEDIUM_CHECKMARX}
-        --github.url="https://github.com"
-        --github.api-url="https://api.github.com/repos/"
-        --github.token="${GITHUB_TOKEN}"
-        --github.block-merge=true
-        --github.error-merge:true
-        --github.max-delay=3
-        ${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
+  - run:
+      name: Checkmarx Scan
+      environment:
+        HEAD_BRANCH_NAME: <<parameters.branch_head_name>>
+        PROJECT_TYPE: <<parameters.project_type>>
+        PARAMETER_METHODE: "project_exists"
+      command: <<include(scripts/checkmarx-scan.sh)>>
   - run:
       name: Checkmarx delete last scan ID.
       when: on_fail
