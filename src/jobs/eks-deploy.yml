@@ -58,6 +58,7 @@ steps:
         equal: [true, <<parameters.rollback>>]
       steps:
         - checkout
+        - aws-ecr/ecr-login
         - run:
             name: Validating version hash to rollback
             environment:
