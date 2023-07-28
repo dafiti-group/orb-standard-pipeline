@@ -1,10 +1,6 @@
 description: |
   Example using a legacy branch strategy [master,qa].
   This example assume that your application is already using docker-compose run --rm ci to unit test everything!
-  You only need to replace:
-    -<path-to-gitops-deployment>in steps:
-      - deploy-qa
-      - deploy-live
   In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
   in your project settings or in your organization context, with the name of your team
   like @team or with a specific person id using <@USERID>
@@ -20,7 +16,7 @@ usage:
     branches:
       only: [master]
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@2.0.1
+    dft: dafiti-group/orb-standard-pipeline@3.1.0
   workflows:
     deployment-flow:
       jobs:
@@ -44,24 +40,13 @@ usage:
         # qa deploy =====================================================================================================
         - dft/eks-deploy:
             name: deploy-qa
-            context: [DEFAULT]
-            deployment_path: <path-to-gitops-deployment>
+            context: [DEFAULT, QA]
             filters: *qa_filter
             requires: [build-and-push]
-        - dft/instana-notify:
-            name: instana-notify-qa
-            context: [DEFAULT, QA]
-            requires: [deploy-qa]
-        - dft/grafana-notify:
-            name: grafana-notify-qa
-            context: [DEFAULT]
-            target_env: qa
-            requires: [deploy-qa]
         # live deploy ===================================================================================================
         - dft/eks-deploy:
             name: deploy-live
-            context: [DEFAULT]
-            deployment_path: <path-to-gitops-deployment>
+            context: [DEFAULT, LIVE]
             filters: *head_filter
             requires: [build-and-push]
         - dft/instana-notify:

@@ -6,6 +6,10 @@ parameters:
   cloudfront_id:
     type: string
     description: The Id to be used in the aws cli command
+  path:
+    type: string
+    default: /*
+    description: Path in the CloudFront to be purged
 executor: small
 steps:
   - aws-cli/setup
@@ -13,6 +17,7 @@ steps:
       name: invalidate cache
       environment:
         PARAMETER_CLOUDFRONT_ID: <<parameters.cloudfront_id>>
+        PARAMETER_CLOUDFRONT_PATH: <<parameters.path>>
       command: <<include(scripts/invalidate-cache.sh)>>
   - slack/notify:
       event: fail

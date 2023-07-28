@@ -9,6 +9,18 @@ parameters:
     default: ""
     description: >
       Used to pass aditional docker build args like: `--build-arg GITHUB_TOKEN=${GITHUB_TOKEN}`
+  has_coverage:
+    type: boolean
+    default: false
+    description: Used to enable coverage
+  coverage_file:
+    type: string
+    default: ""
+    description: "the file name to be copyed from container to workspace"
+  container_work_dir:
+    type: string
+    default: /app/
+    description: The root path inside docker container where your project is to copy coverage file
 executor: base
 steps:
   - checkout
@@ -22,7 +34,18 @@ steps:
       command: docker-compose build <<parameters.build_args>> ci
   - run:
       name: Run unit tests
-      command: docker-compose run --rm ci
+      command: docker-compose run --name dafiti_ci ci
+  - when:
+      condition:
+        equal: [true, <<parameters.has_coverage>>]
+      steps:
+        - run:
+            name: copy file from container to local
+            command: docker cp dafiti_ci:<<parameters.container_work_dir>><<parameters.coverage_file>> .
+        - persist_to_workspace:
+            root: .
+            paths:
+            - <<parameters.coverage_file>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>

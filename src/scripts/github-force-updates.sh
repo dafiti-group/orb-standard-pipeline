@@ -7,9 +7,9 @@ if [[ "${CURRENT_BRANCH}" != "main" && "${CURRENT_BRANCH}" != "master" ]]; then
 fi
 
 echo ">>>> check pr list to request changes"
-if [[ $(gh pr list) ]]; then
+if [[ $(gh pr list -B ${CURRENT_BRANCH}) ]]; then
   echo "PR open listed. Notify to update"
-  gh pr list | awk '{print$1}' | while read -r line; do
+  gh pr list -B ${CURRENT_BRANCH} | awk '{print$1}' | while read -r line; do
     if [ "$(gh pr view $line --json author --jq '.author.login')" != "dft-deploy" ]; then
       gh pr review $line --request-changes --body "The HEAD branch was updated!!! \
         I'll merge the updates into your branch, so make sure you test and/or resolve conflicts. \
@@ -22,9 +22,8 @@ else
 fi
 
 echo ">>>> force updating branches"
-if git branch -a | grep -Eq "origin\/(release|hotfix)"
-then
-  git branch -a | grep "origin" | grep -Eo "release.*|hotfix.*" | while read -r line; do
+if git branch -a | grep -Eq "origin\/(release|hotfix)"; then
+  git branch -a | grep -E "origin\/(release|hotfix)" | grep -Eo "release.*|hotfix.*" | while read -r line; do
     echo ">>>CURRENT-LINE: ${line}"
     git checkout $line
     git merge -X theirs origin/${CURRENT_BRANCH}

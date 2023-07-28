@@ -6,7 +6,7 @@ parameters:
   service_name:
     type: string
     description: Name of you application service in instana apm
-    default: ${CIRCLE_PROJECT_REPONAME}.${ENV_SHORT}.dafiti.local
+    default: ${CIRCLE_PROJECT_REPONAME}.${COUNTRY}.${ENV_SHORT}
   release_scope:
     type: string
     # description: Default protocol service https://circleci.com/developer/orbs/orb/instana/pipeline-feedback?version=2.0.3#commands-create_release
@@ -16,7 +16,7 @@ parameters:
       ```json
         {
           "services": [
-            {"name": "${CIRCLE_PROJECT_REPONAME}.${ENV}"},
+            {"name": "${CIRCLE_PROJECT_REPONAME}.${COUNTRY}.${ENV_SHORT}"},
             {"name": "<depencecy application service name>"},
           ]
         }
@@ -39,7 +39,7 @@ steps:
         LOCAL_RELEASE_SCOPE: <<parameters.release_scope>>
       command: <<include(scripts/create_release.sh)>>
   - pipeline-feedback/create_release:
-      release_name: "${ENV_SHORT}-${CIRCLE_PROJECT_REPONAME} commit ${CIRCLE_SHA1}"
+      release_name: "${CIRCLE_PROJECT_REPONAME}.${COUNTRY}.${ENV_SHORT} commit ${CIRCLE_SHA1}"
       release_scope: ${INTERNAL_INTERPOLATED_JSON}
   - slack/notify:
       event: fail

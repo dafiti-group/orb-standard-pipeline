@@ -4,7 +4,7 @@ usage:
   version: 2.1
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@2.0.1
+    dft: dafiti-group/orb-standard-pipeline@3.1.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -43,7 +43,7 @@ usage:
         - dft/hold-slack:
             name: slack-notify-hold-qa
             context: [DEFAULT]
-            step_name: ":alert: a new release is awaiting your approve"
+            step_name: "A new release is awaiting your approve"
             filters: *release_filters
         - approval:
             name: start-to-qa
@@ -52,7 +52,7 @@ usage:
         - dft/hold-slack:
             name: slack-notify-hold-hotfix
             context: [DEFAULT]
-            step_name: ":alert: the hotfix is waiting your approval to deploy"
+            step_name: "The hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
             # requires: [unit-test, sonarqube]
         - approval:
@@ -66,11 +66,6 @@ usage:
             context: [DEFAULT, QA]
             filters: *deployment_filters
             requires: [approve-to-qa, start-to-qa]
-        - dft/grafana-notify:
-            name: grafana-notify-qa
-            target_env: qa
-            context: [DEFAULT]
-            requires: [build-and-upload-qa]
         # =========================================================================
         # TODO: when the staging cluster is available, uncoment the section below
         # - approval:
@@ -83,10 +78,6 @@ usage:
         #     context: [DEFAULT]
         #     requires:
         #       - approve-to-staging
-        # - dft/instana-notify:
-        #     name: feedback-instana-staging
-        #     context: [DEFAULT]
-        #     requires: [promote-qa-to-staging]
         # =========================================================================
         - dft/github-approve:
             name: dft-deploy-approve-pr
@@ -96,13 +87,13 @@ usage:
         # ==============================================================================================================
         # master & live delivery =======================================================================================
         - dft/github-update:
-            name: review-open-pr-to-force-update
+            name: git-force-update
             context: [DEFAULT]
             filters: *head_filters
         - dft/hold-slack:
             name: slack-notify-hold-live
             context: [DEFAULT]
-            step_name: ":alert: pipeline waiting approval to promote to live"
+            step_name: "Pipeline waiting approval to promote to live"
             filters: *head_filters
         - approval:
             type: approval

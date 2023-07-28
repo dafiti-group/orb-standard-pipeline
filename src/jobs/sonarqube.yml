@@ -46,9 +46,25 @@ parameters:
     default: ""
     description: >
       Used to pass aditional docker build args like: `--build-arg GITHUB_TOKEN=${GITHUB_TOKEN}`
+  sonar_extra_args:
+    type: string
+    default: ""
+    description: >
+      Used to pass aditional sonar args like: `-Dsonar.java.binaries=.`
+  has_coverage:
+    type: boolean
+    default: false
+    description: Used to enable coverage
+
 executor: <<parameters.runner>>
 steps:
   - checkout
+  - when:
+      condition:
+        equal: [true, <<parameters.has_coverage>>]
+      steps:
+        - attach_workspace:
+            at: .
   - when:
       condition:
         equal: [true, <<parameters.custom_command>>]
@@ -70,6 +86,8 @@ steps:
       steps:
         - run:
             name: Run Sonar
+            environment:
+              PARAMETER_SONAR_EXTRA_ARGS: <<parameters.sonar_extra_args>>
             command: <<include(scripts/sonar-scanner.sh)>>
   - slack/notify:
       event: fail

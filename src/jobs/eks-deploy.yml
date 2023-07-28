@@ -1,16 +1,29 @@
 description: |
   Used to update the gitops repository to k8s deployment
   Needs:
-    context: [DEFAULT]
+    context: [DEFAULT, (LIVE|QA)]
 parameters:
+  country:
+    type: string
+    default: br
+    description: The name of the country folder inside gitops repo
+  app_name:
+    type: string
+    default: ${CIRCLE_PROJECT_REPONAME}
+    description: the name of the app. Default is ${CIRCLE_PROJECT_REPONAME}
+  app_env:
+    type: string
+    default: ${ENV_SHORT}
+    description: The name of the folder inside app_name that holds the deployment target of this change.
   deployment_path:
     type: string
-    description: >
-      The path in argo repo to navigate to and change image tag ref for
-      your application
+    default: ""
+    description: |
+      Override default pattern: [gitops]/apps/[country]/[app_name]/[app_env]
+      If this fiels is filled, the value will be used insted of the default setup
   gitops:
     type: string
-    default: argo
+    default: gitops
     description: |
       The repository name to be cloned to change the image tag in deployment yaml file
       available options is:
@@ -26,7 +39,7 @@ parameters:
     description: The commit hash to rollback your deployment use <<pipeline.parameters.rollback>>
   file_name:
     type: string
-    default: ""
+    default: kustomization
     description: |
       The name of the file to be updated with the new image tag without the extension ex:
       - backstage
@@ -48,8 +61,9 @@ steps:
   - clone_gitops:
       gitops: <<parameters.gitops>>
   - run:
-      name: change value in <<parameters.gitops>> repo
+      name: change value in <<parameters.gitops>> repo and env <<parameters.app_env>>
       environment:
+        PARAMETER_COMPOSITE_PATH: "<<parameters.gitops>>/apps/<<parameters.country>>/<<parameters.app_name>>/<<parameters.app_env>>"
         PARAMETER_DEPLOYMENT_PATH: <<parameters.deployment_path>>
         PARAMETER_ROLLBACK: <<parameters.rollback>>
         PARAMETER_VERSION: <<parameters.version>>
