@@ -45,6 +45,12 @@ parameters:
       - backstage
       - kustomize
       Default value is CIRCLE_PROJECT_REPONAME that is the name of your repository in GitHub
+  use_yq:
+    type: boolean
+    default: true
+    description: |
+      Flag to use yq command to replace image tag instead of sed command
+      WARNING: use only if your project is using kustomization file!
 executor: small
 steps:
   - when:
@@ -52,6 +58,7 @@ steps:
         equal: [true, <<parameters.rollback>>]
       steps:
         - checkout
+        - aws-ecr/ecr-login
         - run:
             name: Validating version hash to rollback
             environment:
@@ -68,6 +75,7 @@ steps:
         PARAMETER_ROLLBACK: <<parameters.rollback>>
         PARAMETER_VERSION: <<parameters.version>>
         PARAMETER_FILE_NAME: <<parameters.file_name>>
+        PARAMETER_USE_YQ: <<parameters.use_yq>>
       command: <<include(scripts/gitops-update.sh)>>
   - slack/notify:
       event: fail

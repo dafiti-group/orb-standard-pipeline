@@ -6,16 +6,26 @@ if [[ ! -d "${LOCAL_DEPLOYMENT_PATH}" ]]; then
   exit 1
 fi
 cd ${LOCAL_DEPLOYMENT_PATH} || exit 1
-IMAGE="tag: \"${CIRCLE_SHA1:0:7}\""
+IMAGE=${CIRCLE_SHA1:0:7}
 if [ "${PARAMETER_ROLLBACK}" -eq "1" ]; then
-  IMAGE="tag: \"${PARAMETER_VERSION}\""
+  IMAGE=${PARAMETER_VERSION}
 fi
 CONFIG_FILE=$(eval echo "${PARAMETER_FILE_NAME}.yaml")
 if [ ! -f "${CONFIG_FILE}" ]; then
   echo "file ${LOCAL_DEPLOYMENT_PATH}/${CONFIG_FILE} not found!"
   exit 1
 fi
-sed -Ei "s|tag: \".*\"|${IMAGE}|" ${CONFIG_FILE}
+
+if [ "${PARAMETER_USE_YQ}" -eq "1" ]; then
+  echo "Using YQ and new tag is: ${IMAGE}"
+  yq -i ".helmCharts[0].valuesInline.image.tag = \"${IMAGE}\"" $CONFIG_FILE
+else
+  IMAGE="tag: \"${IMAGE}\""
+  echo "Using SED and new tag is: ${IMAGE}"
+  sed -Ei "s|tag: \".*\"|${IMAGE}|" ${CONFIG_FILE}
+fi
+
+
 if [[ $(git diff) ]]; then
   git diff
   git add .
