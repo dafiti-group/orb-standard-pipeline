@@ -43,8 +43,8 @@ PARAMETER_BRANCH_NAME_SANITIZED=$(echo ${CIRCLE_BRANCH} | sed 's|\/|-|g' | sed '
 PARAMETER_PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}.${PARAMETER_BRANCH_NAME_SANITIZED}"
 # CREATING THE ENV TO HANDLE SYMBOLIC LINKS IN THE NEXT STEP
 PARAMETER_ADITIONAL_CHECKMARX_ARGS=""
-THRESHOLDS_HIGH_CHECKMARX=""
-THRESHOLDS_MEDIUM_CHECKMARX=""
+PARAM_THRESHOLDS_HIGH_CHECKMARX=""
+PARAM_THRESHOLDS_MEDIUM_CHECKMARX=""
 
 #Init local envs
 PROJECT_LIST=""
@@ -195,11 +195,15 @@ function project_exists() {
   get_projects
 
   echo "Project Type: " ${PROJECT_TYPE}
+  echo "Initial THRESHOLDS_HIGH: ${PARAM_THRESHOLDS_HIGH_CHECKMARX}"
+  echo "Initial THRESHOLDS_MEDIUM: ${PARAM_THRESHOLDS_MEDIUM_CHECKMARX}"
+  echo "ARGS_PARAMETER_ADITIONAL: ${PARAMETER_ADITIONAL_CHECKMARX_ARGS}"
+  echo "####################################"
+
   if [[ ${PROJECT} != "" ]]; then
     # Projeto Legado ou Novo + Existente
-    THRESHOLDS_HIGH_CHECKMARX="0"
-    THRESHOLDS_MEDIUM_CHECKMARX="0"
     echo "Project Found: ${PROJECT} . Verifing if branch: ${PARAMETER_BRANCH_NAME_SANITIZED} exists."
+    set_thresholds
 
     if [[ ${BRANCH} == "" ]]; then
       echo "Branch not found, trying to create one!"
@@ -213,9 +217,8 @@ function project_exists() {
   else
     PARAMETER_PROJECT_BRANCH_NAME="${CIRCLE_PROJECT_REPONAME}"
     if [[ ${PROJECT_TYPE} != "legacy" ]]; then
-      echo "Set Thresholds"
-      THRESHOLDS_HIGH_CHECKMARX="0"
-      THRESHOLDS_MEDIUM_CHECKMARX="0"
+      echo "Project new, setting thresholds ..."
+      set_thresholds
     fi
     echo "Project not found, ready to execute next step. The project listed is: "
     echo "${PROJECT_LIST}"
@@ -266,6 +269,19 @@ function delete_last_scan_id() {
   echo "Last scan ID deleted with success! ${DELETE_LAST_SCAN_ID_RESPONSE}"
 }
 
+function set_thresholds() {
+
+  echo "======================================================"
+  echo "Set Thresholds"
+  # Projeto Legado ou Novo + Existente
+  PARAM_THRESHOLDS_HIGH_CHECKMARX="${CHECKMARX_THRESHOLDS_HIGH}"
+  PARAM_THRESHOLDS_MEDIUM_CHECKMARX="${CHECKMARX_THRESHOLDS_MEDIUM}"
+  echo "THRESHOLDS_HIGH: ${PARAM_THRESHOLDS_HIGH_CHECKMARX}"
+  echo "THRESHOLDS_MEDIUM: ${PARAM_THRESHOLDS_MEDIUM_CHECKMARX}"
+  echo "======================================================"
+
+}
+
 ###### Main ######
 
 # Call autentication function
@@ -281,8 +297,8 @@ echo "Exporting context env to next steps"
   echo "export PARAMETER_BRANCH_NAME_SANITIZED=${PARAMETER_BRANCH_NAME_SANITIZED}"
   echo "export PARAMETER_PROJECT_BRANCH_NAME=${PARAMETER_PROJECT_BRANCH_NAME}"
   echo "export PARAMETER_ADITIONAL_CHECKMARX_ARGS=${PARAMETER_ADITIONAL_CHECKMARX_ARGS}"
-  echo "export THRESHOLDS_HIGH_CHECKMARX=${THRESHOLDS_HIGH_CHECKMARX}"
-  echo "export THRESHOLDS_MEDIUM_CHECKMARX=${THRESHOLDS_MEDIUM_CHECKMARX}"
+  echo "export THRESHOLDS_HIGH_CHECKMARX=${PARAM_THRESHOLDS_HIGH_CHECKMARX}"
+  echo "export THRESHOLDS_MEDIUM_CHECKMARX=${PARAM_THRESHOLDS_MEDIUM_CHECKMARX}"
 
 } >>"${BASH_ENV}"
 
