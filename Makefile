@@ -9,3 +9,6 @@ validate: pack
 
 dev: pack validate
 	circleci orb publish --skip-update-check "orb.yml" "dafiti-group/orb-standard-pipeline@dev:first"
+
+checkmarx: pack validate
+	circleci orb publish --skip-update-check "orb.yml" "dafiti-group/orb-standard-pipeline@dev:checkmarx"
