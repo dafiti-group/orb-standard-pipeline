@@ -46,31 +46,16 @@ steps:
       sca-appUrl: "https://sca.scacheckmarx.com"
       bug-tracker: GitHub
       params: >-
-        --cx-flow.zip-exclude="${PARAMETER_SYMBOLIC_FILES}"
         --checkmarx.settings-override=true
         --namespace="${CIRCLE_PROJECT_USERNAME}"
         --repo-name="${CIRCLE_PROJECT_REPONAME}"
         --branch="${PARAMETER_BRANCH_NAME_SANITIZED}"
+        --cx-flow.zip-exclude="${PARAMETER_SYMBOLIC_FILES}"
         --cx-flow.filterSeverity=High
         --cx-flow.filterSeverity=Medium
-        --cx-flow.filterStatus=New
-        --cx-flow.filter-status="New"
-        --cx-flow.filterStatus=Reoccured
-        --cx-flow.thresholds.High=${THRESHOLDS_HIGH_CHECKMARX}
-        --cx-flow.thresholds.Medium=${THRESHOLDS_MEDIUM_CHECKMARX}
-        --github.url="https://github.com"
-        --github.api-url="https://api.github.com/repos/"
-        --github.token="${GITHUB_TOKEN}"
-        --github.block-merge=true
-        --github.error-merge:true
-        --github.max-delay=3
+        --cx-flow.thresholds.High="${THRESHOLDS_HIGH_CHECKMARX}"
+        --cx-flow.thresholds.Medium="${THRESHOLDS_MEDIUM_CHECKMARX}"
         ${PARAMETER_ADITIONAL_CHECKMARX_ARGS}
-  - run:
-      name: Checkmarx delete last scan ID.
-      when: on_fail
-      environment:
-        PARAMETER_METHODE: "get_last_scan_id"
-      command: <<include(scripts/checkmarx.sh)>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
