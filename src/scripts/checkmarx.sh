@@ -194,7 +194,7 @@ function project_exists() {
   # Get project list
   get_projects
 
-  echo "Project Type: " ${PROJECT_TYPE}
+  echo "Project Type: ${PROJECT_TYPE}"
   echo "Initial THRESHOLDS_HIGH: ${PARAM_THRESHOLDS_HIGH_CHECKMARX}"
   echo "Initial THRESHOLDS_MEDIUM: ${PARAM_THRESHOLDS_MEDIUM_CHECKMARX}"
   echo "ARGS_PARAMETER_ADITIONAL: ${PARAMETER_ADITIONAL_CHECKMARX_ARGS}"
