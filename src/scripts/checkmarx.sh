@@ -203,7 +203,10 @@ function project_exists() {
   if [[ ${PROJECT} != "" ]]; then
     # Projeto Legado ou Novo + Existente
     echo "Project Found: ${PROJECT} . Verifing if branch: ${PARAMETER_BRANCH_NAME_SANITIZED} exists."
-    set_thresholds
+    if [[ ${PROJECT_TYPE} != "legacy" ]]; then
+      echo "Project new, setting thresholds ..."
+      set_thresholds
+    fi
 
     if [[ ${BRANCH} == "" ]]; then
       echo "Branch not found, trying to create one!"
