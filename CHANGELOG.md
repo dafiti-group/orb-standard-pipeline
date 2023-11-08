@@ -1,5 +1,26 @@
 # orb-standard-pipeline
 
+
+
+## `[3.2.0 2023-11-08]`
+
+### Changes
+
+- New executor `arn` to be used in `ecr-build-and-push`
+- Update `job ecr-build-and-push` including a new parameter `docker_version` to setup custom docker versions
+- Update command `config_docker`  including a new parameter `version` to setup docker context
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
+
+
 ## `[3.1.2 2023-07-24]`
 
 ### Changes

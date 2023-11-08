@@ -1,0 +1,12 @@
+description: This example show only how to setup the job ecr-build-and-push to use ARN architecture
+usage:
+  version: 2.1
+  orbs:
+    dft: dafiti-group/orb-standard-pipeline@3.2.0
+  workflows:
+    deployment-flow:
+      jobs:
+        - dft/ecr-build-and-push:
+            context: [DEFAULT]
+            runner: dft/arn
+            docker_version: default
