@@ -1,0 +1,6 @@
+description: |
+  ARN base OS for docker builds
+  To use this executor, please change docker version to 'default'
+docker:
+  - image: cimg/base:2023.06
+resource_class: arm.medium

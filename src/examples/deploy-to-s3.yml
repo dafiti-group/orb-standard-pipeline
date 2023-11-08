@@ -4,7 +4,7 @@ usage:
   version: 2.1
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.1.2
+    dft: dafiti-group/orb-standard-pipeline@3.2.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
