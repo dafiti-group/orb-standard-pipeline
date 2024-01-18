@@ -5,7 +5,7 @@
 ### Changes
 
 - Changed the command `config_docker` version `src/commands/config_docker.yml`
-- Changed the version `docker_version` to setup build
+- Changed the version `docker_version` to setup build in job `ecr-build-and-push`
 
 ### Added
 
