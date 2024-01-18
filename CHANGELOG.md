@@ -1,5 +1,20 @@
 # orb-standard-pipeline
 
+## `[3.3.0 2024-01-18]`
+
+### Changes
+
+N\A
+
+### Added
+
+- Added variables `path` and `no_output_timeout`.
+
+### Removed
+
+N\A
+
+___
 
 
 ## `[3.2.0 2023-11-08]`

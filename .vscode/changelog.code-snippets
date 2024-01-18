@@ -1,0 +1,25 @@
+{
+  "CHANGELOG_ITEM": {
+    "scope": "plaintext, markdown",
+    "description": "Include new item in a CHANGELOG file",
+    "prefix": "orb:changelog",
+    "body": [
+      "## `[${1:1.0.0} $CURRENT_YEAR-$CURRENT_MONTH-$CURRENT_DATE]`",
+      "",
+      "### Changes",
+      "",
+      "$2",
+      "",
+      "### Added",
+      "",
+      "${3:N\\A}",
+      "",
+      "### Removed",
+      "",
+      "${4:N\\A}",
+      "",
+      "___",
+      "",
+    ]
+  }
+}
