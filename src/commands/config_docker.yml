@@ -3,7 +3,7 @@ parameters:
   version:
     type: string
     description: The docker version to setup builds, Find more at <https://circleci.com/docs/building-docker-images/#docker-version>
-    default: "20.10.14"
+    default: "default"
 
 steps:
   - setup_remote_docker:
