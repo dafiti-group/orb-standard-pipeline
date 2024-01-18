@@ -4,11 +4,11 @@
 
 ### Changes
 
-N\A
+- Changed the command `config_docker` version `src/commands/config_docker.yml`
 
 ### Added
 
-- Added variables `path` and `no_output_timeout`.
+- Added variables `path` and `no_output_timeout` in job `ecr-build-and-push`.
 
 ### Removed
 
