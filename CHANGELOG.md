@@ -5,10 +5,11 @@
 ### Changes
 
 - Changed the command `config_docker` version `src/commands/config_docker.yml`
+- Changed the version `docker_version` to setup build
 
 ### Added
 
-- Added variables `path` and `no_output_timeout` in job `ecr-build-and-push`.
+- Added variables `path` and `no_output_timeout` in job `ecr-build-and-push`
 
 ### Removed
 
