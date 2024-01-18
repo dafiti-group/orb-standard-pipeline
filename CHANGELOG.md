@@ -1,5 +1,21 @@
 # orb-standard-pipeline
 
+## `[3.3.0 2024-01-18]`
+
+### Changes
+
+- Changed the command `config_docker` version `src/commands/config_docker.yml`
+- Changed the version `docker_version` to setup build in job `ecr-build-and-push`
+
+### Added
+
+- Added variables `path` and `no_output_timeout` in job `ecr-build-and-push`
+
+### Removed
+
+N\A
+
+___
 
 
 ## `[3.2.0 2023-11-08]`
