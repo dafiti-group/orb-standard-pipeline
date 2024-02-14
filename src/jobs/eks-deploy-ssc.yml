@@ -8,33 +8,26 @@ parameters:
     default: ncharts
   deployment_file:
     type: string
+  rollback:
+    type: boolean
+    default: false
+    description: Use <<pipeline.parameters.rollback>> in this parameter
   version:
     type: string
     default: ""
     description: The commit hash to rollback your deployment use <<pipeline.parameters.rollback>>
 executor: small
 steps:
-  - when:
-    condition:
-      equal: [true, <<parameters.rollback>>]
-      steps:
-        - checkout
-        - aws-ecr/ecr-login
-        - run:
-            name: Validating version hash to rollback
-            environment:
-              PARAMETER_VERSION: <<parameters.version>>
-            command: <<include(scripts/validate-hash.sh)>>
-  - name: check image hash
-    command: <<include(scripts/validate-hash.sh)>>
   - config_git
   - clone_ncharts:
       ncharts: <<parameters.gitops>>
-  - name: change image tag and push
-    command: |
-      yq -i '.app.image.tag = strenv(PARAMETER_VERSION)' <<parameters.deployment_file>>
-      git commit -a -m "${CIRCLE_PROJECT_REPONAME} change image tag in: " <<parameters.deployment_file>>
-      git push
+  - run:
+      name: change image tag and push
+      environment:
+        PARAMETER_GITOPS: <<parameters.gitops>>
+        PARAMETER_DEPLOYMENT_FILE: <<parameters.deployment_file>>
+        PARAMETER_ROLLBACK: <<parameters.rollback>>
+      command: <<include(scripts/gitlab-update.sh)>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
