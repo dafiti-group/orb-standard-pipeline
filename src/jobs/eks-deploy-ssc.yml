@@ -6,8 +6,10 @@ parameters:
   gitops:
     type: string
     default: ncharts
+    description: Ncharts gitlab repository name.
   deployment_file:
     type: string
+    description: The name of the deployment file. Ex path/to/file_name.yaml
   rollback:
     type: boolean
     default: false
