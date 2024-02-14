@@ -12,7 +12,7 @@ fi
 
 IMAGE=${CIRCLE_SHA1:0:7}
 if [ "${PARAMETER_ROLLBACK}" -eq "1" ]; then
-  if [ -z "${PARAMETER_VERSION}" ]
+  if [ -z "${PARAMETER_VERSION}" ]; then
     echo "Parameter version PARAMETER_VERSION must be defined in Rollback."
     exit 1
   fi
