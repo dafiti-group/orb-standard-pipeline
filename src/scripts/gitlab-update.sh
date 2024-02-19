@@ -21,11 +21,11 @@ fi
 
 if [ "${PARAMETER_USE_YQ}" -eq "1" ]; then
   echo "Using YQ and new tag is: ${IMAGE}"
-  yq -i ".app.image.tag = \"${IMAGE}\"" ${PARAMETER_VERSION}
+  yq -i ".app.image.tag = \"${IMAGE}\"" ${PARAMETER_GITOPS}/${PARAMETER_DEPLOYMENT_FILE}
 else
   IMAGE="tag: \"${IMAGE}\""
   echo "Using SED and new tag is: ${IMAGE}"
-  sed -Ei "s|tag: \".*\"|${IMAGE}|" ${PARAMETER_VERSION}
+  sed -Ei "s|tag: \".*\"|${IMAGE}|" ${PARAMETER_GITOPS}/${PARAMETER_DEPLOYMENT_FILE}
 fi
 
 if [[ $(git diff) ]]; then
