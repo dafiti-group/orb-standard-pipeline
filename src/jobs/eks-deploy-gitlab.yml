@@ -1,5 +1,5 @@
 description: |
-  Used to update the ncharts repository to k8s deployment
+  Used to update the ncharts image tag in k8s deployment
   Needs:
     context: [DEFAULT]
 parameters:
@@ -29,6 +29,7 @@ steps:
         PARAMETER_GITOPS: <<parameters.gitops>>
         PARAMETER_DEPLOYMENT_FILE: <<parameters.deployment_file>>
         PARAMETER_ROLLBACK: <<parameters.rollback>>
+        PARAMETER_VERSION: <<parameters.version>>
       command: <<include(scripts/gitlab-update.sh)>>
   - slack/notify:
       event: fail
