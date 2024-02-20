@@ -13,4 +13,4 @@ if [[ -z "$GITLAB_GROUP" ]]; then
   exit 1
 fi
 
-git clone https://${GITLAB_TOKEN}@gitlab.com/${GITLAB_GROUP}/${NCHARTS_REPOSITORY}.git
+git clone https://${GITLAB_TOKEN_NAME}:${GITLAB_TOKEN}@gitlab.com/${GITLAB_GROUP}/${NCHARTS_REPOSITORY}.git

@@ -14,6 +14,12 @@ parameters:
     type: boolean
     default: false
     description: Use <<pipeline.parameters.rollback>> in this parameter
+  use_yq:
+    type: boolean
+    default: true
+    description: |
+      Flag to use yq command to replace image tag instead of sed command
+      WARNING: use only if your project is using kustomization file!
   version:
     type: string
     default: ""
@@ -30,6 +36,7 @@ steps:
         PARAMETER_DEPLOYMENT_FILE: <<parameters.deployment_file>>
         PARAMETER_ROLLBACK: <<parameters.rollback>>
         PARAMETER_VERSION: <<parameters.version>>
+        PARAMETER_USE_YQ: <<parameters.use_yq>>
       command: <<include(scripts/gitlab-update.sh)>>
   - slack/notify:
       event: fail
