@@ -73,7 +73,6 @@ steps:
         PARAMETER_COMPOSITE_DESTINY_PATH: "<<parameters.gitops>>/apps/<<parameters.country>>/<<parameters.app_name>>/<<parameters.destiny_env>>"
         PARAMETER_DESTINY_FILE: <<parameters.destiny_file>>
         PARAMETER_USE_YQ: <<parameters.use_yq>>
-
       command: <<include(scripts/gitops-promote.sh)>>
   - slack/notify:
       event: fail

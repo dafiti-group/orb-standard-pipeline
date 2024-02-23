@@ -1,0 +1,44 @@
+description: |
+  Used to get image tag from origin environment to replace into target environment
+  Needs:
+    context: [DEFAULT]
+parameters:
+  origin_file:
+    type: string
+    default: kustomization
+    description: |
+      Full file path `path/to/file_name.yaml`
+  destiny_file:
+    type: string
+    default: kustomization
+    description: |
+      Full file path `path/to/file_name.yaml`
+  gitops:
+    type: string
+    default: ncharts
+    description: The repo name to clone deployments to change image tags
+  use_yq:
+    type: boolean
+    default: true
+    description: |
+      Flag to use yq command to replace image tag instead of sed command
+      WARNING: use only if your project is using kustomization file!
+executor: base
+steps:
+  - config_git
+  - clone_ncharts:
+    ncharts: <<parameters.gitops>>
+  - run:
+      name: Promote image from <<parameters.origin_file>> to <<parameters.destiny_file>>
+      environment:
+        PARAMETER_START_FOLDER: <<parameters.gitops>>
+        PARAMETER_ORIGIN_FILE: <<parameters.origin_file>>
+        PARAMETER_DESTINY_FILE: <<parameters.destiny_file>>
+        PARAMETER_USE_YQ: <<parameters.use_yq>>
+      command: <<include(scripts/gitlab-promote.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>
+  - slack/notify:
+      event: pass
+      custom: <<include(templates/success.json)>>

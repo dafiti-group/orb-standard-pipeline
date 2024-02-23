@@ -8,8 +8,7 @@ N\A
 
 ### Added
 
-- Added job `eks-deploy-ssc`. It just change the image tag in `ncharts` repository.
-It is assumed that the image already exists in gitlab registry.
+- Added job `eks-deploy-gitlab`. It just change the image tag in `ncharts` repository on gitlab.
 
 ### Removed
 
