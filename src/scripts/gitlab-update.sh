@@ -1,3 +1,5 @@
+echo "Full path: ${PARAMETER_GITOPS}/${PARAMETER_DEPLOYMENT_FILE}"
+
 if [[ ! -d "${PARAMETER_GITOPS}" ]]; then
   echo "The path ${PARAMETER_GITOPS} does not exists"
   exit 1

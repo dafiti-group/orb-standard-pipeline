@@ -25,7 +25,6 @@ usage:
         - dft/eks-deploy-gitlab:
             name: deploy-to-ssc
             gitops: ncharts
-            deployment_file: devxp/test.yaml
             rollback: <<pipeline.parameters.rollback>>
             version: <<pipeline.parameters.version>>
             context: [DEFAULT]

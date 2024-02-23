@@ -16,6 +16,4 @@ usage:
         - dft/eks-promote-gitlab:
               name: eks-promote-gitlab cl
               gitops: ncharts
-              origin_file: devxp/values.cl.preprod.yaml
-              destiny_file: devxp/values.cl.prod.yaml
               context: [DEFAULT]

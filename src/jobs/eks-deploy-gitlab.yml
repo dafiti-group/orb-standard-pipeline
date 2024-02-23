@@ -1,15 +1,24 @@
 description: |
   Used to update the ncharts image tag in k8s deployment
   Needs:
-    context: [DEFAULT]
+    context: [DEFAULT, CO_QA|CL_QA]
 parameters:
   gitops:
     type: string
     default: ncharts
     description: Ncharts gitlab repository name.
-  deployment_file:
+  project_name:
     type: string
-    description: The name of the deployment file. Ex path/to/file_name.yaml
+    default: ${CIRCLE_PROJECT_REPONAME}
+    description: The repo name to clone deployments to change image tags
+  country:
+    type: string
+    default: ${COUNTRY}
+    description: The repo name to clone deployments to change image tags
+  environment:
+    type: string
+    default: ${ENV_SHORT}
+    description: Environment to be deployed at.
   rollback:
     type: boolean
     default: false
@@ -30,10 +39,10 @@ steps:
   - clone_ncharts:
       ncharts: <<parameters.gitops>>
   - run:
-      name: change image tag and push
+      name: change image tag and push in file "<<parameters.project_name>>/values.<<parameters.country>>.<<parameters.environment>>.yaml"
       environment:
         PARAMETER_GITOPS: <<parameters.gitops>>
-        PARAMETER_DEPLOYMENT_FILE: <<parameters.deployment_file>>
+        PARAMETER_DEPLOYMENT_FILE: "<<parameters.project_name>>/values.<<parameters.country>>.<<parameters.environment>>.yaml"
         PARAMETER_ROLLBACK: <<parameters.rollback>>
         PARAMETER_VERSION: <<parameters.version>>
         PARAMETER_USE_YQ: <<parameters.use_yq>>
