@@ -15,7 +15,7 @@ parameters:
     type: string
     default: ${COUNTRY}
     description: The repo name to clone deployments to change image tags
-  environment:
+  app_env:
     type: string
     default: ${ENV_SHORT}
     description: Environment to be deployed at.
@@ -39,10 +39,10 @@ steps:
   - clone_ncharts:
       ncharts: <<parameters.gitops>>
   - run:
-      name: change image tag and push in file "<<parameters.project_name>>/values.<<parameters.country>>.<<parameters.environment>>.yaml"
+      name: change image tag and push in file "<<parameters.project_name>>/values.<<parameters.country>>.<<parameters.app_env>>.yaml"
       environment:
         PARAMETER_GITOPS: <<parameters.gitops>>
-        PARAMETER_DEPLOYMENT_FILE: "<<parameters.project_name>>/values.<<parameters.country>>.<<parameters.environment>>.yaml"
+        PARAMETER_DEPLOYMENT_FILE: "<<parameters.project_name>>/values.<<parameters.country>>.<<parameters.app_env>>.yaml"
         PARAMETER_ROLLBACK: <<parameters.rollback>>
         PARAMETER_VERSION: <<parameters.version>>
         PARAMETER_USE_YQ: <<parameters.use_yq>>
