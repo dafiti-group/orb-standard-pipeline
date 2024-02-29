@@ -1,0 +1,229 @@
+description: |
+  This workflow example is used only to deploys in 2 environments: [qa, live]
+  This example assume that your application is already using docker-compose run --rm ci to unit test everything!
+  In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
+  in your project settings or in your organization context, with the name of your team
+  like @team or with a specific person id using <@USERID>
+usage:
+  version: 2.1
+  parameters:
+    rollback:
+      type: boolean
+      default: false
+      description: Arbitraty parameter to trigger manually this workflow selecting rollback actions
+    version:
+      type: string
+      default: ""
+      description: The commit hash to revert deployment
+  # including dft org
+  orbs:
+    dft: dafiti-group/orb-standard-pipeline@dev:first
+  # reserved filters anchors
+  test_filters: &test_filters
+    branches:
+      only: [/^feature.*/, /^hotfix.*/]
+  deployment_filters: &deployment_filters
+    branches:
+      only: [/^release.*/, /^hotfix.*/]
+  head_filters: &head_filters
+    branches:
+      only: [master, main]
+  release_filters: &release_filters
+    branches:
+      only: [/^release.*/]
+  hotfix_filters: &hotfix_filters
+    branches:
+      only: [/^hotfix.*/]
+  # declaring your workflows
+  workflows:
+    rollback-flow:
+      when:
+        or:
+          - equal: [true, <<pipeline.parameters.rollback>>]
+      jobs:
+        - dft/eks-deploy:
+            name: rollback-br
+            context: [DEFAULT, QA]
+            rollback: true
+            version: <<pipeline.parameters.version>>
+            filters: *head_filters
+        - dft/eks-deploy-gitlab:
+            name: rollback-co
+            context: [DEFAULT, CO_LIVE]
+            rollback: true
+            app_env: preprod
+            version: <<pipeline.parameters.version>>
+            filters: *head_filters
+        - dft/eks-deploy-gitlab:
+            name: rollback-cl
+            context: [DEFAULT, CL_LIVE]
+            rollback: true
+            app_env: preprod
+            version: <<pipeline.parameters.version>>
+            filters: *head_filters
+            requires: [rollback-co]
+    deployment-flow:
+      when:
+        or:
+          - equal: [false, <<pipeline.parameters.rollback>>]
+      jobs:
+        # features & hotfix =============================================================================================
+        - dft/unit-test:
+            name: unit-test
+            context: [DEFAULT]
+            filters: *test_filters
+        - dft/sonarqube:
+            name: sonarqube
+            context: [DEFAULT]
+            filters: *test_filters
+        # WFA
+        # - dft/checkmarx:
+        #     name: checkmarx
+        #     context: [DEFAULT]
+        #     filters: *test_filters
+        # ===============================================================================================================
+        # releases ======================================================================================================
+        - dft/hold-slack:
+            name: slack-notify-hold-qa
+            context: [DEFAULT]
+            step_name: "A new release is awaiting your approve"
+            filters: *release_filters
+        - approval:
+            name: start-to-qa
+            type: approval
+            filters: *release_filters
+        # ===============================================================================================================
+        # hotfix ========================================================================================================
+        - dft/hold-slack:
+            name: slack-notify-hold-hotfix
+            context: [DEFAULT]
+            step_name: "The hotfix is waiting your approval to deploy"
+            filters: *hotfix_filters
+            requires: [unit-test, sonarqube]
+        - approval:
+            name: approve-to-qa
+            type: approval
+            filters: *hotfix_filters
+            requires: [unit-test, sonarqube]
+        # ===============================================================================================================
+        - dft/ecr-build-and-push:
+            name: ecr-build-and-push
+            # rev_txt_path: public/rev.txt
+            context: [DEFAULT]
+            filters: *deployment_filters
+            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+        # ===============================================================================================================
+        # == BR QA DEPLOYMENT
+        - approval:
+            name: approve-deploy-to-br-qa
+            type: approval
+            filters: *deployment_filters
+            requires: [ecr-build-and-push]
+        - dft/eks-deploy:
+            name: deploy-to-br-qa
+            context: [DEFAULT, QA]
+            requires: [approve-deploy-to-br-qa]
+        # ===============================================================================================================
+        # == CO QA DEPLOYMENT
+        - approval:
+            name: approve-deploy-to-co-qa
+            type: approval
+            filters: *deployment_filters
+            requires: [ecr-build-and-push]
+        - dft/eks-deploy-gitlab:
+            name: deploy-to-co-qa
+            app_env: preprod
+            context: [DEFAULT, CO_QA]
+            requires: [approve-deploy-to-co-qa]
+        # ===============================================================================================================
+        # == CL QA DEPLOYMENT
+        - approval:
+            name: approve-deploy-to-cl-qa
+            type: approval
+            filters: *deployment_filters
+            requires: [ecr-build-and-push]
+        - dft/eks-deploy-gitlab:
+            name: deploy-to-cl-qa
+            app_env: preprod
+            context: [DEFAULT, CL_QA]
+            requires: [approve-deploy-to-cl-qa, deploy-to-co-qa]
+
+        # =============================================================================================================
+        # github action to approve this release/hotfix PR to proceed
+        - dft/github-approve:
+            name: dft-deploy-approve-pr
+            context: [DEFAULT]
+            requires: [deploy-to-br-qa, deploy-to-co-qa, deploy-to-cl-qa]
+        # ===============================================================================================================
+        # master & live delivery ========================================================================================
+        - dft/github-update:
+            name: git-force-update
+            context: [DEFAULT]
+            filters: *head_filters
+        - dft/hold-slack:
+            name: slack-notify-hold-live
+            context: [DEFAULT]
+            step_name: "Pipeline waiting approval to promote to live"
+            filters: *head_filters
+            requires: [git-force-update]
+        # ===============================================================================================================
+        # Promote qa to live BR
+        - approval:
+            type: approval
+            name: approve-deploy-br-live
+            filters: *head_filters
+            requires: [git-force-update]
+        - dft/eks-promote:
+            name: promote-br-live
+            context: [DEFAULT]
+            requires: [approve-deploy-br-live]
+        - dft/instana-notify:
+            name: instana-notify-live
+            context: [DEFAULT, LIVE]
+            requires: [promote-br-live]
+        - dft/grafana-notify:
+            name: grafana-notify-br-live
+            context: [DEFAULT]
+            target_env: live
+            requires: [promote-br-live]
+        # ===============================================================================================================
+        # Promote qa to live CO
+        - approval:
+            name: approve-deploy-co-live
+            type: approval
+            filters: *head_filters
+            requires: [git-force-update]
+        - dft/eks-promote-gitlab:
+            name: eks-promote-co-live
+            requires: [approve-deploy-co-live]
+            context: [DEFAULT, CO_LIVE]
+        - dft/instana-notify:
+            name: instana-notify-live
+            context: [DEFAULT, CO_LIVE]
+            requires: [eks-promote-co-live]
+        - dft/grafana-notify:
+            name: grafana-notify-co-live
+            context: [DEFAULT, CO_LIVE]
+            target_env: live
+            requires: [eks-promote-co-live]
+        # ===============================================================================================================
+        # Promote qa to live CL
+        - approval:
+            name: approve-deploy-cl-live
+            type: approval
+            filters: *head_filters
+            requires: [git-force-update]
+        - dft/eks-promote-gitlab:
+            name: eks-promote-cl-live
+            context: [DEFAULT, CL_LIVE]
+            requires: [approve-deploy-cl-live]
+        - dft/instana-notify:
+            name: instana-notify-live
+            context: [DEFAULT, CL_LIVE]
+            requires: [eks-promote-cl-live]
+        - dft/grafana-notify:
+            name: grafana-notify-cl-live
+            context: [DEFAULT, CL_LIVE]
+            target_env: live
+            requires: [eks-promote-cl-live]
+        # ===============================================================================================================

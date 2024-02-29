@@ -4,14 +4,15 @@
 
 ### Changes
 
-- Changed default repo to gitops in `commands/clone_gitops.yaml`.
+- Changed default repo from argo to gitops in `commands/clone_gitops.yaml`.
+- Included gitlab's git configuration in scripts `config_git`.
 
 ### Added
 
 - Added job `eks-deploy-gitlab`. It just change the image tag in `ncharts` repository on gitlab.
 - Added job `eks-promote-gitlab`. It promotes the tag in preprod to prod file.
 - Added commands `clone_ncharts` to download the gilab ncharts repo.
-
+- Added Country in `grafana-notify` script.
 
 ### Removed
 
