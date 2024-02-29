@@ -1,6 +1,6 @@
 description: >
   Used to clone the ncharts repo to change image tag into k8s deployment.
-  Needs context with GITHUB_TOKEN with a personal access token into it
+  Needs context with GITLAB_TOKEN with a personal access token into it
 parameters:
   ncharts:
     type: string

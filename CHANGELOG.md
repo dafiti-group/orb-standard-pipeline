@@ -4,11 +4,14 @@
 
 ### Changes
 
-N\A
+- Changed default repo to gitops in `commands/clone_gitops.yaml`.
 
 ### Added
 
 - Added job `eks-deploy-gitlab`. It just change the image tag in `ncharts` repository on gitlab.
+- Added job `eks-promote-gitlab`. It promotes the tag in preprod to prod file.
+- Added commands `clone_ncharts` to download the gilab ncharts repo.
+
 
 ### Removed
 
