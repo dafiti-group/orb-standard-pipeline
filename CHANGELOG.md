@@ -6,6 +6,7 @@
 
 - Changed default repo from argo to gitops in `commands/clone_gitops.yaml`.
 - Included gitlab's git configuration in scripts `config_git`.
+- Include `git pull --rebase` in promote jobs to prevent conflicts on `push`
 
 ### Added
 
@@ -274,7 +275,7 @@ ___
   The `eks-promote` job will automatically get the `image.tag` from `gitops/apps/${COUNTRY}/${CIRCLE_PROJECT_REPONAME}/qa/kustomization.yaml` to replace in `gitops/apps/${COUNTRY}/${CIRCLE_PROJECT_REPONAME}/live/kustomization.yaml`. There are more variables to handle this job like:
   | parameter     | type     | description                                                |
   | :------------ | :------- | :--------------------------------------------------------- |
-  | `app_name`    | `string` | Default is env `$CIRCLE_PROJECT_REPONAME`                |
+  | `app_name`    | `string` | Default is env `$CIRCLE_PROJECT_REPONAME`                  |
   | `origin_env`  | `string` | Default is `qa`, the folder name where to get `image.tag`  |
   | `destiny_env` | `string` | Default `live`, the folder name where to place `image.tag` |
   | `origin`      | `string` | Override all path creation to get the `image.tag` from     |
