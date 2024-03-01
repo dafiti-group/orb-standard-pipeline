@@ -37,6 +37,7 @@ if [[ $(git diff) ]]; then
   git diff
   git add .
   git commit -m "${CIRCLE_PROJECT_REPONAME} change image tag in: ${LOCAL_PARAMETER_DEPLOYMENT_FILE}"
+  git pull --rebase
   git push
 else
   echo "Nothing to commit, deployment already done!"

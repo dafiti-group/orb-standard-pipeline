@@ -17,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@dev:first
+    dft: dafiti-group/orb-standard-pipeline@3.4.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -43,7 +43,7 @@ usage:
       jobs:
         - dft/eks-deploy:
             name: rollback-br
-            context: [DEFAULT, QA]
+            context: [DEFAULT, LIVE]
             rollback: true
             version: <<pipeline.parameters.version>>
             filters: *head_filters
@@ -51,17 +51,16 @@ usage:
             name: rollback-co
             context: [DEFAULT, CO_LIVE]
             rollback: true
-            app_env: preprod
+            app_env: production
             version: <<pipeline.parameters.version>>
             filters: *head_filters
         - dft/eks-deploy-gitlab:
             name: rollback-cl
             context: [DEFAULT, CL_LIVE]
             rollback: true
-            app_env: preprod
+            app_env: production
             version: <<pipeline.parameters.version>>
             filters: *head_filters
-            requires: [rollback-co]
     deployment-flow:
       when:
         or:
@@ -76,11 +75,6 @@ usage:
             name: sonarqube
             context: [DEFAULT]
             filters: *test_filters
-        # WFA
-        # - dft/checkmarx:
-        #     name: checkmarx
-        #     context: [DEFAULT]
-        #     filters: *test_filters
         # ===============================================================================================================
         # releases ======================================================================================================
         - dft/hold-slack:
@@ -184,7 +178,6 @@ usage:
         - dft/grafana-notify:
             name: grafana-notify-br-live
             context: [DEFAULT]
-            target_env: live
             requires: [promote-br-live]
         # ===============================================================================================================
         # Promote qa to live CO
@@ -195,8 +188,8 @@ usage:
             requires: [git-force-update]
         - dft/eks-promote-gitlab:
             name: eks-promote-co-live
-            requires: [approve-deploy-co-live]
             context: [DEFAULT, CO_LIVE]
+            requires: [approve-deploy-co-live]
         - dft/instana-notify:
             name: instana-notify-live
             context: [DEFAULT, CO_LIVE]
@@ -204,7 +197,6 @@ usage:
         - dft/grafana-notify:
             name: grafana-notify-co-live
             context: [DEFAULT, CO_LIVE]
-            target_env: live
             requires: [eks-promote-co-live]
         # ===============================================================================================================
         # Promote qa to live CL
@@ -224,6 +216,5 @@ usage:
         - dft/grafana-notify:
             name: grafana-notify-cl-live
             context: [DEFAULT, CL_LIVE]
-            target_env: live
             requires: [eks-promote-cl-live]
         # ===============================================================================================================
