@@ -4,7 +4,7 @@ description: >
 parameters:
   gitops:
     type: string
-    default: argo
+    default: gitops
     description: The name of the repo used to gitOps operations
 steps:
   - config_git

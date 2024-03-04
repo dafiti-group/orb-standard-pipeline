@@ -42,6 +42,7 @@ if [[ $(git diff) ]]; then
   git diff
   git add .
   git commit -m "${CIRCLE_PROJECT_REPONAME} promoting image from ${ORIGIN_FILE} to ${DESTINY_FILE}"
+  git pull --rebase
   git push
 else
   echo "Nothing to commit, promotion already done!"
