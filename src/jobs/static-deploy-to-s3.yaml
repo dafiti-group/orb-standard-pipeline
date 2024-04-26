@@ -7,12 +7,11 @@ parameters:
     type: string
     description: The bucket to deploy the artifacts, including the path inside the bucket
   folder:
-      type: string
-      description: The folder in the repo that contains the artifacts to be deployed
+    type: string
+    description: The folder in the repo that contains the artifacts to be deployed
 executor: base
 steps:
   - checkout
-  - config_docker
   #using DOCKER_BUILDKIT=1 to output the files generated inside the build
   - aws-s3/sync:
       from: <<parameters.folder>>
