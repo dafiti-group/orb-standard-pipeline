@@ -6,29 +6,18 @@ parameters:
   bucket:
     type: string
     description: The bucket to deploy the artifacts, including the path inside the bucket
-  use_docker_build:
-    type: boolean
-    default: true
-    description: Used to run a docker build and use the output files to upload to S3
-  folder:
-    type: string
-    default: ./out
-    description: The folder in the repo that contains the artifacts to be deployed
 executor: base
 steps:
   - checkout
-  - when:
-      condition: <<parameters.use_docker_build>>
-      steps:
-        - config_docker
-        #using DOCKER_BUILDKIT=1 to output the files generated inside the build
-        - run:
-            name: build artifact
-            command: DOCKER_BUILDKIT=1 docker build -t deploy-to-s3 -o <<parameters.folder>> .
-        - store_artifacts:
-            path: <<parameters.folder>>
+  - config_docker
+  #using DOCKER_BUILDKIT=1 to output the files generated inside the build
+  - run:
+      name: build artifact
+      command: DOCKER_BUILDKIT=1 docker build -t deploy-to-s3 -o out .
+  - store_artifacts:
+      path: out/
   - aws-s3/sync:
-      from: <<parameters.folder>>
+      from: /home/circleci/project/out
       to: <<parameters.bucket>>
   - slack/notify:
       event: fail
