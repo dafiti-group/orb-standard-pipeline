@@ -19,8 +19,7 @@ parameters:
     description: |
       Extra arguments to command sam deploy
       Could be any options available in `sam deploy --help`
-machine:
-  image: ubuntu-2204:2022.07.1
+executor: machine
 steps:
   - checkout
   - config_git
