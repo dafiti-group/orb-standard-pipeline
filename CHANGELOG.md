@@ -6,6 +6,8 @@
 
 - Changed `unit-test` job to set custom executor (runner)
 - Changed `sam-deploy` job to set custom executor (runner)
+- Changed `deploy-to-s3` job to set custom executor (runner)
+- Changed `deploy-to-s3` job to include two new parameters so that it is possible to set up and deploy S3 artifacts without Docker build
 
 ### Added
 

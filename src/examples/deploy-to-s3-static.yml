@@ -1,0 +1,15 @@
+description: |
+  An example showing how to deploy some artifacts inside a S3 bucket without Docker Build
+usage:
+  version: 2.1
+  orbs:
+    dft: dafiti-group/orb-standard-pipeline@3.5.0
+  workflows:
+    deployment-flow:
+      jobs:
+        - dft/deploy-to-s3:
+            name: build-and-upload-qa
+            use_docker_build: false
+            folder: "./react-external-components"
+            bucket: "s3://dft-static-qa/react-external-components"
+            context: [DEFAULT, QA]
