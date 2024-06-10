@@ -4,7 +4,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.4.0
+    dft: dafiti-group/orb-standard-pipeline@3.5.0
   workflows:
     deployment-flow:
       jobs:

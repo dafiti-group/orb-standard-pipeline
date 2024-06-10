@@ -1,5 +1,22 @@
 # orb-standard-pipeline
 
+## `[3.5.0 2024-06-10]`
+
+### Changes
+
+- Changed `unit-test` job to set custom executor (runner)
+- Changed `sam-deploy` job to set custom executor (runner)
+
+### Added
+
+- Include new `executor` type `machine` to execute jobs in machines
+
+### Removed
+
+N\A
+
+___
+
 ## `[3.4.0 2024-02-19]`
 
 ### Changes
