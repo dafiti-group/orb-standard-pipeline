@@ -67,14 +67,7 @@ usage:
             s3-bucket: dft-qa-repo
             context: [DEFAULT, QA]
             filters: *deployment_filters
-            requires:
-              [
-                unit-test,
-                sonarqube,
-                sam-validate-template,
-                approve-to-qa,
-                start-to-qa,
-              ]
+            requires: [unit-test, sonarqube, sam-validate-template, approve-to-qa, start-to-qa]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
