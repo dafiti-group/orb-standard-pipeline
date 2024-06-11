@@ -1,5 +1,25 @@
 # orb-standard-pipeline
 
+## `[3.5.0 2024-06-10]`
+
+### Changes
+
+- Changed `unit-test` job to set custom executor (runner)
+- Changed `sam-deploy` job to set custom executor (runner)
+- Changed `deploy-to-s3` job to set custom executor (runner)
+- Changed `deploy-to-s3` job to include two new parameters so that it is possible to set up and deploy S3 artifacts without Docker build
+
+### Added
+
+- Include new `executor` type `machine` to execute jobs in machines
+- Include `arguments` parameter in `deploy-to-s3` job
+
+### Removed
+
+N\A
+
+___
+
 ## `[3.4.0 2024-02-19]`
 
 ### Changes
