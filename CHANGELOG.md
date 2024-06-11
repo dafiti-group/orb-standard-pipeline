@@ -12,6 +12,7 @@
 ### Added
 
 - Include new `executor` type `machine` to execute jobs in machines
+- Include `arguments` parameter in `deploy-to-s3` job
 
 ### Removed
 

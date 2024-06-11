@@ -14,6 +14,9 @@ parameters:
     type: string
     default: ./out
     description: The folder in the repo that contains the artifacts to be deployed
+  arguments:
+    type: string
+    description: Arguments to be used in S3 aws-s3/sync
   runner:
     type: executor
     default: base
@@ -61,6 +64,7 @@ steps:
   - aws-s3/sync:
       from: <<parameters.folder>>
       to: <<parameters.bucket>>
+      arguments: <<parameters.arguments>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
