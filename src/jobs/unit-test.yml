@@ -83,7 +83,7 @@ steps:
         - persist_to_workspace:
             root: .
             paths:
-            - <<parameters.coverage_file>>
+              - <<parameters.coverage_file>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
