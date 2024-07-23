@@ -7,7 +7,24 @@ parameters:
   services:
     type: string
     default: ""
-    description: Use to include additional docker-compose services to build
+    description: |
+      Use to include additional docker-compose services to build ex:
+      ```yaml
+      # docker-compose.yaml
+      services:
+        ci:
+          # ...
+        ci_database:
+          image: my-project-customized-database
+          build:
+            # ...
+      ```
+      Then use on your pipline
+      ```yaml
+        dft/unit-test:
+          context: [DEFAULT]
+          services: ci_database # only extra services
+      ```
   build_args:
     type: string
     default: ""
