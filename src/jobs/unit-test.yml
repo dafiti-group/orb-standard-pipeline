@@ -4,10 +4,10 @@ description: |
   Needs:
     context: [DEFAULT]
 parameters:
-  build_extra_services:
+  services:
     type: string
     default: ""
-    description: Use to include more than ci service to build
+    description: Use to include additional docker-compose services to build
   build_args:
     type: string
     default: ""
@@ -66,7 +66,10 @@ steps:
       command: docker network create docker-dafiti_default || true
   - run:
       name: Build ci image test
-      command: docker-compose build <<parameters.build_args>> ci <<parameters.build_extra_services>>
+      environments:
+        SERVICES: <<parameters.services>>
+        BUILD_ARGS: <<parameters.build_args>>
+      command: docker-compose build ${BUILD_ARGS} ci ${SERVICES}
   - run:
       name: Run unit tests
       command: docker-compose run --name dafiti_ci ci
