@@ -4,6 +4,27 @@ description: |
   Needs:
     context: [DEFAULT]
 parameters:
+  services:
+    type: string
+    default: ""
+    description: |
+      Use to include additional docker-compose services to build ex:
+      ```yaml
+      # docker-compose.yaml
+      services:
+        ci:
+          # ...
+        ci_database:
+          image: my-project-customized-database
+          build:
+            # ...
+      ```
+      Then use on your pipline
+      ```yaml
+        dft/unit-test:
+          context: [DEFAULT]
+          services: ci_database # only extra services
+      ```
   build_args:
     type: string
     default: ""
@@ -62,7 +83,10 @@ steps:
       command: docker network create docker-dafiti_default || true
   - run:
       name: Build ci image test
-      command: docker-compose build <<parameters.build_args>> ci
+      environments:
+        SERVICES: <<parameters.services>>
+        BUILD_ARGS: <<parameters.build_args>>
+      command: docker-compose build ${BUILD_ARGS} ci ${SERVICES}
   - run:
       name: Run unit tests
       command: docker-compose run --name dafiti_ci ci
@@ -76,7 +100,7 @@ steps:
         - persist_to_workspace:
             root: .
             paths:
-            - <<parameters.coverage_file>>
+              - <<parameters.coverage_file>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
