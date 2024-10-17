@@ -1,0 +1,42 @@
+description: |
+  Used to get image tag from origin environment to replace into target environment
+  Needs:
+    context: [DEFAULT, CL_LIVE|CO_LIVE]
+parameters:
+  gitops:
+    type: string
+    default: ncharts
+    description: The repo name to clone deployments to change image tags
+  project_name:
+    type: string
+    default: ${CIRCLE_PROJECT_REPONAME}
+    description: The repo name to clone deployments to change image tags
+  country:
+    type: string
+    default: ${COUNTRY}
+    description: The repo name to clone deployments to change image tags
+  use_yq:
+    type: boolean
+    default: true
+    description: |
+      Flag to use yq command to replace image tag instead of sed command
+      WARNING: use only if your project is using kustomization file!
+executor: base
+steps:
+  - config_git
+  - clone_ncharts:
+    ncharts: <<parameters.gitops>>
+  - run:
+      name: Promote image from <<parameters.project_name>>/values.<<parameters.country>>.preprod.yaml to <<parameters.project_name>>/values.<<parameters.country>>.production.yaml
+      environment:
+        PARAMETER_START_FOLDER: <<parameters.gitops>>
+        PARAMETER_ORIGIN_FILE: "<<parameters.project_name>>/values.<<parameters.country>>.preprod.yaml"
+        PARAMETER_DESTINY_FILE: "<<parameters.project_name>>/values.<<parameters.country>>.production.yaml"
+        PARAMETER_USE_YQ: <<parameters.use_yq>>
+      command: <<include(scripts/gitlab-promote.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>
+  - slack/notify:
+      event: pass
+      custom: <<include(templates/success.json)>>

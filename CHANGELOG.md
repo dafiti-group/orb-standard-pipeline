@@ -1,5 +1,84 @@
 # orb-standard-pipeline
 
+## `[3.5.0 2024-06-10]`
+
+### Changes
+
+- Changed `unit-test` job to set custom executor (runner)
+- Changed `sam-deploy` job to set custom executor (runner)
+- Changed `deploy-to-s3` job to set custom executor (runner)
+- Changed `deploy-to-s3` job to include two new parameters so that it is possible to set up and deploy S3 artifacts without Docker build
+
+### Added
+
+- Include new `executor` type `machine` to execute jobs in machines
+- Include `arguments` parameter in `deploy-to-s3` job
+
+### Removed
+
+N\A
+
+___
+
+## `[3.4.0 2024-02-19]`
+
+### Changes
+
+- Changed default repo from argo to gitops in `commands/clone_gitops.yaml`.
+- Included gitlab's git configuration in scripts `config_git`.
+- Include `git pull --rebase` in promote jobs to prevent conflicts on `push`
+
+### Added
+
+- Added job `eks-deploy-gitlab`. It just change the image tag in `ncharts` repository on gitlab.
+- Added job `eks-promote-gitlab`. It promotes the tag in preprod to prod file.
+- Added commands `clone_ncharts` to download the gilab ncharts repo.
+- Added Country in `grafana-notify` script.
+
+### Removed
+
+N\A
+
+___
+
+
+## `[3.3.0 2024-01-18]`
+
+### Changes
+
+- Changed the command `config_docker` version `src/commands/config_docker.yml`
+- Changed the version `docker_version` to setup build in job `ecr-build-and-push`
+
+### Added
+
+- Added variables `path` and `no_output_timeout` in job `ecr-build-and-push`
+
+### Removed
+
+N\A
+
+___
+
+
+## `[3.2.0 2023-11-08]`
+
+### Changes
+
+- New executor `arn` to be used in `ecr-build-and-push`
+- Update `job ecr-build-and-push` including a new parameter `docker_version` to setup custom docker versions
+- Update command `config_docker`  including a new parameter `version` to setup docker context
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
+
+
 ## `[3.1.2 2023-07-24]`
 
 ### Changes
@@ -216,7 +295,7 @@ ___
   The `eks-promote` job will automatically get the `image.tag` from `gitops/apps/${COUNTRY}/${CIRCLE_PROJECT_REPONAME}/qa/kustomization.yaml` to replace in `gitops/apps/${COUNTRY}/${CIRCLE_PROJECT_REPONAME}/live/kustomization.yaml`. There are more variables to handle this job like:
   | parameter     | type     | description                                                |
   | :------------ | :------- | :--------------------------------------------------------- |
-  | `app_name`    | `string` | Default is env `$CIRCLE_PROJECT_REPONAME`                |
+  | `app_name`    | `string` | Default is env `$CIRCLE_PROJECT_REPONAME`                  |
   | `origin_env`  | `string` | Default is `qa`, the folder name where to get `image.tag`  |
   | `destiny_env` | `string` | Default `live`, the folder name where to place `image.tag` |
   | `origin`      | `string` | Override all path creation to get the `image.tag` from     |

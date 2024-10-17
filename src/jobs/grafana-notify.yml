@@ -2,7 +2,7 @@ description: |
   Default grafana notify.
 
   Needs:
-    context: [DEFAULT]
+    context: [DEFAULT, CL_QA|CO_QA|CL_LIVE|CO_LIVE]
 
   Read more in: https://argocd-notifications.readthedocs.io/en/stable/services/grafana/
 parameters:

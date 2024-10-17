@@ -1,5 +1,11 @@
 description: Used to setup all dockers with same configurations
+parameters:
+  version:
+    type: string
+    description: The docker version to setup builds, Find more at <https://circleci.com/docs/building-docker-images/#docker-version>
+    default: "default"
+
 steps:
   - setup_remote_docker:
       docker_layer_caching: false
-      version: 20.10.14
+      version: <<parameters.version>>
