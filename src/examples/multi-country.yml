@@ -1,5 +1,5 @@
 description: |
-  This workflow example is used only to deploys in 2 environments: [qa, live]
+  This workflow example is used when your application runs in br cl co
   This example assume that your application is already using docker-compose run --rm ci to unit test everything!
   In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
   in your project settings or in your organization context, with the name of your team
