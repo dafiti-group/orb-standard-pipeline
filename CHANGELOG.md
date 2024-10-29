@@ -5,6 +5,7 @@
 ### Changes
 
 - `eks-deploy` job change argument `country` now using the environment `COUNTRY`.
+- `eks-promote` job change argument `country` now using the environment `COUNTRY`.
 
 ### Added
 
