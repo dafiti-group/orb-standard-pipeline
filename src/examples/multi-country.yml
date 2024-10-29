@@ -42,23 +42,21 @@ usage:
           - equal: [true, <<pipeline.parameters.rollback>>]
       jobs:
         - dft/eks-deploy:
-            name: rollback-br
+            name: rollback-live-br
             context: [DEFAULT, LIVE]
             rollback: true
             version: <<pipeline.parameters.version>>
             filters: *head_filters
-        - dft/eks-deploy-gitlab:
-            name: rollback-co
+        - dft/eks-deploy:
+            name: rollback-live-co
             context: [DEFAULT, CO_LIVE]
             rollback: true
-            app_env: production
             version: <<pipeline.parameters.version>>
             filters: *head_filters
-        - dft/eks-deploy-gitlab:
-            name: rollback-cl
+        - dft/eks-deploy:
+            name: rollback-live-cl
             context: [DEFAULT, CL_LIVE]
             rollback: true
-            app_env: production
             version: <<pipeline.parameters.version>>
             filters: *head_filters
     deployment-flow:
@@ -70,11 +68,15 @@ usage:
         - dft/unit-test:
             name: unit-test
             context: [DEFAULT]
+            has_coverage: true
+            coverage_file: profile.cov
             filters: *test_filters
         - dft/sonarqube:
             name: sonarqube
             context: [DEFAULT]
+            has_coverage: true
             filters: *test_filters
+            requires: [unit-test]
         # ===============================================================================================================
         # releases ======================================================================================================
         - dft/hold-slack:
@@ -124,9 +126,8 @@ usage:
             type: approval
             filters: *deployment_filters
             requires: [ecr-build-and-push]
-        - dft/eks-deploy-gitlab:
+        - dft/eks-deploy:
             name: deploy-to-co-qa
-            app_env: preprod
             context: [DEFAULT, CO_QA]
             requires: [approve-deploy-to-co-qa]
         # ===============================================================================================================
@@ -136,12 +137,10 @@ usage:
             type: approval
             filters: *deployment_filters
             requires: [ecr-build-and-push]
-        - dft/eks-deploy-gitlab:
+        - dft/eks-deploy:
             name: deploy-to-cl-qa
-            app_env: preprod
             context: [DEFAULT, CL_QA]
-            requires: [approve-deploy-to-cl-qa, deploy-to-co-qa]
-
+            requires: [approve-deploy-to-cl-qa]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
@@ -159,7 +158,6 @@ usage:
             context: [DEFAULT]
             step_name: "Pipeline waiting approval to promote to live"
             filters: *head_filters
-            requires: [git-force-update]
         # ===============================================================================================================
         # Promote qa to live BR
         - approval:
@@ -178,6 +176,7 @@ usage:
         - dft/grafana-notify:
             name: grafana-notify-br-live
             context: [DEFAULT]
+            target_env: live
             requires: [promote-br-live]
         # ===============================================================================================================
         # Promote qa to live CO
@@ -186,10 +185,10 @@ usage:
             type: approval
             filters: *head_filters
             requires: [git-force-update]
-        - dft/eks-promote-gitlab:
+        - dft/eks-promote:
             name: eks-promote-co-live
-            context: [DEFAULT, CO_LIVE]
             requires: [approve-deploy-co-live]
+            context: [DEFAULT, CO_LIVE]
         - dft/instana-notify:
             name: instana-notify-live
             context: [DEFAULT, CO_LIVE]
@@ -197,6 +196,7 @@ usage:
         - dft/grafana-notify:
             name: grafana-notify-co-live
             context: [DEFAULT, CO_LIVE]
+            target_env: live
             requires: [eks-promote-co-live]
         # ===============================================================================================================
         # Promote qa to live CL
@@ -205,7 +205,7 @@ usage:
             type: approval
             filters: *head_filters
             requires: [git-force-update]
-        - dft/eks-promote-gitlab:
+        - dft/eks-promote:
             name: eks-promote-cl-live
             context: [DEFAULT, CL_LIVE]
             requires: [approve-deploy-cl-live]
@@ -216,5 +216,6 @@ usage:
         - dft/grafana-notify:
             name: grafana-notify-cl-live
             context: [DEFAULT, CL_LIVE]
+            target_env: live
             requires: [eks-promote-cl-live]
         # ===============================================================================================================
