@@ -23,6 +23,13 @@ if [ ! -f "${DESTINY_FILE}" ]; then
   exit 1
 fi
 
+echo "
+===================================
+Origin: ${ORIGIN_FILE}
+Destiny: ${DESTINY_FILE}
+===================================
+"
+
 if [ "${PARAMETER_USE_YQ}" -eq "1" ]; then
   TAG=$(yq '.helmCharts[0].valuesInline.image.tag' ${ORIGIN_FILE})
   echo "Using YQ and new tag is:${TAG}"

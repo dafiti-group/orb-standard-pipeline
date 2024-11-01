@@ -5,7 +5,7 @@ description: |
 parameters:
   country:
     type: string
-    default: br
+    default: ${COUNTRY}
     description: The name of the country folder inside gitops repo
   app_name:
     type: string

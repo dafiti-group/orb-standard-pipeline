@@ -1,5 +1,50 @@
 # orb-standard-pipeline
 
+## `[3.7.0 2024-10-29]`
+
+### Changes
+
+- `eks-deploy` job change argument `country` now using the environment `COUNTRY`.
+- `eks-promote` job change argument `country` now using the environment `COUNTRY`.
+
+### Added
+
+- `examples` of pipeline using `gitops` to deploy multi-country
+
+### Removed
+
+N\A
+
+___
+
+
+## `[3.6.0 2024-08-23]`
+
+### Changes
+
+- `unit-test` job include a extra argument `services` to include more items to be build on unit-testing context. The arg type is a `string` and should separate with `spaces`. Ex:
+
+    ```yaml
+    version: 2.1
+    workflows:
+      deployment-flow:
+        jobs:
+          - dft/unit-test:
+              name: unit-test
+              services: "flyway_test mysql_test"
+    ```
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
+
+
 ## `[3.5.0 2024-06-10]`
 
 ### Changes

@@ -15,7 +15,12 @@ if [ ! -f "${CONFIG_FILE}" ]; then
   echo "file ${LOCAL_DEPLOYMENT_PATH}/${CONFIG_FILE} not found!"
   exit 1
 fi
-
+echo "
+===================================
+file to change: ${LOCAL_DEPLOYMENT_PATH}/${CONFIG_FILE}
+new tag: ${IMAGE}
+===================================
+"
 if [ "${PARAMETER_USE_YQ}" -eq "1" ]; then
   echo "Using YQ and new tag is: ${IMAGE}"
   yq -i ".helmCharts[0].valuesInline.image.tag = \"${IMAGE}\"" $CONFIG_FILE

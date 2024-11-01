@@ -1,3 +1,3 @@
 description: golang executor
 docker:
-  - image: cimg/go:1.18
+  - image: cimg/go:1.22
