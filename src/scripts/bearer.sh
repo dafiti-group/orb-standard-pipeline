@@ -17,8 +17,8 @@ touch $GITHUB_OUTPUT
 
 echo "==========================================================="
 echo "installing bearer scanner"
-if [[ ! -z "$VERSION" ]]; then
-  VERSION="v${VERSION#v}"
+if [[ ! -z "$BEARER_VERSION" ]]; then
+  BEARER_VERSION="v${BEARER_VERSION#v}"
 fi
 curl -sfL https://raw.githubusercontent.com/Bearer/bearer/main/contrib/install.sh | sh -s -- -b "$RUNNER_TEMP" "$VERSION"
 echo "==========================================================="
@@ -47,7 +47,7 @@ echo "exit_code=$SCAN_EXIT_CODE" >>$GITHUB_OUTPUT
 
 echo "==========================================================="
 echo "sending report to PR"
-cat ${BEARER_OUTPUT} | reviewdog -f=rdjson -reporter=github-pr-review -level=debug
+cat ${GITHUB_OUTPUT} | reviewdog -f=rdjson -reporter=github-pr-review -level=debug
 echo "==========================================================="
 
 exit $SCAN_EXIT_CODE
