@@ -6,12 +6,18 @@ SHA=${CIRCLE_SHA1}
 export CI_COMMIT==${CIRCLE_SHA1}
 export CI_REPO_OWNER=${CIRCLE_PROJECT_USERNAME}
 export CI_REPO_NAME=${CIRCLE_PROJECT_REPONAME}
+
+# export CI_COMMIT=="teste"
+# export CI_REPO_OWNER="golang-template-project"
+# export CI_REPO_NAME="golang-template-project"
+
 CURRENT_BRANCH=${CIRCLE_BRANCH}
 DEFAULT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 RUNNER_TEMP=/tmp/bearer_scanner/
 GITHUB_OUTPUT=/tmp/output.json
+BEARER_PATH="."
 export REVIEWDOG_GITHUB_API_TOKEN=${GITHUB_TOKEN}
-# export REVIEWDOG_TOKEN=${GITHUB_TOKEN}
+export REVIEWDOG_TOKEN=${GITHUB_TOKEN}
 
 touch $GITHUB_OUTPUT
 
@@ -20,7 +26,7 @@ echo "installing bearer scanner"
 if [[ ! -z "$BEARER_VERSION" ]]; then
   BEARER_VERSION="v${BEARER_VERSION#v}"
 fi
-curl -sfL https://raw.githubusercontent.com/Bearer/bearer/main/contrib/install.sh | sh -s -- -b "$RUNNER_TEMP" "$VERSION"
+curl -sfL https://raw.githubusercontent.com/Bearer/bearer/main/contrib/install.sh | sh -s -- -b "$RUNNER_TEMP" "$BEARER_VERSION"
 echo "==========================================================="
 echo "installing reviewdoc cli"
 curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh| sh -s -- -b ~/go/bin
@@ -32,22 +38,40 @@ if [ ! -z "${CIRCLE_PULL_REQUEST}" ]; then
 fi
 export CI_PULL_REQUEST
 
-RULE_BREACHES=$($RUNNER_TEMP/bearer scan ${BEARER_PATH})
+echo "==========================================================="
+echo "running bearer scan"
+echo "********************************"
+echo "RUNNER_TEMP: " ${RUNNER_TEMP}
+echo "BEARER_PATH: " ${BEARER_PATH}
+echo "listando arquivos"
+ls -la ${BEARER_PATH}
+echo "********************************"
+# RULE_BREACHES=$($RUNNER_TEMP/bearer scan ${BEARER_PATH})
+$RUNNER_TEMP/bearer scan ${BEARER_PATH} > output.json
+echo "==========================================================="
+echo "bearer scan completed"
+echo "output"
+cat output.json
+echo "outpu end"
+echo $RULE_BREACHES
+
+echo "BEARER_EXIT_CODE: "${BEARER_EXIT_CODE}
 SCAN_EXIT_CODE=${BEARER_EXIT_CODE}
 
-echo "::debug::$RULE_BREACHES"
+# echo "::debug::$RULE_BREACHES"
 
-EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+# EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
 
-echo "rule_breaches<<$EOF" >>$GITHUB_OUTPUT
-echo "$RULE_BREACHES" >>$GITHUB_OUTPUT
-echo "$EOF" >>$GITHUB_OUTPUT
+# echo "rule_breaches<<$EOF" >>$GITHUB_OUTPUT
+# echo "$RULE_BREACHES" >>$GITHUB_OUTPUT
+# echo "$EOF" >>$GITHUB_OUTPUT
 
-echo "exit_code=$SCAN_EXIT_CODE" >>$GITHUB_OUTPUT
+# echo "exit_code=$SCAN_EXIT_CODE" >>$GITHUB_OUTPUT
 
 echo "==========================================================="
 echo "sending report to PR"
-cat ${GITHUB_OUTPUT} | reviewdog -f=rdjson -reporter=github-pr-review -level=debug
+cat ${GITHUB_OUTPUT}
+# cat ${GITHUB_OUTPUT} | reviewdog -f=rdjson -reporter=github-pr-review -level=debug
 echo "==========================================================="
 
 exit $SCAN_EXIT_CODE
