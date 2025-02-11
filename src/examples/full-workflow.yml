@@ -17,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.7.0
+    dft: dafiti-group/orb-standard-pipeline@3.8.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -61,11 +61,10 @@ usage:
             name: sonarqube
             context: [DEFAULT]
             filters: *test_filters
-        # Aguardando aprovação
-        # - dft/checkmarx:
-        #     name: checkmarx
-        #     context: [DEFAULT]
-        #     filters: *test_filters
+        - dft/bearer:
+            name: bearer
+            context: [DEFAULT]
+            filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
