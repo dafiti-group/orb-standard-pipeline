@@ -30,7 +30,6 @@ usage:
         - dft/bearer:
             name: bearer
             context: [DEFAULT]
-            filters: *test_filters
         # ===============================================================================================================
         - dft/ecr-build-and-push:
             name: build-and-push
