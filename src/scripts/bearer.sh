@@ -7,6 +7,14 @@ DEFAULT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 RUNNER_TEMP=/tmp
 export REVIEWDOG_GITHUB_API_TOKEN=${GITHUB_TOKEN}
 
+echo "================================================"
+echo "Validation Envs"
+echo "SHA" $SHA
+echo "CURRENT_BRANCH" $CURRENT_BRANCH
+echo "DEFAULT_BRANCH" $DEFAULT_BRANCH
+echo ""
+
+
 echo "==========================================================="
 echo "installing bearer scanner"
 
