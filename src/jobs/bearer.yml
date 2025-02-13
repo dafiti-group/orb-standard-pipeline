@@ -1,16 +1,26 @@
 description: "Bearer Security scanner"
+parameters:
+  severity:
+    description: "Specify which severities are included in the report as a comma separated string. Exemplo: critical,high"
+    default: ""
+    type: string
+  exit_code:
+    description: "Forces the exit-code when errors are reported"
+    default: "0"
+    type: string
+  path:
+    description: "The path to scan"
+    default: "."
+    type: string
 executor: machine
 steps:
   - checkout
   - config_git
+  - github-cli/setup
   - run:
-      name: Install Bearer and dependencies
+      name: install and run bearer scanner
+      environment:
+        BEARER_EXIT_CODE: <<parameters.exit_code>>
+        BEARER_SEVERITY: <<parameters.severity>>
+        BEARER_PATH: <<parameters.path>>
       command: <<include(scripts/bearer.sh)>>
-  - run:
-      name: Run Bearer scan
-      command: /tmp/bearer scan . --diff --format=rdjson --output=rd.json || export BEARER_EXIT=$?
-  - run:
-      name: Run ReviewDog (comment PR)
-      command: |
-        cat rd.json | /tmp/reviewdog -f=rdjson -reporter=github-pr-review
-        exit $BEARER_EXIT
