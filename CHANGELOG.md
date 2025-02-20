@@ -1,5 +1,22 @@
 # orb-standard-pipeline
 
+## `[3.8.0 2025-02-11]`
+
+### Changes
+
+N/A
+
+### Added
+
+- Add a job bearer for a SAST scan that comments on the PR with a description and resolution of the vulnerability.
+
+### Removed
+
+- Remove example to `deploy-latam.yaml` with jobs that delivery in GITLAB.
+
+___
+
+
 ## `[3.7.0 2024-10-29]`
 
 ### Changes
