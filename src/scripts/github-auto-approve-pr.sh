@@ -8,7 +8,8 @@ if [[ "${LOCAL_PR_AUTHOR}" == "${LOCAL_PARSED_BOT_NAME}" ]]; then
   LOCAL_ACTION="approved"
   gh pr review --approve --body ":robot: This PR is ready to merge! :rocket:"
   echo "${LOCAL_STRING} ${LOCAL_ACTION}"
-
   echo "Closing PR"
   gh pr merge -s -d
+else
+  echo "Not elegible to auto-approve PR, diferent Author to automation bot"
 fi
