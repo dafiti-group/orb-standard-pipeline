@@ -1,5 +1,22 @@
 # orb-standard-pipeline
 
+## `[3.9.0 2025-03-06]`
+
+### Changes
+
+N/A
+
+### Added
+
+- New job to auto approve PRs.
+
+### Removed
+
+N/A
+
+___
+
+
 ## `[3.8.0 2025-02-11]`
 
 ### Changes

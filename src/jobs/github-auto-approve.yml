@@ -1,0 +1,22 @@
+description: |
+  Used to approve PR from BOT open
+  Needs:
+    context: [DEFAULT]
+executor: small
+parameters:
+  dft_bot_name:
+    type: string
+    default: ${DFT_BOT_NAME}
+    description: The name of the owner of the token GITHUB_TOKEN in the context DEFAULT
+steps:
+  - checkout
+  - config_git
+  - github-cli/setup
+  - run:
+      name: Check if this repo has open PRs
+      environment:
+        LOCAL_DFT_BOT_NAME: <<parameters.dft_bot_name>>
+      command: <<include(scripts/github-auto-approve-pr.sh)>>
+  - slack/notify:
+      event: fail
+      custom: <<include(templates/fail.json)>>

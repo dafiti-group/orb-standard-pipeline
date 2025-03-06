@@ -17,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.8.0
+    dft: dafiti-group/orb-standard-pipeline@3.9.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
