@@ -1,11 +1,19 @@
 #!/bin/bash
 
+INTERNAL_SAM_COMMAND="sam build"
+
+if [ "${PARAMETER_USE_CONTAINER}" -eq "1" ]; then
+  INTERNAL_SAM_COMMAND="sam build --use-container"
+fi
+
 if [[ -z "${PARAMETER_S3_BUCKET}" ]]; then
   echo "ENV PARAMETER_S3_BUCKET could not be empty!"
   exit 1
 fi
 
-sam build --use-container
+export CGO_ENABLED=0
+
+$INTERNAL_SAM_COMMAND
 
 cd .aws-sam/build || exit 1
 

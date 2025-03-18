@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.9.0
+    dft: dafiti-group/orb-standard-pipeline@4.0.0
   test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
@@ -27,18 +27,22 @@ usage:
             name: sam-validate-template
             context: [DEFAULT]
             filters: *test_filters
-        - dft/sam-test:
+        - dft/unit-test:
             name: unit-test
             context: [DEFAULT]
-            filters: *test_filters
-        - dft/sonarqube:
-            name: sonarqube
-            context: [DEFAULT]
+            has_coverage: true
+            coverage_file: profile.cov
             filters: *test_filters
         - dft/bearer:
             name: bearer
             context: [DEFAULT]
             filters: *test_filters
+        - dft/sonarqube:
+            name: sonarqube
+            context: [DEFAULT]
+            has_coverage: true
+            filters: *test_filters
+            requires: [unit-test]
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
@@ -55,18 +59,18 @@ usage:
             context: [DEFAULT]
             step_name: "The hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube, sam-validate-template]
+            requires: [sonarqube, sam-validate-template, bearer]
         - approval:
             name: approve-to-qa
             type: approval
             filters: *hotfix_filters
-            requires: [unit-test, sonarqube, sam-validate-template]
+            requires: [sonarqube, sam-validate-template, bearer]
         - dft/sam-deploy:
             name: deploy-to-qa
             s3-bucket: dft-qa-repo
             context: [DEFAULT, QA]
             filters: *deployment_filters
-            requires: [unit-test, sonarqube, sam-validate-template, approve-to-qa, start-to-qa]
+            requires: [approve-to-qa, start-to-qa]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
@@ -93,10 +97,6 @@ usage:
             s3-bucket: dft-live-repo
             context: [DEFAULT, LIVE]
             requires: [approve-deploy-live, git-force-update]
-        - dft/instana-notify:
-            name: instana-notify-live
-            context: [DEFAULT, LIVE]
-            requires: [deploy-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
             context: [DEFAULT]

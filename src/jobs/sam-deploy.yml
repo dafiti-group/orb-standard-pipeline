@@ -19,6 +19,10 @@ parameters:
     description: |
       Extra arguments to command sam deploy
       Could be any options available in `sam deploy --help`
+  use_container:
+    type: boolean
+    default: true
+    description: flag to use container as builder
 executor: machine
 steps:
   - checkout
@@ -30,6 +34,7 @@ steps:
         PARAMETER_S3_BUCKET: <<parameters.s3-bucket>>
         PARAMETER_EXTRA_PACKAGE_ARGS: <<parameters.extra_package_args>>
         PARAMETER_EXTRA_DEPLOY_ARGS: <<parameters.extra_deploy_args>>
+        PARAMETER_USE_CONTAINER: <<parameters.use_container>>
       command: <<include(scripts/sam-deploy.sh)>>
   - slack/notify:
       event: fail
