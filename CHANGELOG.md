@@ -1,19 +1,10 @@
 # orb-standard-pipeline
 
-## `[4.0.0 2025-03-18]`
+## `[3.10.0 2025-03-18]`
 
-**__BREAKIN_CHANGES__**
+Pipelinei context for lambdas using  `sam-deploy` has changes !
 
-Pipelinei context for lambdas using `sam-test` and `sam-deploy` has major changes ang behavior
-changes.
-
-Now the `sam-deploy` has parameter `use_container` to switch between `true/false` value and change `sam build` command behavior. 
-
-the job `sam-test` was deprecated and your application should use `unit-test` job using the default Docker behavior for unity testing and sonarqube coverage
-
-To adjust your pipeline, you need to create a `Dockerfile` and `docker-compose.yaml` file with service name `ci` to use job name `unit-test`
-
-Example pipeline shows the new pipeline layout to adopt.
+Now the `sam-deploy` has parameter `use_container` to switch between `true/false` value and change `sam build` command behavior.
 
 ### Changes
 
@@ -25,7 +16,7 @@ N\A
 
 ### Removed
 
-- `sam-test` This job was removed to stand only `unit-test` job using docker, removing stack knowledge from pipeline to Docker context
+N\A
 
 ___
 
