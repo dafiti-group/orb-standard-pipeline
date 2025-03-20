@@ -1,8 +1,6 @@
 description: >
   Needs:
-    - GITHUB_TOKEN with a personal access token into it
-    - GITHUB_USER_NAME
-    - GITHUB_USER_EMAIL
+    context: [DEFAULT]
 steps:
   - run:
       name: config git to use GITHUB_TOKEN
