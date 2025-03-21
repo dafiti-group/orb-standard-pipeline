@@ -1,5 +1,35 @@
 # orb-standard-pipeline
 
+## `[3.10.0 2025-03-18]`
+
+Pipelinei context for lambdas using  `sam-deploy` has changes !
+
+Now the `sam-deploy` has parameter `use_container` to switch between `true/false` value and change `sam build` command behavior.
+
+Deprecated jobs using Gitlab integrations removed
+
+### Changes
+
+- `sam-deploy` job has changes to fit new deployment standard
+- `config_git` command remove setup for gitlab
+
+### Added
+
+N\A
+
+### Removed
+
+- Commands:
+  - `clone_ncharts` deprecated command removed
+- Jobs:
+  - `eks-deploy-gitlab` deprecated Job removed
+  - `eks-promote-gitlab` deprecated Job removed
+- Scripts:
+  - `config-git.sh` removed configuration for GITLAB
+  - `gitlab-update` deprecated script removed
+
+___
+
 ## `[3.9.0 2025-03-06]`
 
 ### Changes
