@@ -1,0 +1,4 @@
+description: Machine kind executor in arm64 architecture
+machine:
+    image: ubuntu-2204:current
+    resource_class: arm.medium
