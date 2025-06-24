@@ -83,11 +83,21 @@ parameters:
       Path to the directory containing your Dockerfile and build context.
       Defaults to . (working directory).
     type: string
+  platform:
+    type: string
+    default: "linux/amd64"
+    description: |
+      Platform targets for the docker image, multi arch images. Ex. linux/amd64,linux/arm64
+  setup-remote-docker:
+    type: boolean
+    default: false
+    description: |
+        Setup and use CircleCI's remote Docker environment for Docker and docker-compose commands? Not required if using the default executor
 executor: <<parameters.runner>>
 steps:
   - checkout
-  - config_docker:
-      version: <<parameters.docker_version>>
+  # - config_docker:
+  #     version: <<parameters.docker_version>>
   - aws-ecr/ecr-login
   - rev_txt:
       rev_txt_path: <<parameters.rev_txt_path>>
@@ -101,6 +111,9 @@ steps:
       dockerfile: <<parameters.dockerfile>>
       no-output-timeout: <<parameters.no_output_timeout>>
       path: <<parameters.path>>
+      platform: <<parameters.platform>>
+      setup-remote-docker: <<parameters.setup-remote-docker>>
+      remote-docker-version: <<parameters.docker_version>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
