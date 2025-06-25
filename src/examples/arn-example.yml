@@ -2,7 +2,7 @@ description: This example show only how to setup the job ecr-build-and-push to u
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.10.0
+    dft: dafiti-group/orb-standard-pipeline@3.11.0
   workflows:
     deployment-flow:
       jobs:
