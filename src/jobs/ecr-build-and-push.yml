@@ -34,7 +34,7 @@ parameters:
     default: []
   runner:
     type: executor
-    default: base
+    default: machine
     description: |
       base image to run the pipeline
       Available options inside orb is [node, golang]
@@ -85,7 +85,7 @@ parameters:
     type: string
   platform:
     type: string
-    default: "linux/amd64"
+    default: "linux/amd64,linux/arm64"
     description: |
       Platform targets for the docker image, multi arch images. Ex. linux/amd64,linux/arm64
   setup-remote-docker:
