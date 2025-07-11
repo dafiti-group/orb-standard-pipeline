@@ -9,6 +9,7 @@ Include new architecture to deploy, build option `arm64`.
 - `ecr-build-and-push` update version and include new parameters to setup `platform` and run `config_docker` into this step
 - `orb dependency` update `circleci/aws-ecr@7.3.0` to `circleci/aws-ecr@8.2.1`
 - Enabled mult-arch build by default
+- Update Sonarqube image version to `latest`
 
 ### Added
 
