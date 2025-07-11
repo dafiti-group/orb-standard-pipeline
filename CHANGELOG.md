@@ -17,7 +17,7 @@ N\A
 
 ### Removed
 
-N\A
+Remove delivery to `CO` in example to deploy multi-country
 
 ___
 
