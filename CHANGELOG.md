@@ -1,5 +1,38 @@
 # orb-standard-pipeline
 
+## `[3.11.0 2025-06-24]`
+
+Include new architecture to deploy, build option `arm64`.
+
+### Changes
+
+- `ecr-build-and-push` update version and include new parameters to setup `platform` and run `config_docker` into this step
+- `orb dependency` update `circleci/aws-ecr@7.3.0` to `circleci/aws-ecr@8.2.1`
+- Enabled mult-arch build by default
+- Update Sonarqube image version to `latest`
+- `sam-deploy` update dependency orb  `circleci/aws-sam-serverless` from `3.0` to `3.3.0` to include job parameter `sam_cli_version` to arbitrary change SAM CLI version to install to void further problems with new cli versions, as in this [ISSUE](https://github.com/aws/aws-sam-cli/issues/8141) where `v1.142.0` crashes our pipeline. The default value still `latest` but it's possible to use like the example below:
+
+    ```yaml
+    version: 2.1
+    orbs:
+      dft: dafiti-group/orb-standard-pipeline@3.11.0
+    workflows:
+      example:
+        jobs:
+          - dft/sam-deploy:
+              sam_cli_version: v.1.141.0
+    ```
+
+### Added
+
+N\A
+
+### Removed
+
+Remove delivery to `CL` in example to deploy multi-country
+
+___
+
 ## `[3.10.0 2025-03-18]`
 
 Pipelinei context for lambdas using  `sam-deploy` has changes !

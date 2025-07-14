@@ -15,9 +15,9 @@ display:
 
 orbs:
   aws-cli: circleci/aws-cli@2.0.3 # needs context: [DEFAULT, (LIVE | QA | LIVE_AWS_DAFITI)]
-  aws-ecr: circleci/aws-ecr@7.3.0 # needs context: DEFAULT
+  aws-ecr: circleci/aws-ecr@8.2.1 # needs context: DEFAULT
   aws-s3: circleci/aws-s3@3.1 # needs context: [DEFAULT, (LIVE | QA | LIVE_AWS_DAFITI)]
-  sam: circleci/aws-sam-serverless@3.0 # needs context: [DEFAULT, (LIVE | QA | LIVE_AWS_DAFITI)]
+  sam: circleci/aws-sam-serverless@3.3.0 # needs context: [DEFAULT, (LIVE | QA | LIVE_AWS_DAFITI)]
   cxflow: checkmarx-ts/cxflow@1.0.6 # needs context: DEFAULT
   github-cli: circleci/github-cli@2.1.0 # needs one of  context: DEFAULT
   pipeline-feedback: instana/pipeline-feedback@2.0.3 # needs context: [DEFAULT, (LIVE | QA | LIVE_AWS_DAFITI)]

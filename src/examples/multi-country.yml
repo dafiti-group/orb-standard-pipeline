@@ -17,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.10.0
+    dft: dafiti-group/orb-standard-pipeline@3.11.0
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -50,12 +50,6 @@ usage:
         - dft/eks-deploy:
             name: rollback-live-co
             context: [DEFAULT, CO_LIVE]
-            rollback: true
-            version: <<pipeline.parameters.version>>
-            filters: *head_filters
-        - dft/eks-deploy:
-            name: rollback-live-cl
-            context: [DEFAULT, CL_LIVE]
             rollback: true
             version: <<pipeline.parameters.version>>
             filters: *head_filters
@@ -134,23 +128,12 @@ usage:
             name: deploy-to-co-qa
             context: [DEFAULT, CO_QA]
             requires: [approve-deploy-to-co-qa]
-        # ===============================================================================================================
-        # == CL QA DEPLOYMENT
-        - approval:
-            name: approve-deploy-to-cl-qa
-            type: approval
-            filters: *deployment_filters
-            requires: [ecr-build-and-push]
-        - dft/eks-deploy:
-            name: deploy-to-cl-qa
-            context: [DEFAULT, CL_QA]
-            requires: [approve-deploy-to-cl-qa]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
             name: dft-deploy-approve-pr
             context: [DEFAULT]
-            requires: [deploy-to-br-qa, deploy-to-co-qa, deploy-to-cl-qa]
+            requires: [deploy-to-br-qa, deploy-to-co-qa]
         # ===============================================================================================================
         # master & live delivery ========================================================================================
         - dft/github-update:
@@ -202,24 +185,4 @@ usage:
             context: [DEFAULT, CO_LIVE]
             target_env: live
             requires: [eks-promote-co-live]
-        # ===============================================================================================================
-        # Promote qa to live CL
-        - approval:
-            name: approve-deploy-cl-live
-            type: approval
-            filters: *head_filters
-            requires: [git-force-update]
-        - dft/eks-promote:
-            name: eks-promote-cl-live
-            context: [DEFAULT, CL_LIVE]
-            requires: [approve-deploy-cl-live]
-        - dft/instana-notify:
-            name: instana-notify-live
-            context: [DEFAULT, CL_LIVE]
-            requires: [eks-promote-cl-live]
-        - dft/grafana-notify:
-            name: grafana-notify-cl-live
-            context: [DEFAULT, CL_LIVE]
-            target_env: live
-            requires: [eks-promote-cl-live]
         # ===============================================================================================================
