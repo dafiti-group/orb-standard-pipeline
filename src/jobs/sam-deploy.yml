@@ -23,11 +23,16 @@ parameters:
     type: boolean
     default: true
     description: flag to use container as builder
+  sam_cli_version:
+    type: string
+    default: latest
+    description: SAM CLI version to be installed.
 executor: machine
 steps:
   - checkout
   - config_git
-  - sam/install
+  - sam/install:
+      version: <<parameters.sam_cli_version>>
   - run:
       name: Deploy lambda funcion
       environment:
