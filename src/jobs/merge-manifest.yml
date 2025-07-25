@@ -3,6 +3,12 @@ description: |
   Needs:
     context: [DEFAULT]
 parameters:
+  build_tag:
+    type: string
+    default: "$(echo ${CIRCLE_SHA1:0:7})"
+    description: |
+      The artifact tag name or names comma separated
+      Default value is the first 7 characters of current commit tag
   runner:
     type: executor
     default: base
@@ -16,4 +22,6 @@ steps:
   - aws-ecr/ecr-login
   - run:
       name: Create merge Manifest
+      environment:
+              BUILD_TAG: <<parameters.build_tag>>
       command: <<include(scripts/merge-manifest.sh)>>
