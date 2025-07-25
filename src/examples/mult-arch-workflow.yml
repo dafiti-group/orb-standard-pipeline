@@ -1,9 +1,24 @@
 description: |
-  This example show how to pipeline to handle lambda deploys
+  This workflow example is used only to deploys in 2 environments: [qa, live]
+  This example assume that your application is already using docker-compose run --rm ci to unit test everything!
+  In order to be notifyed in slack channel, please setup an environment SLACK_MENTIONS,
+  in your project settings or in your organization context, with the name of your team
+  like @team or with a specific person id using <@USERID>
 usage:
   version: 2.1
+  parameters:
+    rollback:
+      type: boolean
+      default: false
+      description: Arbitraty parameter to trigger manually this workflow selecting rollback actions
+    version:
+      type: string
+      default: ""
+      description: The commit hash to revert deployment
+  # including dft org
   orbs:
     dft: dafiti-group/orb-standard-pipeline@3.11.1
+  # reserved filters anchors
   test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
@@ -19,30 +34,37 @@ usage:
   hotfix_filters: &hotfix_filters
     branches:
       only: [/^hotfix.*/]
+  # declaring your workflows
   workflows:
+    rollback-flow:
+      when:
+        or:
+          - equal: [true, <<pipeline.parameters.rollback>>]
+      jobs:
+        - dft/eks-deploy:
+            name: rollback-live
+            context: [DEFAULT, LIVE]
+            rollback: true
+            version: <<pipeline.parameters.version>>
+            filters: *head_filters
     deployment-flow:
+      when:
+        or:
+          - equal: [false, <<pipeline.parameters.rollback>>]
       jobs:
         # features & hotfix =============================================================================================
-        - dft/sam-validate:
-            name: sam-validate-template
-            context: [DEFAULT]
-            filters: *test_filters
         - dft/unit-test:
             name: unit-test
-            context: [DEFAULT]
-            has_coverage: true
-            coverage_file: profile.cov
-            filters: *test_filters
-        - dft/bearer:
-            name: bearer
             context: [DEFAULT]
             filters: *test_filters
         - dft/sonarqube:
             name: sonarqube
             context: [DEFAULT]
-            has_coverage: true
             filters: *test_filters
-            requires: [unit-test]
+        - dft/bearer:
+            name: bearer
+            context: [DEFAULT]
+            filters: *test_filters
         # ===============================================================================================================
         # releases & hotfixes ===========================================================================================
         - dft/hold-slack:
@@ -59,18 +81,37 @@ usage:
             context: [DEFAULT]
             step_name: "The hotfix is waiting your approval to deploy"
             filters: *hotfix_filters
-            requires: [sonarqube, sam-validate-template, bearer]
+            requires: [unit-test, sonarqube]
         - approval:
             name: approve-to-qa
             type: approval
             filters: *hotfix_filters
-            requires: [sonarqube, sam-validate-template, bearer]
-        - dft/sam-deploy:
-            name: deploy-to-qa
-            s3-bucket: dft-qa-repo
-            context: [DEFAULT, QA]
+            requires: [unit-test, sonarqube]
+        - dft/ecr-build-and-push:
+            name: ecr-build-and-push-arm64
+            runner: dft/base
+            platform: linux/arm64
+            build_tag: "$(echo ${CIRCLE_SHA1:0:7})-arm64,latest-arm64"
+            context: [DEFAULT]
             filters: *deployment_filters
-            requires: [approve-to-qa, start-to-qa]
+            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+        - dft/ecr-build-and-push:
+            name: ecr-build-and-push-amd64
+            runner: dft/base
+            platform: linux/amd64
+            build_tag: "$(echo ${CIRCLE_SHA1:0:7})-amd64,latest-amd64"
+            context: [DEFAULT]
+            filters: *deployment_filters
+            requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
+        - dft/merge-manifest:
+            name: merge-manifest
+            context: [DEFAULT]
+            filters: *deployment_filters
+            requires: [ecr-build-and-push-amd64, ecr-build-and-push-arm64]
+        - dft/eks-deploy:
+            name: deploy-to-qa
+            context: [DEFAULT, QA]
+            requires: [approve-to-qa, merge-manifest]
         # =============================================================================================================
         # github action to approve this release/hotfix PR to proceed
         - dft/github-approve:
@@ -92,14 +133,17 @@ usage:
             type: approval
             name: approve-deploy-live
             filters: *head_filters
-        - dft/sam-deploy:
-            name: deploy-to-live
-            s3-bucket: dft-live-repo
-            context: [DEFAULT, LIVE]
+        - dft/eks-promote:
+            name: promote-to-live
+            context: [DEFAULT]
             requires: [approve-deploy-live, git-force-update]
+        - dft/instana-notify:
+            name: instana-notify-live
+            context: [DEFAULT, LIVE]
+            requires: [promote-to-live]
         - dft/grafana-notify:
             name: grafana-notify-live
             context: [DEFAULT]
             target_env: live
-            requires: [deploy-to-live]
+            requires: [promote-to-live]
         # ===============================================================================================================
