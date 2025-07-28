@@ -1,5 +1,23 @@
 # orb-standard-pipeline
 
+## `[3.11.1 2025-07-25]`
+
+Change as appropriate to build multi-arch.
+
+### Changes
+
+- Example to multi-arch with 2 builds and 1 manifest index
+
+### Added
+
+- `merge-manifest` created to create a index in ECR to both architecture `arm64` and `amd64`
+
+### Removed
+
+N/A
+
+___
+
 ## `[3.11.0 2025-06-24]`
 
 Include new architecture to deploy, build option `arm64`.

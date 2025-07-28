@@ -1,0 +1,19 @@
+description: |
+  Merge manifest job to build and push docker image to AWS ECR
+  Needs:
+    context: [DEFAULT]
+parameters:
+  runner:
+    type: executor
+    default: base
+    description: |
+      base image to run the pipeline
+      To use a customized runner, see this documentation https://circleci.com/docs/reusing-config#executor
+      Use CircleCI images -> https://circleci.com/developer/images
+executor: <<parameters.runner>>
+steps:
+  - config_docker
+  - aws-ecr/ecr-login
+  - run:
+      name: Create merge Manifest
+      command: <<include(scripts/merge-manifest.sh)>>
