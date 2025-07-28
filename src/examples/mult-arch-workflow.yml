@@ -89,7 +89,7 @@ usage:
             requires: [unit-test, sonarqube]
         - dft/ecr-build-and-push:
             name: ecr-build-and-push-arm64
-            runner: dft/base
+            runner: dft/arm64
             platform: linux/arm64
             build_tag: "$(echo ${CIRCLE_SHA1:0:7})-arm64,latest-arm64"
             context: [DEFAULT]
@@ -97,7 +97,7 @@ usage:
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
         - dft/ecr-build-and-push:
             name: ecr-build-and-push-amd64
-            runner: dft/base
+            runner: dft/machine
             platform: linux/amd64
             build_tag: "$(echo ${CIRCLE_SHA1:0:7})-amd64,latest-amd64"
             context: [DEFAULT]
