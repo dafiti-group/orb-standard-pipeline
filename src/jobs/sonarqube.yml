@@ -4,6 +4,15 @@ description: |
   Needs:
     context: [DEFAULT]
 parameters:
+  checkout_method:
+    type: enum
+    default: full
+    enum: [blobless, full]
+    description: |
+      Method to checkout the code.
+      Available options are [blobless, full]
+      blobless: checkout the code using the git tag
+      full: checkout the code with full history
   runner:
     type: executor
     default: sonarqube
@@ -58,7 +67,8 @@ parameters:
 
 executor: <<parameters.runner>>
 steps:
-  - checkout
+  - checkout:
+      method: <<parameters.checkout_method>>
   - when:
       condition:
         equal: [true, <<parameters.has_coverage>>]
