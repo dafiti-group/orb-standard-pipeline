@@ -1,5 +1,27 @@
 # orb-standard-pipeline
 
+## `[3.11.2 2025-12-05]`
+
+### Changes
+
+- Job `sonarqube` now has a new parameter `checkout_method` to configure checkout step to always clone project with full history to prevent issues in SonarQube scan. The error log this new version fixes is:
+  
+  ```log
+  12:58:40.047 ERROR Error during SonarScanner CLI execution
+  java.lang.IllegalStateException: java.util.concurrent.ExecutionException: java.lang.IllegalStateException: org.eclipse.jgit.errors.MissingObjectException: Missing blob 4f0065563787d0bd03490ba7d3ae00059bd3d40a
+  ```
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
+
+
 ## `[3.11.1 2025-07-25]`
 
 Change as appropriate to build multi-arch.

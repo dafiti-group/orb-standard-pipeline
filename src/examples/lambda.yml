@@ -3,7 +3,7 @@ description: |
 usage:
   version: 2.1
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.11.1
+    dft: dafiti-group/orb-standard-pipeline@3.11.2
   test_filters: &test_filters
     branches:
       only: [/^feature.*/, /^hotfix.*/]
