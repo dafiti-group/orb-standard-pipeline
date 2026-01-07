@@ -3,6 +3,10 @@ description: |
   Needs:
     context: [DEFAULT]
 parameters:
+  app_name:
+    type: string
+    default: ${CIRCLE_PROJECT_REPONAME}
+    description: the name of the app. Default is ${CIRCLE_PROJECT_REPONAME}
   runner:
     type: executor
     default: base
@@ -16,4 +20,6 @@ steps:
   - aws-ecr/ecr-login
   - run:
       name: Create merge Manifest
+      environment:
+        PARAMETER_APP_NAME: <<parameters.app_name>>
       command: <<include(scripts/merge-manifest.sh)>>
