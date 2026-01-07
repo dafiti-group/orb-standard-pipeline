@@ -1,5 +1,21 @@
 # orb-standard-pipeline
 
+## `[3.11.3 2025-12-07]`
+
+### Changes
+
+- Added the `app_name` parameter to the `merge-manifest` job, allowing users to specify the application name when creating the manifest.
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+___
+
 ## `[3.11.2 2025-12-05]`
 
 ### Changes
