@@ -23,7 +23,14 @@ sam package \
   --s3-prefix ${CIRCLE_PROJECT_REPONAME} \
   --s3-bucket ${PARAMETER_S3_BUCKET} ${PARAMETER_EXTRA_PACKAGE_ARGS}
 
+# sam deploy \
+#   --template-file package.yaml \
+#   --stack-name ${CIRCLE_PROJECT_REPONAME} \
+#   --capabilities CAPABILITY_IAM  ${PARAMETER_EXTRA_DEPLOY_ARGS}
+
 sam deploy \
   --template-file package.yaml \
   --stack-name ${CIRCLE_PROJECT_REPONAME} \
-  --capabilities CAPABILITY_IAM  ${PARAMETER_EXTRA_DEPLOY_ARGS}
+  --capabilities CAPABILITY_IAM \
+  --image-repository "556684128444.dkr.ecr.us-east-1.amazonaws.com/fashion-agent"
+  #--image-repository ${ECR_REPOSITORY_URI} 
