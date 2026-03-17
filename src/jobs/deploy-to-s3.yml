@@ -17,6 +17,7 @@ parameters:
   arguments:
     type: string
     description: Arguments to be used in S3 aws-s3/sync
+    default: ""
   runner:
     type: executor
     default: base
@@ -48,6 +49,14 @@ parameters:
       ```
       To use a customized runner, see this documentation https://circleci.com/docs/reusing-config#executor
       Use CircleCI images -> https://circleci.com/developer/images
+  aws-access-key-id:
+    default: AWS_ACCESS_KEY_ID
+    description: aws access key id override
+    type: env_var_name
+  aws-secret-access-key:
+    default: AWS_SECRET_ACCESS_KEY
+    description: aws secret access key override
+    type: env_var_name
 executor: <<parameters.runner>>
 steps:
   - checkout
@@ -61,10 +70,13 @@ steps:
             command: DOCKER_BUILDKIT=1 docker build -t deploy-to-s3 -o <<parameters.folder>> .
         - store_artifacts:
             path: out/
-  - aws-s3/sync:
-      from: <<parameters.folder>>
-      to: <<parameters.bucket>>
-      arguments: <<parameters.arguments>>
+  - aws-cli/setup:
+      aws-access-key-id: <<parameters.aws-access-key-id>>
+      aws-secret-access-key: <<parameters.aws-secret-access-key>>
+  - run:
+      name: S3 Sync
+      command: |
+        aws s3 sync <<parameters.folder>> <<parameters.bucket>> <<parameters.arguments>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
