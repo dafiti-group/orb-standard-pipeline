@@ -69,7 +69,7 @@ steps:
             name: build artifact
             command: DOCKER_BUILDKIT=1 docker build -t deploy-to-s3 -o <<parameters.folder>> .
         - store_artifacts:
-            path: out/
+            path: <<parameters.folder>>
   - aws-cli/setup:
       aws-access-key-id: <<parameters.aws-access-key-id>>
       aws-secret-access-key: <<parameters.aws-secret-access-key>>
