@@ -75,8 +75,11 @@ steps:
       aws-secret-access-key: <<parameters.aws-secret-access-key>>
   - run:
       name: S3 Sync
-      command: |
-        aws s3 sync <<parameters.folder>> <<parameters.bucket>> <<parameters.arguments>>
+      environment:
+        PARAMETER_FOLDER: <<parameters.folder>>
+        PARAMETER_BUCKET: <<parameters.bucket>>
+        PARAMETER_ARGUMENTS: <<parameters.arguments>>
+      command: <<include(scripts/deploy-to-s3.sh)>>
   - slack/notify:
       event: fail
       custom: <<include(templates/fail.json)>>
