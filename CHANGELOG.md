@@ -1,5 +1,36 @@
 # orb-standard-pipeline
 
+## `[3.11.4 2026-03-17]`
+
+### Changes
+
+- **deploy-to-s3**: Replaced `circleci/aws-s3` orb `sync` command with a direct `aws-cli/setup` + `aws s3 sync` invocation.
+  - **Fix**: The upstream `aws-s3/sync` command wrapped the `arguments` parameter in quotes, causing multi-token arguments (e.g., `--endpoint-url <url>`) to be passed as a single string to the AWS CLI, resulting in `ParamValidation: Unknown options` errors.
+  - **Improvement**: Custom credentials (`aws-access-key-id`, `aws-secret-access-key`) are now properly forwarded through `aws-cli/setup`, enabling S3-compatible storage providers (e.g., Azion Edge Storage) to work correctly.
+
+  This refactor enables uploading artifacts to Azion Edge Storage (or any S3-compatible provider) by allowing custom credentials and endpoint configuration through the `arguments` parameter. Usage example:
+
+  ```yaml
+  - dft/deploy-to-s3:
+      context: [DEFAULT, QA]
+      aws-access-key-id: AZION_S3_ACCESS_KEY
+      aws-secret-access-key: AZION_S3_SECRET_KEY
+      arguments: --profile default --endpoint-url $AZION_S3_ENDPOINT
+      bucket: s3://bob-br-qa-data-storage/temporary_files/
+      use_docker_build: false
+      folder: app1
+  ```
+
+### Added
+
+N\A
+
+### Removed
+
+N\A
+
+
+
 ## `[3.11.3 2025-12-07]`
 
 ### Changes
