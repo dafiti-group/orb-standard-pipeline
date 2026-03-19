@@ -1,0 +1,23 @@
+description: |
+  Command used to purge AZION EDGE caching.
+  This command will purge the AZION edge cache for the specified url or pattern.
+  Needs:
+    context: [DEFAULT]
+parameters:
+  arguments:
+    type: string
+    description: |
+      The arguments to be passed to `azion purge` command. Ex: `--url https://example.com/image.jpg`
+      Available arguments are:
+        --wildcard=www.example.com/*
+        --urls=www.example.com,www.pudim.com
+        --cachekey=www.domain.com/@@cookie_name=cookie_value,www.domain.com/test.js
+executor: base
+steps:
+  - install-azion-cli
+  - run:
+      name: Purge AZION cache
+      command: <<include(scripts/azion-purge.sh)>>
+      environment:
+        PARAMETER_ARGUMENTS: <<parameters.arguments>>
+

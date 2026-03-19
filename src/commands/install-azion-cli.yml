@@ -1,0 +1,8 @@
+description: |
+  Install azion cli
+  Needs:
+    context: [DEFAULT]
+steps:
+  - run:
+      name: Install azion cli
+      command: <<include(scripts/install-azion-cli.sh)>>
