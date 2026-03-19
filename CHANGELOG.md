@@ -1,5 +1,69 @@
 # orb-standard-pipeline
 
+## `[3.11.5 2026-03-20]`
+
+### Changes
+
+N/A
+
+### Added
+
+- **New Azion CLI interface added**: Now you can use job `azion-purge` to invalidade edge caching
+
+example:
+
+```yaml
+- dft/azion-purge:
+    arguments: --urls=https://youcompany.com/static/content.ext
+```
+
+All available options on the original azion cli interface are availabe as follow:
+
+```sh
+Azion CLI 4.18.0
+
+DESCRIPTION
+  Deletes an object from the Cache or Tiered Cache layers before time-out
+
+SYNOPSIS
+  azion purge [flags]
+
+EXAMPLES
+  $ azion purge --wildcard "www.example.com/*"
+  $ azion purge --urls "www.example.com,www.pudim.com"
+  $ azion purge --cache-key "www.domain.com/@@cookie_name=cookie_value,www.domain.com/test.js"
+
+LOCAL OPTIONS
+      --cache-key string   Provides a list of URLs that must be purged from Azion Cache
+  -h, --help               Displays more information about the purge command
+      --layer string       Specifies the layer the purge will be executed. Possible values: 'cache' or 'tiered_cache' (default "edge_caching")
+      --urls string        Provides a list of URLs that must be purged from Azion Cache
+      --wildcard string    Specifies the Wildcard URL or Cache Key for the objects you want to purge. Only one Wildcard expression can be used per request.
+
+GLOBAL OPTIONS
+  -c, --config string      Sets the Azion configuration folder for the current command only, without changing persistent settings.
+  -d, --debug              Displays log at a debug level
+      --format string      Changes the output format passing the json value to the flag
+  -l, --log-level string   Set the logging level, "debug", "info", or "error". (default "info")
+      --no-color           Changes the output format passing the json value to the flag
+      --out string         Exports the output to the given <file_path/file_name.ext>
+  -s, --silent             Silences log completely; mostly used for automation purposes
+      --timeout int        Defines how much time in seconds the CLI will wait before timing out from the HTTP connection (default 50)
+  -t, --token string       Saves a given Personal Token locally to authorize CLI commands
+  -y, --yes                Answers all yes/no interactions automatically with yes
+
+LEARN MORE
+  Use 'azion <command> <subcommand> --help' for more information about a command
+
+```
+
+### Removed
+
+N\A
+
+___
+
+
 ## `[3.11.4 2026-03-17]`
 
 ### Changes
