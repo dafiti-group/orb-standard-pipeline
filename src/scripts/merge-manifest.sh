@@ -1,6 +1,20 @@
 #!/bin/bash
 
+echo "================================================"
+echo "CIRCLE_PROJECT_REPONAME: ${CIRCLE_PROJECT_REPONAME}"
+echo "PARAMETER_APP_NAME (raw): ${PARAMETER_APP_NAME}"
+echo "================================================"
+
+# Se PARAMETER_APP_NAME contém a string literal não resolvida, usa CIRCLE_PROJECT_REPONAME
+if echo "${PARAMETER_APP_NAME}" | grep -q 'CIRCLE_PROJECT_REPONAME'; then
+  PARAMETER_APP_NAME=${CIRCLE_PROJECT_REPONAME}
+fi
 PARAMETER_APP_NAME=${PARAMETER_APP_NAME:-${CIRCLE_PROJECT_REPONAME}}
+
+echo "APP_NAME (resolved): ${PARAMETER_APP_NAME}"
+echo "SHA_TAG: ${CIRCLE_SHA1:0:7}"
+echo "ECR_URL: ${AWS_ECR_ACCOUNT_URL}"
+echo "================================================"
 
 docker manifest create ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7} \
   ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-amd64 \
