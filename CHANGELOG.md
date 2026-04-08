@@ -1,5 +1,22 @@
 # orb-standard-pipeline
 
+## `[3.11.6 2025-06-11]`
+
+### Changes
+
+- **bearer**: Pinned Bearer scanner installation version (default `1.51.1`). Added new `bearer_version` parameter to the job, allowing version changes without publishing a new orb release.
+- **merge-manifest**: Fixed `invalid reference format: repository name must be lowercase` error caused by `app_name` parameter receiving `${CIRCLE_PROJECT_REPONAME}` as a literal string instead of the resolved environment variable value. Added fallback and debug logs to the script.
+
+### Added
+
+N/A
+
+### Removed
+
+N/A
+
+___
+
 ## `[3.11.5 2026-03-20]`
 
 ### Changes
