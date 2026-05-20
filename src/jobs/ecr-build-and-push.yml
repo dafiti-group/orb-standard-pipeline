@@ -15,6 +15,7 @@ parameters:
     type: string
     default: >-
       --build-arg GITHUB_TOKEN=${GITHUB_TOKEN}
+      --provenance=false
     description: |
       Extra docker build image parameters
       By default the GITHUB_TOKEN is already included, if you need to pass

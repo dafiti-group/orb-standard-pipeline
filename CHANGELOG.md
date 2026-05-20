@@ -1,5 +1,22 @@
 # orb-standard-pipeline
 
+## `[3.11.7 2026-05-20]`
+
+### Changes
+
+- **merge-manifest**: The `latest` manifest index is now created from the same images as the SHA tag (`${CIRCLE_SHA1:0:7}-amd64` and `${CIRCLE_SHA1:0:7}-arm64`), removing the need to publish `latest-amd64` and `latest-arm64` suffixed images. The `build_tag` parameters in the multi-arch example have been updated accordingly.
+- **ecr-build-and-push**: Added `--provenance=false` to `extra-build-args` to prevent Docker Buildx from generating a provenance attestation manifest, which was causing the multi-arch manifest merge to fail due to an unexpected extra manifest entry introduced by a Docker Buildx behavior change.
+
+### Added
+
+N/A
+
+### Removed
+
+N/A
+
+___
+
 ## `[3.11.6 2025-06-11]`
 
 ### Changes
