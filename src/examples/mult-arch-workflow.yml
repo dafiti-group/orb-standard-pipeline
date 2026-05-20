@@ -17,7 +17,7 @@ usage:
       description: The commit hash to revert deployment
   # including dft org
   orbs:
-    dft: dafiti-group/orb-standard-pipeline@3.11.6
+    dft: dafiti-group/orb-standard-pipeline@3.11.7
   # reserved filters anchors
   test_filters: &test_filters
     branches:
@@ -91,7 +91,7 @@ usage:
             name: ecr-build-and-push-arm64
             runner: dft/arm64
             platform: linux/arm64
-            build_tag: "$(echo ${CIRCLE_SHA1:0:7})-arm64,latest-arm64"
+            build_tag: "$(echo ${CIRCLE_SHA1:0:7})-arm64"
             context: [DEFAULT]
             filters: *deployment_filters
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
@@ -99,7 +99,7 @@ usage:
             name: ecr-build-and-push-amd64
             runner: dft/machine
             platform: linux/amd64
-            build_tag: "$(echo ${CIRCLE_SHA1:0:7})-amd64,latest-amd64"
+            build_tag: "$(echo ${CIRCLE_SHA1:0:7})-amd64"
             context: [DEFAULT]
             filters: *deployment_filters
             requires: [unit-test, sonarqube, approve-to-qa, start-to-qa]
