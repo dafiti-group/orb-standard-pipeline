@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eo pipefail
 
 echo "================================================"
 echo "CIRCLE_PROJECT_REPONAME: ${CIRCLE_PROJECT_REPONAME}"
@@ -16,21 +17,17 @@ echo "SHA_TAG: ${CIRCLE_SHA1:0:7}"
 echo "ECR_URL: ${AWS_ECR_ACCOUNT_URL}"
 echo "================================================"
 
-docker manifest create ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7} \
-  ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-amd64 \
-  ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-arm64
+IMAGE="${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}"
+SHA_TAG="${CIRCLE_SHA1:0:7}"
 
-docker manifest create ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:latest \
-  ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-amd64 \
-  ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-arm64
+# Usa buildx imagetools em vez de "docker manifest": suporta imagens publicadas
+# como OCI index (ex.: buildx com provenance/attestations habilitado), que o
+# "docker manifest create" nao trata e gera o erro "manifest blob unknown" no ECR.
+# A arquitetura de cada imagem e lida da propria imagem, sem precisar de annotate.
+docker buildx imagetools create \
+  --tag "${IMAGE}:${SHA_TAG}" \
+  --tag "${IMAGE}:latest" \
+  "${IMAGE}:${SHA_TAG}-amd64" \
+  "${IMAGE}:${SHA_TAG}-arm64"
 
-# Anota as arquiteturas para ambas as tags
-docker manifest annotate ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7} ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-amd64 --arch amd64
-docker manifest annotate ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7} ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-arm64 --arch arm64
-
-docker manifest annotate ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:latest ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-amd64 --arch amd64
-docker manifest annotate ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:latest ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}-arm64 --arch arm64
-
-# Publica ambos os manifests
-docker manifest push ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:${CIRCLE_SHA1:0:7}
-docker manifest push ${AWS_ECR_ACCOUNT_URL}/${PARAMETER_APP_NAME}:latest
+docker buildx imagetools inspect "${IMAGE}:${SHA_TAG}"
