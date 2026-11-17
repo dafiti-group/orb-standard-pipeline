@@ -20,6 +20,17 @@ jobs:
       - orb-standard-pipeline/config_docker
       - orb-standard-pipeline/config_git
       - orb-standard-pipeline/rev_txt
+  # Creates the vX.Y.Z tag from the latest CHANGELOG.md entry when a bump is merged into main.
+  # The tag push triggers a new pipeline that runs the production publish below.
+  # See docs/RELEASE.md
+  auto-tag:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Create release tag from CHANGELOG.md
+          command: bash .circleci/scripts/auto-tag.sh
 workflows:
   test-deploy:
     jobs:
@@ -29,6 +40,14 @@ workflows:
           context: [DEFAULT]
       - orb-tools/pack:
           filters: *filters
+      - auto-tag:
+          context: [DEFAULT]
+          requires:
+            - orb-tools/pack
+            - command-tests
+          filters:
+            branches:
+              only: main
       - orb-tools/publish:
           orb-name: dafiti-group/orb-standard-pipeline
           vcs-type: << pipeline.project.type >>
