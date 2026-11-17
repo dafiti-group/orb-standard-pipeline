@@ -1,5 +1,21 @@
 # orb-standard-pipeline
 
+## `[3.11.8 2026-11-17]`
+
+### Changes
+
+- **merge-manifest**: Fixed `manifest blob unknown: Images with digests [...] required for pushing image into repository [...] do not exist` error on `docker manifest push`. When the per-arch images (`-amd64`/`-arm64`) are published as an OCI index (e.g. Buildx provenance attestation enabled, which happens when `extra-build-args` is overridden without `--provenance=false`), `docker manifest create` referenced digests that do not exist in ECR. The script now uses `docker buildx imagetools create`, which supports both OCI indexes and plain manifests, creating the `${CIRCLE_SHA1:0:7}` and `latest` tags in a single call (architectures are read from the images, so `annotate` is no longer needed). Added `set -eo pipefail` and a final `imagetools inspect` for troubleshooting.
+
+### Added
+
+N/A
+
+### Removed
+
+N/A
+
+___
+
 ## `[3.11.7 2026-05-20]`
 
 ### Changes
