@@ -41,6 +41,13 @@ orbs:
         # dft/job-to-test-with:
 ```
 
+## Release
+
+Production versions (`@X.Y.Z`) are published only by `vX.Y.Z` git tags. On `main` the tag is created
+automatically from the latest `CHANGELOG.md` entry. To release, bump `CHANGELOG.md` and `src/examples` in your PR.
+
+See [docs/RELEASE.md](./docs/RELEASE.md) for the full flow, the manual fallback and troubleshooting.
+
 ## Others options
 
 ```sh
